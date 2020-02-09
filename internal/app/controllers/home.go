@@ -6,5 +6,5 @@ import (
 )
 
 func Home(res http.ResponseWriter, req *http.Request) {
-	template.Index(prepHtml(res, req), res)
+	template.Index(prepHtml(res, req, ""), res)
 }

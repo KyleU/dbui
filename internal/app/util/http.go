@@ -15,15 +15,17 @@ func NotFound(res http.ResponseWriter, _ *http.Request) {
 }
 
 type AppInfo struct {
-	Debug bool
-	Version string
+	AppName    string
+	Debug      bool
+	Version    string
 	CommitHash string
-	ConfigDir string
+	ConfigDir  string
 }
 
 type RequestContext struct {
 	AppInfo AppInfo
 	Routes  *mux.Router
+	Title string
 }
 
 func (r *RequestContext) Route(act string, pairs ...string) string {
@@ -34,11 +36,15 @@ func (r *RequestContext) Route(act string, pairs ...string) string {
 	return url.Path
 }
 
-func ExtractContext(req *http.Request) RequestContext {
-	r := req.Context().Value("routes")
-	ai := req.Context().Value("info")
+func ExtractContext(req *http.Request, title string) RequestContext {
+	ai := req.Context().Value("info").(AppInfo)
+	r := req.Context().Value("routes").(*mux.Router)
+	if title == "" {
+		title = ai.AppName
+	}
 	return RequestContext {
-		AppInfo: ai.(AppInfo),
-		Routes: r.(*mux.Router),
+		AppInfo: ai,
+		Routes: r,
+		Title: title,
 	}
 }

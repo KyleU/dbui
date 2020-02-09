@@ -5,7 +5,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-
 // Configure configures a root command.
 func Configure(rootCmd *cobra.Command, version string, commitHash string) {
 	var config string
@@ -16,6 +15,7 @@ func Configure(rootCmd *cobra.Command, version string, commitHash string) {
 	flags.BoolVarP(&verbose, "verbose", "v", false, "Verbose output")
 
 	info := util.AppInfo {
+		AppName: rootCmd.Use,
 		Debug: verbose,
 		Version: version,
 		CommitHash: commitHash,
