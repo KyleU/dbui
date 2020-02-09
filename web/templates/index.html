@@ -1,0 +1,42 @@
+<%: func Index(ctx util.RequestContext, w io.Writer) (int, error) %>
+
+<%~ "layout/basic.html" %>
+
+<%@ body { %>
+  <div class="uk-section uk-section-small">
+    <div class="uk-container">
+      <div>
+        <h1 class="uk-heading-hero">dbui</h1>
+        <div class="uk-text-lead">A work in progress</div>
+        <div class="uk-margin-top">
+          <div>
+            <h5>Settings</h5>
+            <table class="uk-table uk-table-divider uk-text-left">
+              <tbody>
+                <tr>
+                  <th>Config Directory</th>
+                  <td><%= ctx.AppInfo.ConfigDir %></td>
+                </tr>
+                <tr>
+                  <th>Version</th>
+                  <td><%= ctx.AppInfo.Version %></td>
+                </tr>
+                <tr>
+                  <th>Commit Hash</th>
+                  <td><%= ctx.AppInfo.CommitHash %></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <h5>Available Actions</h5>
+            <ul>
+              <li><a href="<%= ctx.Route("home") %>">Home</a></li>
+              <li><a href="<%= ctx.Route("sandbox.list") %>">Sandboxes</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% } %>

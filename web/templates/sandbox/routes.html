@@ -1,0 +1,14 @@
+<table>
+  <thead>
+    <tr>
+      <th>Routes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% for _, r := range util.ExtractRoutes(ctx.Routes) { %>
+    <tr>
+      <td><%= r %></td>
+    </tr>
+    <% } %>
+  </tbody>
+</table>

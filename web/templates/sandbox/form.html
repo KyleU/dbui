@@ -1,0 +1,23 @@
+<%: func SandboxForm(key string, ctx util.RequestContext, w io.Writer) (int, error) %>
+
+<%~ "layout/basic.html" %>
+
+<%@ body { %>
+  <div class="uk-section uk-section-small">
+    <div class="uk-container">
+      <div>
+        <h1 class="uk-heading-hero">Sandbox [<%= key %>]</h1>
+        <div class="uk-margin-top">
+          <% switch key { %>
+          <% case "routes": %>
+            <%+ "sandbox/routes.html" %>
+          <% case "gallery": %>
+            <%+ "sandbox/gallery.html" %>
+          <% default: %>
+            TODO!
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% } %>
