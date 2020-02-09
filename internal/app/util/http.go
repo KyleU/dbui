@@ -19,13 +19,12 @@ type AppInfo struct {
 	Debug      bool
 	Version    string
 	CommitHash string
-	ConfigDir  string
 }
 
 type RequestContext struct {
 	AppInfo AppInfo
 	Routes  *mux.Router
-	Title string
+	Title   string
 }
 
 func (r *RequestContext) Route(act string, pairs ...string) string {
@@ -42,9 +41,9 @@ func ExtractContext(req *http.Request, title string) RequestContext {
 	if title == "" {
 		title = ai.AppName
 	}
-	return RequestContext {
+	return RequestContext{
 		AppInfo: ai,
-		Routes: r,
-		Title: title,
+		Routes:  r,
+		Title:   title,
 	}
 }

@@ -30,9 +30,9 @@ func NewQueryCommand() *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.StringVarP(&connNameArg, "conn", "c", "", "Connection name")
-	flags.StringVarP(&inputArg, "input", "i", "", "???")
-	flags.StringVarP(&outputArg, "output", "o", "", "???")
+	flags.StringVarP(&connNameArg, "conn", "c", "", "connection name or url")
+	flags.StringVarP(&inputArg, "input", "i", "", "input SQL string or file path")
+	flags.StringVarP(&outputArg, "output", "o", "", "output format, one of [markdown, json, csv]")
 
 	return cmd
 }
