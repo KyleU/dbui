@@ -9,5 +9,7 @@ import (
 
 func MakeServer(info util.AppInfo, address string, port uint16) error {
 	routes := controllers.BuildRouter(info)
-	return http.ListenAndServe(fmt.Sprintf("%v:%v", address, port), routes)
+	fmt.Println(fmt.Sprintf("[%v] starting on %v:%v (verbose)", info.AppName, address, port))
+	err := http.ListenAndServe(fmt.Sprintf("%v:%v", address, port), routes)
+	return err
 }

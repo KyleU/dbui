@@ -59,7 +59,7 @@ endif
 .PHONY: build-release
 build-release: ## Build all binaries without debug information
 	@go-embed -input web/assets -output internal/app/controllers/assets/assets.go
-	@${MAKE} LDFLAGS="-w ${LDFLAGS}" GOARGS="${GOARGS} -trimpath" BUILD_DIR="${BUILD_DIR}/release" build
+	@env GOOS=${GOOS} GOARCH=${GOARCH} ${MAKE} LDFLAGS="-w ${LDFLAGS}" GOARGS="${GOARGS} -trimpath" BUILD_DIR="${BUILD_DIR}/release" build
 	@git checkout internal/app/controllers/assets/assets.go
 
 .PHONY: build-debug

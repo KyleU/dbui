@@ -14,6 +14,8 @@ func BuildRouter(info util.AppInfo) *mux.Router {
 
 	// Home
 	r.Handle("/", addContext(r, info, http.HandlerFunc(Home))).Name("home")
+	r.Handle("/profile", addContext(r, info, http.HandlerFunc(Profile))).Name("profile")
+	r.Handle("/settings", addContext(r, info, http.HandlerFunc(Settings))).Name("settings")
 
 	// Sandbox
 	r.Handle("/sandbox", addContext(r, info, http.HandlerFunc(SandboxList))).Name("sandbox.list")
