@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"github.com/jackc/pgx/v4"
 	"github.com/kyleu/dbui/internal/app/conn/output"
-	"github.com/kyleu/dbui/internal/app/conn/query"
 	"github.com/kyleu/dbui/internal/app/conn/results"
+	"github.com/kyleu/dbui/internal/app/queries"
+	"strings"
 )
 
 func Sandbox(conn string, in string, out string) error {
@@ -24,8 +25,9 @@ func Sandbox(conn string, in string, out string) error {
 
 func runQuery(conn string, in string, out string) (*results.ResultSet, error) {
 	url := "postgres://127.0.0.1:5432/dbui"
-	sql := query.ListDatabases
-	return connTest(url, sql)
+	sb := &strings.Builder{}
+	queries.ListColumns(sb)
+	return connTest(url, sb.String())
 }
 
 func connTest(url string, sql string) (*results.ResultSet, error) {
