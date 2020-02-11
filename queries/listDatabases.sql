@@ -8,4 +8,4 @@ select
 from pg_catalog.pg_database d
 order by 1;
 
--- <%: func ListDatabases(buffer *bytes.Buffer) %>
+-- <%: func ListDatabases(w io.Writer) %>

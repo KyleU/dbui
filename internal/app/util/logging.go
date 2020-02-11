@@ -1,9 +1,19 @@
 package util
 
-type Logger interface {
-	Trace(msg string, fields ...map[string]interface{})
-	Debug(msg string, fields ...map[string]interface{})
-	Info(msg string, fields ...map[string]interface{})
-	Warn(msg string, fields ...map[string]interface{})
-	Error(msg string, fields ...map[string]interface{})
+import (
+	"github.com/sirupsen/logrus"
+	logrusadapter "logur.dev/adapter/logrus"
+	"logur.dev/logur"
+	"os"
+)
+
+func InitLogging() logur.LoggerFacade {
+	logger := logrus.New()
+
+	logger.SetOutput(os.Stdout)
+	logger.SetFormatter(&logrus.TextFormatter{})
+
+	logger.SetLevel(logrus.InfoLevel)
+
+	return logrusadapter.New(logger)
 }

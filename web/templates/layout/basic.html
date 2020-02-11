@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <%+ "layout/head.html" %>
-<body>
+<body class="<%= ctx.Profile.Theme.CssClass() %>">
 <%+ "layout/navbar.html" %>
+<div id="content" data-uk-height-viewport="expand: true">
 <%@ body { %><% } %>
+</div>
 </body>
 </html>

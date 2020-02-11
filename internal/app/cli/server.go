@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"github.com/kyleu/dbui/internal/app/util"
 	"github.com/kyleu/dbui/internal/app/web"
 	"github.com/spf13/cobra"
 )
@@ -16,12 +15,7 @@ func NewServerCommand(appName string, version string, commitHash string) *cobra.
 		Short:   "Starts the http server",
 		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			info := util.AppInfo {
-				AppName: appName,
-				Debug: verbose,
-				Version: version,
-				CommitHash: commitHash,
-			}
+			info := InitApp(appName, version, commitHash)
 			return web.MakeServer(info, addr, port)
 		},
 	}

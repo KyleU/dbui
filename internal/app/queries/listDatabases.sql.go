@@ -3,10 +3,16 @@
 // DO NOT EDIT!
 package queries
 
-import "bytes"
+import (
+	"io"
 
-func ListDatabases(buffer *bytes.Buffer) {
-	buffer.WriteString(`select
+	"github.com/shiyanhui/hero"
+)
+
+func ListDatabases(w io.Writer) {
+	_buffer := hero.GetBuffer()
+	defer hero.PutBuffer(_buffer)
+	_buffer.WriteString(`select
   d.datname as "name",
   pg_catalog.pg_get_userbyid(d.datdba) as "owner",
   pg_catalog.pg_encoding_to_char(d.encoding) as "encoding",
@@ -17,5 +23,6 @@ from pg_catalog.pg_database d
 order by 1;
 
 -- `)
+	w.Write(_buffer.Bytes())
 
 }

@@ -3,10 +3,16 @@
 // DO NOT EDIT!
 package queries
 
-import "bytes"
+import (
+	"io"
 
-func ListTables(buffer *bytes.Buffer) {
-	buffer.WriteString(`select
+	"github.com/shiyanhui/hero"
+)
+
+func ListTables(w io.Writer) {
+	_buffer := hero.GetBuffer()
+	defer hero.PutBuffer(_buffer)
+	_buffer.WriteString(`select
   c.oid as "oid",
   n.nspname as "schema",
   c.relname as "name",
@@ -24,5 +30,6 @@ where
 order by 2,3;
 
 -- `)
+	w.Write(_buffer.Bytes())
 
 }

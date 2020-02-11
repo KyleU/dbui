@@ -1,9 +1,8 @@
 package main
 
 import (
-	"github.com/kyleu/dbui/internal/app/cli"
 	"fmt"
-	"github.com/spf13/cobra"
+	"github.com/kyleu/dbui/internal/app/cli"
 	"os"
 )
 
@@ -15,15 +14,9 @@ var (
 )
 
 func main() {
-	rootCmd := &cobra.Command{
-		Use: "dbui",
-		Short: "Command line interface for dbui",
-		Long: "A work in progress...",
-	}
+	cmd := cli.Configure(version, commitHash)
 
-	cli.Configure(rootCmd, version, commitHash)
-
-	if err := rootCmd.Execute(); err != nil {
+	if err := cmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}

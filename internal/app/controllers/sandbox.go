@@ -18,3 +18,9 @@ func SandboxForm(res http.ResponseWriter, req *http.Request) {
 	template.SandboxForm(key, prepHtml(res, req, "Sandbox [" + key + "]"), res)
 }
 
+func SandboxRun(res http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+	key := vars["key"]
+	template.SandboxForm(key, prepHtml(res, req, "Sandbox [" + key + "]"), res)
+}
+

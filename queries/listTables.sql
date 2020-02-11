@@ -15,4 +15,4 @@ where
   and pg_catalog.pg_table_is_visible(c.oid)
 order by 2,3;
 
--- <%: func ListTables(buffer *bytes.Buffer) %>
+-- <%: func ListTables(w io.Writer) %>

@@ -5,14 +5,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewSandboxCommand() *cobra.Command {
+func NewSandboxCommand(appName string, version string, commitHash string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "sandbox",
 		Aliases: []string{"x"},
 		Short:   "Runs an internal test",
-		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			return conn.Sandbox("", "", "")
+			info := InitApp(appName, version, commitHash)
+			return conn.GetResult(info, "", "", "")
 		},
 	}
 

@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"emperror.dev/emperror"
+	"emperror.dev/errors"
 	"github.com/kyleu/dbui/internal/app/controllers/assets"
 	"github.com/kyleu/dbui/internal/app/util"
 	"net/http"
@@ -37,9 +39,7 @@ func zipResponse(res http.ResponseWriter, req *http.Request, data []byte, hash s
 		} else {
 			res.WriteHeader(http.StatusOK)
 			_, err := res.Write(data)
-			if err != nil {
-				panic(err)
-			}
+			emperror.Panic(errors.Wrap(err, "Unable to write to response"))
 		}
 	} else {
 		util.NotFound(res, req)

@@ -8,3 +8,7 @@ import (
 func Profile(res http.ResponseWriter, req *http.Request) {
 	template.Profile(prepHtml(res, req, ""), res)
 }
+
+func ProfileSave(res http.ResponseWriter, req *http.Request) {
+	template.Profile(prepHtml(res, req, ""), res)
+}
