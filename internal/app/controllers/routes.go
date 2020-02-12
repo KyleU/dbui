@@ -13,28 +13,33 @@ func BuildRouter(info util.AppInfo) (*mux.Router, error) {
 	r.Use(ocmux.Middleware())
 
 	// Home
-	r.Methods("get").Path("/").Handler(addContext(r, info, http.HandlerFunc(Home))).Name("home")
+	r.Methods(http.MethodGet).Path("/").Handler(addContext(r, info, http.HandlerFunc(Home))).Name("home")
 
 	profile := r.Path("/profile").Subrouter()
-	profile.Methods("get").Handler(addContext(r, info, http.HandlerFunc(Profile))).Name("profile")
-	profile.Methods("post").Handler(addContext(r, info, http.HandlerFunc(Profile))).Name("profile.save")
+	profile.Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(Profile))).Name("profile")
+	profile.Methods(http.MethodPost).Handler(addContext(r, info, http.HandlerFunc(ProfileSave))).Name("profile.save")
 
 	settings := r.Path("/settings").Subrouter()
-	settings.Methods("get").Handler(addContext(r, info, http.HandlerFunc(Settings))).Name("settings")
+	settings.Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(Settings))).Name("settings")
+	settings.Methods(http.MethodPost).Handler(addContext(r, info, http.HandlerFunc(SettingsSave))).Name("settings.save")
 
 	// Sandbox
 	sandbox := r.Path("/sandbox").Subrouter()
-	sandbox.Methods("get").Handler(addContext(r, info, http.HandlerFunc(SandboxList))).Name("sandbox.list")
-	r.Path("/sandbox/{key}").Methods("get").Handler(addContext(r, info, http.HandlerFunc(SandboxForm))).Name("sandbox.form")
-	r.Path("/sandbox/{key}").Methods("post").Handler(addContext(r, info, http.HandlerFunc(SandboxRun))).Name("sandbox.run")
+	sandbox.Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(SandboxList))).Name("sandbox")
+	r.Path("/sandbox/{key}").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(SandboxForm))).Name("sandbox.run")
+
+	// Ad-hoc SQL Queries
+	sql := r.Path("/sql").Subrouter()
+	sql.Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(SqlForm))).Name("sql.form")
+	sql.Methods(http.MethodPost).Handler(addContext(r, info, http.HandlerFunc(SqlRun))).Name("sql.run")
 
 	// Utils
 	_ = r.Path("/utils").Subrouter()
-	r.Path("/about").Methods("get").Handler(addContext(r, info, http.HandlerFunc(About))).Name("about")
+	r.Path("/about").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(About))).Name("about")
 
 	// Assets
-	r.Path("/favicon.ico").Methods("get").HandlerFunc(Favicon).Name("favicon")
-	r.PathPrefix("/assets").Methods("get").HandlerFunc(Static).Name("assets")
+	r.Path("/favicon.ico").Methods(http.MethodGet).HandlerFunc(Favicon).Name("favicon")
+	r.PathPrefix("/assets").Methods(http.MethodGet).HandlerFunc(Static).Name("assets")
 	return r, nil
 }
 

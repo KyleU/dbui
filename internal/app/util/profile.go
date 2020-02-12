@@ -1,5 +1,6 @@
 package util
 
+var AllColors = []string { "clear", "grey", "bluegrey", "red", "orange", "yellow", "green", "blue", "purple" }
 
 type Theme uint8
 
@@ -9,11 +10,22 @@ const (
 	endTypes
 )
 
+var AllThemes = []Theme{ ThemeLight, ThemeDark }
+
 func (t Theme) String() string {
 	if t < endTypes {
 		return themeNames[t]
 	}
 	return themeNames[ThemeLight]
+}
+
+func ThemeFromString(s string) Theme {
+	for _, t := range AllThemes {
+		if t.String() == s {
+			return t
+		}
+	}
+	return ThemeLight
 }
 
 func (t Theme) CssClass() string {
@@ -44,6 +56,10 @@ type UserProfile struct {
 	Theme Theme
 	NavColor string
 	LinkColor string
+}
+
+func (p *UserProfile) LinkClass() string {
+	return p.LinkColor + "-fg"
 }
 
 var SystemProfile = NewUserProfile()

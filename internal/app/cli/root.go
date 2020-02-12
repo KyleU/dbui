@@ -31,7 +31,7 @@ func Configure(version string, commitHash string) cobra.Command {
 }
 
 func InitApp(appName string, version string, commitHash string) util.AppInfo {
-	logger := util.InitLogging()
+	logger := util.InitLogging(verbose)
 	logger = logur.WithFields(logger, map[string]interface{}{"debug": verbose, "version": version, "commit": commitHash})
 
 	handler := emperror.WithDetails(util.AppErrorHandler{ Logger: logger }, "key", "value")

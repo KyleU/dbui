@@ -10,10 +10,11 @@
         <div class="uk-text-lead">A work in progress</div>
         <div>
           <ul>
-            <li><a href="<%= ctx.Route("home") %>">Home</a></li>
-            <li><a href="<%= ctx.Route("profile") %>">Profile</a></li>
-            <li><a href="<%= ctx.Route("settings") %>">Settings</a></li>
-            <li><a href="<%= ctx.Route("sandbox.list") %>">Sandboxes</a></li>
+            <li><a class="<%= ctx.Profile.LinkClass() %>" href="<%= ctx.Route("home") %>">Home</a></li>
+            <li><a class="<%= ctx.Profile.LinkClass() %>" href="<%= ctx.Route("profile") %>">Profile</a></li>
+            <li><a class="<%= ctx.Profile.LinkClass() %>" href="<%= ctx.Route("settings") %>">Settings</a></li>
+            <li><a class="<%= ctx.Profile.LinkClass() %>" href="<%= ctx.Route("sql.form") %>">Ad-hoc Query</a></li>
+            <li><a class="<%= ctx.Profile.LinkClass() %>" href="<%= ctx.Route("sandbox") %>">Sandboxes</a></li>
           </ul>
         </div>
       </div>

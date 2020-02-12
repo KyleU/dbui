@@ -11,7 +11,7 @@
         <div class="uk-margin-top">
           <ul>
             <% for _, s := range sandboxes { %>
-              <li><a href="<%= ctx.Route("sandbox.form", "key", s) %>"><%= s %></a></li>
+              <li><a class="<%= ctx.Profile.LinkClass() %>" href="<%= ctx.Route("sandbox.run", "key", s) %>"><%= s %></a></li>
             <% } %>
           </ul>
         </div>
