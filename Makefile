@@ -37,8 +37,8 @@ endif
 
 .PHONY: compile-templates
 compile-templates:
-	hero -extensions .html -source web/templates -dest internal/app/templates
-	hero -extensions .sql -pkgname queries -source queries -dest internal/app/queries
+	hero -extensions .html -source web/templates -dest internal/gen/templates
+	hero -extensions .sql -pkgname queries -source queries -dest internal/gen/queries
 
 .PHONY: build-%
 build-%: goversion compile-templates

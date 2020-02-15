@@ -3,4 +3,4 @@
 /build
 /tmp
 /vendor
-/internal/app/templates
+/internal/gen
