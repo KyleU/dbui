@@ -9,20 +9,20 @@ import (
 
 var _sandboxes = []string{"gallery", "testbed"}
 
-func SandboxList(res http.ResponseWriter, req *http.Request) {
-	act(res, req, "Sandbox List", func(ctx util.RequestContext) (int, error) {
-		return template.SandboxList(_sandboxes, ctx, res)
+func SandboxList(w http.ResponseWriter, r *http.Request) {
+	act(w, r, "Sandbox List", func(ctx util.RequestContext) (int, error) {
+		return template.SandboxList(_sandboxes, ctx, w)
 	})
 }
 
-func SandboxForm(res http.ResponseWriter, req *http.Request) {
-	key := mux.Vars(req)["key"]
+func SandboxForm(w http.ResponseWriter, r *http.Request) {
+	key := mux.Vars(r)["key"]
 	if key == "testbed" {
 		// x := 0
 		// _ = 10 / x
 		panic("!!!!")
 	}
-	act(res, req, "Sandbox [" + key + "]", func(ctx util.RequestContext) (int, error) {
-		return template.SandboxForm(key, ctx, res)
+	act(w, r, "Sandbox [" + key + "]", func(ctx util.RequestContext) (int, error) {
+		return template.SandboxForm(key, ctx, w)
 	})
 }

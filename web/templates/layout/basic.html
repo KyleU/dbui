@@ -6,7 +6,7 @@
 <div id="content" data-uk-height-viewport="expand: true">
 <% for _, flash := range ctx.Flashes { %>
   <% cls, content := util.ParseFlash(flash) %>
-  <div class="<%= cls %>" data-uk-alert>
+  <div class="alert-top <%= cls %>" data-uk-alert>
     <a class="uk-alert-close" href="#" data-uk-close=""></a>
     <p><%= content %></p>
   </div>

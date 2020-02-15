@@ -1,23 +1,30 @@
 <div class="sidebar-left" id="sidebar">
-  <h3><%= schema %></h3>
   <div id="nav-testbed">
     <ul class="uk-nav-default uk-nav-parent-icon uk-margin-medium" data-uk-nav="multiple: true">
       <li class="uk-parent">
-        <a href="#">
+        <a href="">
           <span class="uk-margin-small-right" data-uk-icon="icon: bookmark"></span>
-          <span id="nav-table-count"></span>
-          Tables
+          <span id="nav-table-count"><%=i s.Tables.Size() %></span> Tables
         </a>
-        <ul class="uk-nav-sub" id="nav-tables"></ul>
+        <ul class="uk-nav-sub" id="nav-tables">
+          <% for _, t := range s.Tables.Names() { %>
+          <li><%= t %></li>
+          <% } %>
+        </ul>
       </li>
+      <% if s.Views.Size() > 0 { %>
       <li class="uk-parent">
-        <a href="#">
+        <a href="">
           <span class="uk-margin-small-right" data-uk-icon="icon: location"></span>
-          <span id="nav-view-count"></span>
-          Views
+          <span id="nav-view-count"><%=i s.Views.Size() %></span> Views
         </a>
-        <ul class="uk-nav-sub" id="nav-views"></ul>
+        <ul class="uk-nav-sub" id="nav-views">
+          <% for _, v := range s.Views.Names() { %>
+          <li><%= v %></li>
+          <% } %>
+        </ul>
       </li>
+      <% } %>
       <li class="uk-nav-divider"></li>
       <li>
         <a href="" onclick="return false;">

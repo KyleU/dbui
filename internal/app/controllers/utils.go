@@ -6,21 +6,21 @@ import (
 	"net/http"
 )
 
-func Health(res http.ResponseWriter, req *http.Request) {
-	act(res, req, "Routes", func(ctx util.RequestContext) (int, error) {
-		res.Write([]byte("OK"))
+func Health(w http.ResponseWriter, r *http.Request) {
+	act(w, r, "Routes", func(ctx util.RequestContext) (int, error) {
+		_, _ = w.Write([]byte("OK"))
 		return 0, nil
 	})
 }
 
-func Routes(res http.ResponseWriter, req *http.Request) {
-	act(res, req, "Routes", func(ctx util.RequestContext) (int, error) {
-		return template.RoutesList(ctx, res)
+func Routes(w http.ResponseWriter, r *http.Request) {
+	act(w, r, "Routes", func(ctx util.RequestContext) (int, error) {
+		return template.RoutesList(ctx, w)
 	})
 }
 
-func Modules(res http.ResponseWriter, req *http.Request) {
-	act(res, req, "Routes", func(ctx util.RequestContext) (int, error) {
-		return template.ModulesList(ctx, res)
+func Modules(w http.ResponseWriter, r *http.Request) {
+	act(w, r, "Routes", func(ctx util.RequestContext) (int, error) {
+		return template.ModulesList(ctx, w)
 	})
 }

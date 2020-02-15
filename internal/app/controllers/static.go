@@ -10,38 +10,38 @@ import (
 	"strings"
 )
 
-func Static(res http.ResponseWriter, req *http.Request) {
-	path, err := filepath.Abs(strings.TrimPrefix(req.URL.Path, "/assets"))
+func Static(w http.ResponseWriter, r *http.Request) {
+	path, err := filepath.Abs(strings.TrimPrefix(r.URL.Path, "/assets"))
 	if err == nil {
 		if !strings.HasPrefix(path, "/") {
 			path = "/" + path
 		}
 		data, hash, contentType, err := assets.Asset("web/assets", path)
-		zipResponse(res, req, data, hash, contentType, err)
+		zipResponse(w, r, data, hash, contentType, err)
 	} else {
-		http.Error(res, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 }
 
-func Favicon(res http.ResponseWriter, req *http.Request) {
+func Favicon(w http.ResponseWriter, r *http.Request) {
 	data, hash, contentType, err := assets.Asset("web/assets", "/favicon.ico")
-	zipResponse(res, req, data, hash, contentType, err)
+	zipResponse(w, r, data, hash, contentType, err)
 }
 
-func zipResponse(res http.ResponseWriter, req *http.Request, data []byte, hash string, contentType string, err error) {
+func zipResponse(w http.ResponseWriter, r *http.Request, data []byte, hash string, contentType string, err error) {
 	if err == nil {
-		res.Header().Set("Content-Encoding", "gzip")
-		res.Header().Set("Content-Type", contentType)
-		res.Header().Add("Cache-Control", "public, max-age=31536000")
-		res.Header().Add("ETag", hash)
-		if req.Header.Get("If-None-Match") == hash {
-			res.WriteHeader(http.StatusNotModified)
+		w.Header().Set("Content-Encoding", "gzip")
+		w.Header().Set("Content-Type", contentType)
+		w.Header().Add("Cache-Control", "public, max-age=31536000")
+		w.Header().Add("ETag", hash)
+		if r.Header.Get("If-None-Match") == hash {
+			w.WriteHeader(http.StatusNotModified)
 		} else {
-			res.WriteHeader(http.StatusOK)
-			_, err := res.Write(data)
+			w.WriteHeader(http.StatusOK)
+			_, err := w.Write(data)
 			emperror.Panic(errors.WithStack(errors.Wrap(err, "Unable to write to response")))
 		}
 	} else {
-		util.NotFound(res, req)
+		util.NotFound(w, r)
 	}
 }

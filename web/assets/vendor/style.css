@@ -12054,11 +12054,11 @@ h4 {
   padding: 0;
 }
 
-.uk-light #content, .uk-section-primary:not(.uk-preserve-color) #content, .uk-section-secondary:not(.uk-preserve-color) #content, .uk-tile-primary:not(.uk-preserve-color) #content, .uk-tile-secondary:not(.uk-preserve-color) #content, .uk-card-primary.uk-card-body #content, .uk-card-primary > :not([class*=uk-card-media]) #content, .uk-card-secondary.uk-card-body #content, .uk-card-secondary > :not([class*=uk-card-media]) #content, .uk-overlay-primary #content, .uk-offcanvas-bar #content {
+body.uk-light, body.uk-section-primary:not(.uk-preserve-color), body.uk-section-secondary:not(.uk-preserve-color), body.uk-tile-primary:not(.uk-preserve-color), body.uk-tile-secondary:not(.uk-preserve-color), body.uk-card-primary.uk-card-body, .uk-card-primary > body:not([class*=uk-card-media]), body.uk-card-secondary.uk-card-body, .uk-card-secondary > body:not([class*=uk-card-media]), body.uk-overlay-primary, body.uk-offcanvas-bar {
   background-color: #121212;
 }
 
-.uk-dark #content {
+body.uk-dark {
   background-color: #fff;
 }
 

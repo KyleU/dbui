@@ -7,17 +7,17 @@ import (
 	"net/http"
 )
 
-func SqlForm(res http.ResponseWriter, req *http.Request) {
-	act(res, req, "Ad-hoc SQL Query", func(ctx util.RequestContext) (int, error) {
-		return template.SqlForm("", ctx, res)
+func SqlForm(w http.ResponseWriter, r *http.Request) {
+	act(w, r, "Ad-hoc SQL Query", func(ctx util.RequestContext) (int, error) {
+		return template.SqlForm("", ctx, w)
 	})
 }
 
-func SqlRun(res http.ResponseWriter, req *http.Request) {
-	act(res, req, "SQL Results", func(ctx util.RequestContext) (int, error) {
-		_ = req.ParseForm()
-		sql := req.Form.Get("sql")
+func SqlRun(w http.ResponseWriter, r *http.Request) {
+	act(w, r, "SQL Results", func(ctx util.RequestContext) (int, error) {
+		_ = r.ParseForm()
+		sql := r.Form.Get("sql")
 		rs, err := conn.GetResult(ctx.Logger, "", sql)
-		return template.SqlResults(sql, rs, err, ctx, res)
+		return template.SqlResults(sql, rs, err, ctx, w)
 	})
 }

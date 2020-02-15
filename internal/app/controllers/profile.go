@@ -6,21 +6,21 @@ import (
 	"net/http"
 )
 
-func Profile(res http.ResponseWriter, req *http.Request) {
-	act(res, req, "", func(ctx util.RequestContext) (int, error) {
-		return template.Profile(ctx, res)
+func Profile(w http.ResponseWriter, r *http.Request) {
+	act(w, r, "User Profile", func(ctx util.RequestContext) (int, error) {
+		return template.Profile(ctx, w)
 	})
 }
 
-func ProfileSave(res http.ResponseWriter, req *http.Request) {
-	redir(res, req, func(ctx util.RequestContext) (string, error) {
-		_ = req.ParseForm()
-		util.SystemProfile.Name = req.Form.Get("username")
-		util.SystemProfile.Theme = util.ThemeFromString(req.Form.Get("theme"))
-		util.SystemProfile.NavColor = req.Form.Get("navbar-color")
-		util.SystemProfile.LinkColor = req.Form.Get("link-color")
+func ProfileSave(w http.ResponseWriter, r *http.Request) {
+	redir(w, r, func(ctx util.RequestContext) (string, error) {
+		_ = r.ParseForm()
+		util.SystemProfile.Name = r.Form.Get("username")
+		util.SystemProfile.Theme = util.ThemeFromString(r.Form.Get("theme"))
+		util.SystemProfile.NavColor = r.Form.Get("navbar-color")
+		util.SystemProfile.LinkColor = r.Form.Get("link-color")
 		ctx.Session.AddFlash("success:Profile saved")
-		saveSession(res, req, ctx)
+		saveSession(w, r, ctx)
 		return ctx.Route("home"), nil
 	})
 }

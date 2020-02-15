@@ -6,9 +6,11 @@ require (
 	emperror.dev/emperror v0.32.0
 	emperror.dev/errors v0.7.0
 	emperror.dev/handler/logur v0.4.0
+	github.com/emirpasic/gods v1.12.0
 	github.com/gorilla/handlers v1.4.2
 	github.com/gorilla/mux v1.7.3
 	github.com/gorilla/sessions v1.2.0
+	github.com/gorilla/websocket v1.4.1
 	github.com/jackc/pgproto3/v2 v2.0.1
 	github.com/jackc/pgtype v1.1.0
 	github.com/jackc/pgx/v4 v4.3.0

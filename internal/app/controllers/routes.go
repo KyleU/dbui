@@ -14,6 +14,7 @@ func BuildRouter(info util.AppInfo) (*mux.Router, error) {
 
 	// Home
 	r.Methods(http.MethodGet).Path("/").Handler(addContext(r, info, http.HandlerFunc(Home))).Name("home")
+	r.Methods(http.MethodGet).Path("/s").Handler(addContext(r, info, http.HandlerFunc(Socket))).Name("websocket")
 
 	profile := r.Path("/profile").Subrouter()
 	profile.Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(Profile))).Name("profile")
@@ -24,8 +25,9 @@ func BuildRouter(info util.AppInfo) (*mux.Router, error) {
 	settings.Methods(http.MethodPost).Handler(addContext(r, info, http.HandlerFunc(SettingsSave))).Name("settings.save")
 
 	// Project
-	project := r.Path("/q").Subrouter()
-	project.Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(Workspace))).Name("workspace")
+	project := r.PathPrefix("/q").Subrouter()
+	project.Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(Workspace))).Name("workspace.test")
+	r.Path("/q/{key}").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(Workspace))).Name("workspace")
 
 	// Sandbox
 	sandbox := r.Path("/sandbox").Subrouter()
@@ -50,10 +52,10 @@ func BuildRouter(info util.AppInfo) (*mux.Router, error) {
 	return r, nil
 }
 
-func addContext(r *mux.Router, info util.AppInfo, next http.Handler) http.Handler {
-	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
-		ctx := context.WithValue(req.Context(), "routes", r)
+func addContext(router *mux.Router, info util.AppInfo, next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), "routes", router)
 		ctx = context.WithValue(ctx, "info", info)
-		next.ServeHTTP(res, req.WithContext(ctx))
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

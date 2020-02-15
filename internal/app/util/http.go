@@ -12,10 +12,10 @@ import (
 	"strings"
 )
 
-func NotFound(res http.ResponseWriter, _ *http.Request) {
-	res.Header().Set("Content-Type", "text/html")
-	res.WriteHeader(http.StatusNotFound)
-	_, err := res.Write([]byte("404: Page Not Found"))
+func NotFound(w http.ResponseWriter, _ *http.Request) {
+	w.Header().Set("Content-Type", "text/html")
+	w.WriteHeader(http.StatusNotFound)
+	_, err := w.Write([]byte("404: Page Not Found"))
 	emperror.Panic(errors.WithStack(errors.Wrap(err, "Unable to write to response")))
 }
 
@@ -55,11 +55,11 @@ var store = sessions.NewCookieStore([]byte(sessionKey))
 
 const sessionName = "dbui-session"
 
-func ExtractContext(req *http.Request, title string) RequestContext {
-	ai := req.Context().Value("info").(AppInfo)
-	r := req.Context().Value("routes").(*mux.Router)
+func ExtractContext(r *http.Request, title string) RequestContext {
+	ai := r.Context().Value("info").(AppInfo)
+	routes := r.Context().Value("routes").(*mux.Router)
 	prof := SystemProfile
-	session, err := store.Get(req, sessionName)
+	session, err := store.Get(r, sessionName)
 	if err != nil {
 		session = sessions.NewSession(store, sessionName)
 	}
@@ -73,13 +73,13 @@ func ExtractContext(req *http.Request, title string) RequestContext {
 		flashes = append(flashes, fmt.Sprintf("%v", f))
 	}
 
-	logger := logur.WithFields(ai.Logger, map[string]interface{}{ "path": req.URL.Path, "method": req.Method})
+	logger := logur.WithFields(ai.Logger, map[string]interface{}{ "path": r.URL.Path, "method": r.Method})
 
 	return RequestContext{
 		AppInfo: ai,
 		Logger:  logger,
 		Profile: prof,
-		Routes:  r,
+		Routes:  routes,
 		Title:   title,
 		Flashes: flashes,
 		Session: *session,

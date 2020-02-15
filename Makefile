@@ -23,7 +23,7 @@ endif
 .PHONY: clean
 clean: ## Clean builds
 	rm -rf ${BUILD_DIR}/
-	rm -rf cmd/dbui/pkged.go
+	rm -rf internal/gen
 
 .PHONY: dev
 dev: ## Start the project, reloading on changes
