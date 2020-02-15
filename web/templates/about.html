@@ -9,6 +9,12 @@
         <h1 class="uk-heading-hero"><%= ctx.AppInfo.AppName %></h1>
         <div class="uk-text-lead">A work in progress</div>
       </div>
+      <div>
+        <ul>
+          <li><a class="<%= ctx.Profile.LinkClass() %>" href="<%= ctx.Route("routes") %>">Routes</a></li>
+          <li><a class="<%= ctx.Profile.LinkClass() %>" href="<%= ctx.Route("modules") %>">Modules</a></li>
+        </ul>
+      </div>
     </div>
   </div>
 <% } %>

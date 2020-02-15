@@ -1,0 +1,51 @@
+<%: func SqlResults(sql string, results *results.ResultSet, err error, ctx util.RequestContext, w io.Writer) (int, error) %>
+
+<%~ "layout/basic.html" %>
+
+<%@ body { %>
+<div class="uk-section uk-section-small">
+  <div class="uk-container">
+    <div>
+      <h1 class="uk-heading-hero">SQL Query Results</h1>
+      <div>
+        <div>
+          <pre class="uk-textarea"><%= sql %></pre>
+        </div>
+        <% if err == nil { %>
+        <div class="uk-margin-top uk-margin-bottom">
+          Query
+          connected in
+          [<%= util.MicrosToMillis(results.Timing.Connected) %>ms]
+          and returned
+          [<%=i len(results.Data) %>]
+          rows in
+          [<%= util.MicrosToMillis(results.Timing.Elapsed) %>ms]
+        </div>
+        <div>
+          <table class="uk-table uk-table-divider uk-table-small">
+            <thead>
+            <tr>
+              <% for _, c := range results.Columns { %>
+              <th title="<%= c.T.String() %>"><%= c.Name %></th>
+              <% } %>
+            </tr>
+            </thead>
+            <tbody>
+              <% for _, row := range results.Data { %>
+              <tr>
+                <% for _, cell := range row { %>
+                <td><%= cell %></td>
+                <% } %>
+              </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+        <% } else { %>
+          <strong><%=v err %></strong>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+<% } %>

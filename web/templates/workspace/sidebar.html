@@ -1,0 +1,33 @@
+<div class="sidebar-left" id="sidebar">
+  <h3><%= schema %></h3>
+  <div id="nav-testbed">
+    <ul class="uk-nav-default uk-nav-parent-icon uk-margin-medium" data-uk-nav="multiple: true">
+      <li class="uk-parent">
+        <a href="#">
+          <span class="uk-margin-small-right" data-uk-icon="icon: bookmark"></span>
+          <span id="nav-table-count"></span>
+          Tables
+        </a>
+        <ul class="uk-nav-sub" id="nav-tables"></ul>
+      </li>
+      <li class="uk-parent">
+        <a href="#">
+          <span class="uk-margin-small-right" data-uk-icon="icon: location"></span>
+          <span id="nav-view-count"></span>
+          Views
+        </a>
+        <ul class="uk-nav-sub" id="nav-views"></ul>
+      </li>
+      <li class="uk-nav-divider"></li>
+      <li>
+        <a href="" onclick="return false;">
+          <span class="uk-margin-small-right" data-uk-icon="icon: cog"></span>
+          Refresh Schema
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="status-panel">
+    <div id="connection-status">Starting...</div>
+  </div>
+</div>
