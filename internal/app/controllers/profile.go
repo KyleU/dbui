@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	template "github.com/kyleu/dbui/internal/app/templates"
 	"github.com/kyleu/dbui/internal/app/util"
+	template "github.com/kyleu/dbui/internal/gen/templates"
 	"net/http"
 )
 
@@ -13,7 +13,7 @@ func Profile(res http.ResponseWriter, req *http.Request) {
 }
 
 func ProfileSave(res http.ResponseWriter, req *http.Request) {
-	redir(res, req, func(ctx util.RequestContext) string {
+	redir(res, req, func(ctx util.RequestContext) (string, error) {
 		_ = req.ParseForm()
 		util.SystemProfile.Name = req.Form.Get("username")
 		util.SystemProfile.Theme = util.ThemeFromString(req.Form.Get("theme"))
@@ -21,6 +21,6 @@ func ProfileSave(res http.ResponseWriter, req *http.Request) {
 		util.SystemProfile.LinkColor = req.Form.Get("link-color")
 		ctx.Session.AddFlash("success:Profile saved")
 		saveSession(res, req, ctx)
-		return ctx.Route("home")
+		return ctx.Route("home"), nil
 	})
 }

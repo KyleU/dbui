@@ -1,8 +1,10 @@
 package cli
 
 import (
+	"emperror.dev/errors"
+	"fmt"
 	"github.com/kyleu/dbui/internal/app/conn"
-	"github.com/kyleu/dbui/internal/app/queries"
+	"github.com/kyleu/dbui/internal/gen/queries"
 	"github.com/spf13/cobra"
 	"strings"
 )
@@ -19,14 +21,23 @@ func NewQueryCommand(appName string, version string, commitHash string) *cobra.C
 		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			info := InitApp(appName, version, commitHash)
-			return conn.GetResult(info, getConnection(connNameArg), getSql(inputArg), getFormat(outputArg))
+			rs, err := conn.GetResult(info.Logger, getConnection(connNameArg), getSql(inputArg))
+			if err != nil {
+				return errors.WithStack(errors.Wrap(err, "Error retrieving result"))
+			}
+			out, err := conn.OutputFor(rs, getFormat(outputArg))
+			if err != nil {
+				return errors.WithStack(errors.Wrap(err, "Error formatting query output"))
+			}
+			fmt.Println(out)
+			return nil
 		},
 	}
 
 	flags := cmd.Flags()
 	flags.StringVarP(&connNameArg, "conn", "c", "", "connection name or url")
 	flags.StringVarP(&inputArg, "input", "i", "", "SQL string, named query, or file path")
-	flags.StringVarP(&outputArg, "output", "o", "", "output format, one of [table, markdown, json, csv]")
+	flags.StringVarP(&outputArg, "output", "o", "", "output format, one of [table, markdown, csv, json, xml]")
 
 	return cmd
 }

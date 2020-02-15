@@ -2,6 +2,7 @@ package util
 
 import (
 	"github.com/gorilla/mux"
+	"runtime/debug"
 	"strings"
 )
 
@@ -22,4 +23,12 @@ func ExtractRoutes(r *mux.Router) []RouteDescription {
 		return nil
 	})
 	return ret
+}
+
+func ExtractModules() *debug.BuildInfo {
+	bi, ok := debug.ReadBuildInfo()
+	if(!ok) {
+		return nil
+	}
+	return bi
 }

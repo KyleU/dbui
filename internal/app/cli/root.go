@@ -2,6 +2,7 @@ package cli
 
 import (
 	"emperror.dev/emperror"
+	logurhandler "emperror.dev/handler/logur"
 	"github.com/kyleu/dbui/internal/app/util"
 	"github.com/spf13/cobra"
 	"logur.dev/logur"
@@ -33,6 +34,9 @@ func Configure(version string, commitHash string) cobra.Command {
 func InitApp(appName string, version string, commitHash string) util.AppInfo {
 	logger := util.InitLogging(verbose)
 	logger = logur.WithFields(logger, map[string]interface{}{"debug": verbose, "version": version, "commit": commitHash})
+
+	errorHandler := logurhandler.New(logger)
+	defer emperror.HandleRecover(errorHandler)
 
 	handler := emperror.WithDetails(util.AppErrorHandler{ Logger: logger }, "key", "value")
 

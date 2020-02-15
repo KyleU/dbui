@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
+	"logur.dev/logur"
 	"net/http"
 	"os"
 	"strings"
@@ -15,11 +16,12 @@ func NotFound(res http.ResponseWriter, _ *http.Request) {
 	res.Header().Set("Content-Type", "text/html")
 	res.WriteHeader(http.StatusNotFound)
 	_, err := res.Write([]byte("404: Page Not Found"))
-	emperror.Panic(errors.Wrap(err, "Unable to write to response"))
+	emperror.Panic(errors.WithStack(errors.Wrap(err, "Unable to write to response")))
 }
 
 type RequestContext struct {
 	AppInfo AppInfo
+	Logger  logur.LoggerFacade
 	Profile UserProfile
 	Routes  *mux.Router
 	Title   string
@@ -50,6 +52,7 @@ var sessionKey = func() string {
 }()
 
 var store = sessions.NewCookieStore([]byte(sessionKey))
+
 const sessionName = "dbui-session"
 
 func ExtractContext(req *http.Request, title string) RequestContext {
@@ -70,8 +73,11 @@ func ExtractContext(req *http.Request, title string) RequestContext {
 		flashes = append(flashes, fmt.Sprintf("%v", f))
 	}
 
+	logger := logur.WithFields(ai.Logger, map[string]interface{}{ "path": req.URL.Path, "method": req.Method})
+
 	return RequestContext{
 		AppInfo: ai,
+		Logger:  logger,
 		Profile: prof,
 		Routes:  r,
 		Title:   title,

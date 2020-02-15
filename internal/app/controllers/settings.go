@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	template "github.com/kyleu/dbui/internal/app/templates"
 	"github.com/kyleu/dbui/internal/app/util"
+	template "github.com/kyleu/dbui/internal/gen/templates"
 	"net/http"
 )
 
@@ -13,9 +13,9 @@ func Settings(res http.ResponseWriter, req *http.Request) {
 }
 
 func SettingsSave(res http.ResponseWriter, req *http.Request) {
-	redir(res, req, func(ctx util.RequestContext) string {
+	redir(res, req, func(ctx util.RequestContext) (string, error) {
 		ctx.Session.AddFlash("success:Settings saved")
 		saveSession(res, req, ctx)
-		return ctx.Route("settings")
+		return ctx.Route("settings"), nil
 	})
 }

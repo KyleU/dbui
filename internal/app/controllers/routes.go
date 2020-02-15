@@ -23,6 +23,10 @@ func BuildRouter(info util.AppInfo) (*mux.Router, error) {
 	settings.Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(Settings))).Name("settings")
 	settings.Methods(http.MethodPost).Handler(addContext(r, info, http.HandlerFunc(SettingsSave))).Name("settings.save")
 
+	// Project
+	project := r.Path("/q").Subrouter()
+	project.Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(Workspace))).Name("workspace")
+
 	// Sandbox
 	sandbox := r.Path("/sandbox").Subrouter()
 	sandbox.Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(SandboxList))).Name("sandbox")
@@ -36,6 +40,9 @@ func BuildRouter(info util.AppInfo) (*mux.Router, error) {
 	// Utils
 	_ = r.Path("/utils").Subrouter()
 	r.Path("/about").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(About))).Name("about")
+	r.Path("/health").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(Health))).Name("health")
+	r.Path("/modules").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(Modules))).Name("modules")
+	r.Path("/routes").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(Routes))).Name("routes")
 
 	// Assets
 	r.Path("/favicon.ico").Methods(http.MethodGet).HandlerFunc(Favicon).Name("favicon")

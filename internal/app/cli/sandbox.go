@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"emperror.dev/errors"
+	"fmt"
 	"github.com/kyleu/dbui/internal/app/conn"
 	"github.com/spf13/cobra"
 )
@@ -12,7 +14,16 @@ func NewSandboxCommand(appName string, version string, commitHash string) *cobra
 		Short:   "Runs an internal test",
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			info := InitApp(appName, version, commitHash)
-			return conn.GetResult(info, "", "", "")
+			rs, err := conn.GetResult(info.Logger, "", "")
+			if err != nil {
+				return errors.WithStack(errors.Wrap(err, "Error retrieving result"))
+			}
+			out, err := conn.OutputFor(rs, "table")
+			if err != nil {
+				return errors.WithStack(errors.Wrap(err, "Error formatting output"))
+			}
+			fmt.Println(out)
+			return nil
 		},
 	}
 

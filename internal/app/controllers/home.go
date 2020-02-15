@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	template "github.com/kyleu/dbui/internal/app/templates"
 	"github.com/kyleu/dbui/internal/app/util"
+	template "github.com/kyleu/dbui/internal/gen/templates"
 	"net/http"
 )
 

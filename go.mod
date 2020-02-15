@@ -9,6 +9,8 @@ require (
 	github.com/gorilla/handlers v1.4.2
 	github.com/gorilla/mux v1.7.3
 	github.com/gorilla/sessions v1.2.0
+	github.com/jackc/pgproto3/v2 v2.0.1
+	github.com/jackc/pgtype v1.1.0
 	github.com/jackc/pgx/v4 v4.3.0
 	github.com/mattn/go-runewidth v0.0.8 // indirect
 	github.com/olekukonko/tablewriter v0.0.4
