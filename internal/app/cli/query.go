@@ -4,7 +4,7 @@ import (
 	"emperror.dev/errors"
 	"fmt"
 	"github.com/kyleu/dbui/internal/app/conn"
-	"github.com/kyleu/dbui/internal/gen/queries"
+	"github.com/kyleu/dbui/internal/app/util"
 	"github.com/spf13/cobra"
 	"strings"
 )
@@ -21,7 +21,7 @@ func NewQueryCommand(appName string, version string, commitHash string) *cobra.C
 		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			info := InitApp(appName, version, commitHash)
-			rs, err := conn.GetResult(info.Logger, getConnection(connNameArg), getSql(inputArg))
+			rs, err := conn.GetResult(info.Logger, getConnection(connNameArg), util.GetSql(inputArg))
 			if err != nil {
 				return errors.WithStack(errors.Wrap(err, "Error retrieving result"))
 			}
@@ -36,7 +36,7 @@ func NewQueryCommand(appName string, version string, commitHash string) *cobra.C
 
 	flags := cmd.Flags()
 	flags.StringVarP(&connNameArg, "conn", "c", "", "connection name or url")
-	flags.StringVarP(&inputArg, "input", "i", "", "SQL string, named query, or file path")
+	flags.StringVarP(&inputArg, "input", "i", "", "SQL string or \"file://path/filename.sql\"")
 	flags.StringVarP(&outputArg, "output", "o", "", "output format, one of [table, markdown, csv, json, xml]")
 
 	return cmd
@@ -47,25 +47,6 @@ func getConnection(arg string) string {
 		arg = "default"
 	}
 	return arg
-}
-
-func getSql(in string) string {
-	sb := &strings.Builder{}
-	switch in {
-	case "":
-		sb.WriteString("select 'use --input to specify a sql string, named query, or sql file path' as instructions")
-	case "list-columns":
-		queries.ListColumns(sb)
-	case "list-databases":
-		queries.ListDatabases(sb)
-	case "list-indexes":
-		queries.ListIndexes(sb)
-	case "list-tables":
-		queries.ListTables(sb)
-	default:
-		sb.WriteString(in)
-	}
-	return sb.String()
 }
 
 func getFormat(o string) string {

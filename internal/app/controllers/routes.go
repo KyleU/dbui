@@ -25,9 +25,11 @@ func BuildRouter(info util.AppInfo) (*mux.Router, error) {
 	settings.Methods(http.MethodPost).Handler(addContext(r, info, http.HandlerFunc(SettingsSave))).Name("settings.save")
 
 	// Project
-	project := r.PathPrefix("/q").Subrouter()
-	project.Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(Workspace))).Name("workspace.test")
-	r.Path("/q/{key}").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(Workspace))).Name("workspace")
+	_ = r.PathPrefix("/projects").Subrouter()
+	r.Path("/q").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(WorkspaceTest))).Name("workspace.test")
+	r.Path("/q/{p}").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(Workspace))).Name("workspace")
+	r.Path("/q/{p}/t/{t}").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(WorkspaceTable))).Name("workspace.table")
+	r.Path("/q/{p}/v/{v}").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(WorkspaceView))).Name("workspace.view")
 
 	// Sandbox
 	sandbox := r.Path("/sandbox").Subrouter()
@@ -49,13 +51,26 @@ func BuildRouter(info util.AppInfo) (*mux.Router, error) {
 	// Assets
 	r.Path("/favicon.ico").Methods(http.MethodGet).HandlerFunc(Favicon).Name("favicon")
 	r.PathPrefix("/assets").Methods(http.MethodGet).HandlerFunc(Static).Name("assets")
+
+	r.PathPrefix("").Handler(addContext(r, info, http.HandlerFunc(NotFound)))
+
 	return r, nil
 }
 
 func addContext(router *mux.Router, info util.AppInfo, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer internalServerError(w)
 		ctx := context.WithValue(r.Context(), "routes", router)
 		ctx = context.WithValue(ctx, "info", info)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+
+func internalServerError(w http.ResponseWriter) {
+	if err := recover(); err != nil {
+		println("PANIC AT THE SERVER!!!!")
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Internal Server Error"))
+	}
 }

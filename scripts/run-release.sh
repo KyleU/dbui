@@ -10,4 +10,4 @@ cd $project_dir
 bin/build-css
 # bin/build-client
 make build-release
-RUST_BACKTRACE=1 build/release/dbui
+build/release/dbui

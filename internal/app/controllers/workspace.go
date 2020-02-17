@@ -8,9 +8,28 @@ import (
 	"net/http"
 )
 
+func WorkspaceTest(w http.ResponseWriter, r *http.Request) {
+	redir(w, r, func(ctx util.RequestContext) (string, error) {
+		return ctx.Route("workspace", "p", "test"), nil
+	})
+}
 func Workspace(w http.ResponseWriter, r *http.Request) {
-	key := mux.Vars(r)["key"]
-	view(getSchema(key), w, r)
+	p := mux.Vars(r)["p"]
+	view(getSchema(p), w, r)
+}
+
+func WorkspaceTable(w http.ResponseWriter, r *http.Request) {
+	p := mux.Vars(r)["p"]
+	t := mux.Vars(r)["t"]
+	println("Table: " + t)
+	view(getSchema(p), w, r)
+}
+
+func WorkspaceView(w http.ResponseWriter, r *http.Request) {
+	p := mux.Vars(r)["p"]
+	v := mux.Vars(r)["v"]
+	println("View: " + v)
+	view(getSchema(p), w, r)
 }
 
 func view(s models.Schema, w http.ResponseWriter, r *http.Request) {
@@ -22,7 +41,7 @@ func view(s models.Schema, w http.ResponseWriter, r *http.Request) {
 func getSchema(key string) models.Schema {
 	s := models.NewSchema("test", "Test Schema")
 
-	if key == "" {
+	if key == "test" {
 		s.Tables.Add(
 			models.Table{Name: "C"},
 			models.Table{Name: "B"},

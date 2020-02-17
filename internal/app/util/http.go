@@ -1,8 +1,6 @@
 package util
 
 import (
-	"emperror.dev/emperror"
-	"emperror.dev/errors"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
@@ -11,13 +9,6 @@ import (
 	"os"
 	"strings"
 )
-
-func NotFound(w http.ResponseWriter, _ *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
-	w.WriteHeader(http.StatusNotFound)
-	_, err := w.Write([]byte("404: Page Not Found"))
-	emperror.Panic(errors.WithStack(errors.Wrap(err, "Unable to write to response")))
-}
 
 type RequestContext struct {
 	AppInfo AppInfo

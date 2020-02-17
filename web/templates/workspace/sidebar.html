@@ -8,7 +8,7 @@
         </a>
         <ul class="uk-nav-sub" id="nav-tables">
           <% for _, t := range s.Tables.Names() { %>
-          <li><%= t %></li>
+          <li><a class="<%= ctx.Profile.LinkClass() %>" href="<%= ctx.Route("workspace.table", "p", s.Id, "t", t) %>"><%= t %></a></li>
           <% } %>
         </ul>
       </li>
@@ -20,7 +20,7 @@
         </a>
         <ul class="uk-nav-sub" id="nav-views">
           <% for _, v := range s.Views.Names() { %>
-          <li><%= v %></li>
+          <li><a class="<%= ctx.Profile.LinkClass() %>" href="<%= ctx.Route("workspace.view", "p", s.Id, "v", v) %>"><%= v %></a></li>
           <% } %>
         </ul>
       </li>

@@ -18,8 +18,6 @@ func SandboxList(w http.ResponseWriter, r *http.Request) {
 func SandboxForm(w http.ResponseWriter, r *http.Request) {
 	key := mux.Vars(r)["key"]
 	if key == "testbed" {
-		// x := 0
-		// _ = 10 / x
 		panic("!!!!")
 	}
 	act(w, r, "Sandbox [" + key + "]", func(ctx util.RequestContext) (int, error) {

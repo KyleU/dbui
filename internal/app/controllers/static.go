@@ -4,11 +4,15 @@ import (
 	"emperror.dev/emperror"
 	"emperror.dev/errors"
 	"github.com/kyleu/dbui/internal/app/controllers/assets"
-	"github.com/kyleu/dbui/internal/app/util"
 	"net/http"
 	"path/filepath"
 	"strings"
 )
+
+func Favicon(w http.ResponseWriter, r *http.Request) {
+	data, hash, contentType, err := assets.Asset("web/assets", "/favicon.ico")
+	zipResponse(w, r, data, hash, contentType, err)
+}
 
 func Static(w http.ResponseWriter, r *http.Request) {
 	path, err := filepath.Abs(strings.TrimPrefix(r.URL.Path, "/assets"))
@@ -21,11 +25,6 @@ func Static(w http.ResponseWriter, r *http.Request) {
 	} else {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
-}
-
-func Favicon(w http.ResponseWriter, r *http.Request) {
-	data, hash, contentType, err := assets.Asset("web/assets", "/favicon.ico")
-	zipResponse(w, r, data, hash, contentType, err)
 }
 
 func zipResponse(w http.ResponseWriter, r *http.Request, data []byte, hash string, contentType string, err error) {
@@ -42,6 +41,6 @@ func zipResponse(w http.ResponseWriter, r *http.Request, data []byte, hash strin
 			emperror.Panic(errors.WithStack(errors.Wrap(err, "Unable to write to response")))
 		}
 	} else {
-		util.NotFound(w, r)
+		NotFound(w, r)
 	}
 }
