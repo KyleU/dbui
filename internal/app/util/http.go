@@ -2,12 +2,13 @@ package util
 
 import (
 	"fmt"
-	"github.com/gorilla/mux"
-	"github.com/gorilla/sessions"
-	"logur.dev/logur"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
+	"logur.dev/logur"
 )
 
 type RequestContext struct {
@@ -64,7 +65,7 @@ func ExtractContext(r *http.Request, title string) RequestContext {
 		flashes = append(flashes, fmt.Sprintf("%v", f))
 	}
 
-	logger := logur.WithFields(ai.Logger, map[string]interface{}{ "path": r.URL.Path, "method": r.Method})
+	logger := logur.WithFields(ai.Logger, map[string]interface{}{"path": r.URL.Path, "method": r.Method})
 
 	return RequestContext{
 		AppInfo: ai,

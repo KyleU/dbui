@@ -2,10 +2,11 @@ package controllers
 
 import (
 	"context"
+	"net/http"
+
 	"github.com/gorilla/mux"
 	"github.com/kyleu/dbui/internal/app/util"
 	"github.com/sagikazarmark/ocmux"
-	"net/http"
 )
 
 func BuildRouter(info util.AppInfo) (*mux.Router, error) {
@@ -38,8 +39,8 @@ func BuildRouter(info util.AppInfo) (*mux.Router, error) {
 
 	// Ad-hoc SQL Queries
 	sql := r.Path("/sql").Subrouter()
-	sql.Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(SqlForm))).Name("sql.form")
-	sql.Methods(http.MethodPost).Handler(addContext(r, info, http.HandlerFunc(SqlRun))).Name("sql.run")
+	sql.Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(SQLForm))).Name("sql.form")
+	sql.Methods(http.MethodPost).Handler(addContext(r, info, http.HandlerFunc(SQLRun))).Name("sql.run")
 
 	// Utils
 	_ = r.Path("/utils").Subrouter()
@@ -59,18 +60,9 @@ func BuildRouter(info util.AppInfo) (*mux.Router, error) {
 
 func addContext(router *mux.Router, info util.AppInfo, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		defer internalServerError(w)
+		defer InternalServerError(router, info, w, r)
 		ctx := context.WithValue(r.Context(), "routes", router)
 		ctx = context.WithValue(ctx, "info", info)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
-}
-
-func internalServerError(w http.ResponseWriter) {
-	if err := recover(); err != nil {
-		println("PANIC AT THE SERVER!!!!")
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Internal Server Error"))
-	}
 }

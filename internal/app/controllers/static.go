@@ -1,12 +1,13 @@
 package controllers
 
 import (
-	"emperror.dev/emperror"
-	"emperror.dev/errors"
-	"github.com/kyleu/dbui/internal/app/controllers/assets"
 	"net/http"
 	"path/filepath"
 	"strings"
+
+	"emperror.dev/emperror"
+	"emperror.dev/errors"
+	"github.com/kyleu/dbui/internal/app/controllers/assets"
 )
 
 func Favicon(w http.ResponseWriter, r *http.Request) {

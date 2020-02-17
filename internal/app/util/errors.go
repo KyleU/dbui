@@ -3,6 +3,7 @@ package util
 import (
 	"context"
 	"fmt"
+
 	"logur.dev/logur"
 )
 
@@ -11,9 +12,10 @@ type ErrorHandler interface {
 	HandleContext(ctx context.Context, err error)
 }
 
-type AppErrorHandler struct{
+type AppErrorHandler struct {
 	Logger logur.LoggerFacade
 }
+
 func (a AppErrorHandler) Handle(err error) {
 	if err != nil {
 		a.Logger.Error(fmt.Sprintf("Error: %v", err))

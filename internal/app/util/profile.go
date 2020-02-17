@@ -1,6 +1,6 @@
 package util
 
-var AllColors = []string { "clear", "grey", "bluegrey", "red", "orange", "yellow", "green", "blue", "purple" }
+var AllColors = []string{"clear", "grey", "bluegrey", "red", "orange", "yellow", "green", "blue", "purple"}
 
 type Theme uint8
 
@@ -10,7 +10,7 @@ const (
 	endTypes
 )
 
-var AllThemes = []Theme{ ThemeLight, ThemeDark }
+var AllThemes = []Theme{ThemeLight, ThemeDark}
 
 func (t Theme) String() string {
 	if t < endTypes {
@@ -28,7 +28,7 @@ func ThemeFromString(s string) Theme {
 	return ThemeLight
 }
 
-func (t Theme) CssClass() string {
+func (t Theme) CSSClass() string {
 	if t < endTypes {
 		return themeClasses[t]
 	}
@@ -42,19 +42,19 @@ func (t Theme) Valid() bool {
 var (
 	themeNames = [...]string{
 		ThemeLight: "Light",
-		ThemeDark: "Dark",
+		ThemeDark:  "Dark",
 	}
 
 	themeClasses = [...]string{
 		ThemeLight: "uk-dark",
-		ThemeDark: "uk-light",
+		ThemeDark:  "uk-light",
 	}
 )
 
 type UserProfile struct {
-	Name string
-	Theme Theme
-	NavColor string
+	Name      string
+	Theme     Theme
+	NavColor  string
 	LinkColor string
 }
 

@@ -1,10 +1,11 @@
 package util
 
 import (
+	"os"
+
 	"github.com/sirupsen/logrus"
 	logrusadapter "logur.dev/adapter/logrus"
 	"logur.dev/logur"
-	"os"
 )
 
 func InitLogging(verbose bool) logur.LoggerFacade {

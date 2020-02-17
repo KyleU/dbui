@@ -8,3 +8,6 @@ project_dir=${dir}/..
 cd $project_dir
 
 echo "=== formatting ==="
+gofmt -w .
+echo "=== organizing imports ==="
+goimports -w .

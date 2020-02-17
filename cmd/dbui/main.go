@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/kyleu/dbui/internal/app/cli"
 	"os"
+
+	"github.com/kyleu/dbui/internal/app/cli"
 )
 
 // Provisioned by ldflags

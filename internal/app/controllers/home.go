@@ -1,10 +1,11 @@
 package controllers
 
 import (
+	"net/http"
+
 	"github.com/gorilla/websocket"
 	"github.com/kyleu/dbui/internal/app/util"
 	template "github.com/kyleu/dbui/internal/gen/templates"
-	"net/http"
 )
 
 func Home(w http.ResponseWriter, r *http.Request) {

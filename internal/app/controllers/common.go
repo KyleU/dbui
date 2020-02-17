@@ -2,9 +2,10 @@ package controllers
 
 import (
 	"fmt"
-	"github.com/kyleu/dbui/internal/app/util"
 	"net/http"
 	"time"
+
+	"github.com/kyleu/dbui/internal/app/util"
 )
 
 func act(w http.ResponseWriter, r *http.Request, title string, f func(util.RequestContext) (int, error)) {
@@ -19,7 +20,7 @@ func act(w http.ResponseWriter, r *http.Request, title string, f func(util.Reque
 	if err != nil {
 		ctx.Logger.Warn("Error running action")
 	}
-	logComplete(startNanos, ctx, r)
+	logComplete(startNanos, ctx, http.StatusOK, r)
 }
 
 func redir(w http.ResponseWriter, r *http.Request, f func(util.RequestContext) (string, error)) {
@@ -31,13 +32,14 @@ func redir(w http.ResponseWriter, r *http.Request, f func(util.RequestContext) (
 	}
 	w.Header().Set("Location", url)
 	w.WriteHeader(http.StatusFound)
-	logComplete(startNanos, ctx, r)
+	logComplete(startNanos, ctx, http.StatusFound, r)
 }
 
-func logComplete(startNanos int64, ctx util.RequestContext, r *http.Request) {
+func logComplete(startNanos int64, ctx util.RequestContext, status int, r *http.Request) {
 	delta := (time.Now().UnixNano() - startNanos) / int64(time.Microsecond)
 	ms := util.MicrosToMillis(delta)
-	ctx.Logger.Debug(fmt.Sprintf("[%v %v] processed in [%vms]", r.Method, r.URL.Path, ms), map[string]interface{} { "elapsed": delta })
+	args := map[string]interface{}{"elapsed": delta, "status": status}
+	ctx.Logger.Debug(fmt.Sprintf("[%v %v] returned [%v] in [%vms]", r.Method, r.URL.Path, status, ms), args)
 }
 
 func saveSession(w http.ResponseWriter, r *http.Request, ctx util.RequestContext) {

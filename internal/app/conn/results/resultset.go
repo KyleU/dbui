@@ -1,13 +1,13 @@
 package results
 
 type ResultSet struct {
-	Sql string
+	SQL     string
 	Columns []Column
-	Data [][]string
-	Timing ResultSetTiming
+	Data    [][]string
+	Timing  ResultSetTiming
 }
 
 type ResultSetTiming struct {
 	Connected int64
-	Elapsed int64
+	Elapsed   int64
 }

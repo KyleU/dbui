@@ -2,15 +2,16 @@ package conn
 
 import (
 	"context"
-	"emperror.dev/errors"
 	"fmt"
+	"time"
+
+	"emperror.dev/errors"
 	"github.com/jackc/pgproto3/v2"
 	"github.com/jackc/pgtype"
 	"github.com/jackc/pgx/v4"
 	"github.com/kyleu/dbui/internal/app/conn/output"
 	"github.com/kyleu/dbui/internal/app/conn/results"
 	"logur.dev/logur"
-	"time"
 )
 
 func GetResult(logger logur.LoggerFacade, conn string, in string) (*results.ResultSet, error) {
@@ -48,8 +49,8 @@ func runQuery(logger logur.LoggerFacade, url string, sql string) (*results.Resul
 	}
 
 	rs := results.ResultSet{
-		Sql:     sql,
-		Timing: results.ResultSetTiming {
+		SQL: sql,
+		Timing: results.ResultSetTiming{
 			Connected: connected,
 		},
 	}

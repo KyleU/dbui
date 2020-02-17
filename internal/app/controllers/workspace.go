@@ -1,11 +1,12 @@
 package controllers
 
 import (
+	"net/http"
+
 	"github.com/gorilla/mux"
 	"github.com/kyleu/dbui/internal/app/models"
 	"github.com/kyleu/dbui/internal/app/util"
 	template "github.com/kyleu/dbui/internal/gen/templates"
-	"net/http"
 )
 
 func WorkspaceTest(w http.ResponseWriter, r *http.Request) {

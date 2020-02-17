@@ -1,12 +1,13 @@
 package web
 
 import (
-	"emperror.dev/errors"
 	"fmt"
+	"net/http"
+
+	"emperror.dev/errors"
 	"github.com/gorilla/handlers"
 	"github.com/kyleu/dbui/internal/app/controllers"
 	"github.com/kyleu/dbui/internal/app/util"
-	"net/http"
 )
 
 func MakeServer(info util.AppInfo, address string, port uint16) error {
@@ -16,7 +17,7 @@ func MakeServer(info util.AppInfo, address string, port uint16) error {
 	}
 	var msg = fmt.Sprintf("%v is starting on [%v:%v]", info.AppName, address, port)
 	if info.Debug {
-		msg = msg + " (verbose)"
+		msg += " (verbose)"
 	}
 	info.Logger.Info(msg, map[string]interface{}{"address": address, "port": port})
 	err = http.ListenAndServe(fmt.Sprintf("%v:%v", address, port), handlers.CORS()(routes))

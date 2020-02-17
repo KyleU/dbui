@@ -1,8 +1,9 @@
 package util
 
 import (
-	"github.com/shibukawa/configdir"
 	"path/filepath"
+
+	"github.com/shibukawa/configdir"
 )
 
 var cfg = configdir.New("dbui", "dbui")

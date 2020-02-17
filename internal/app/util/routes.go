@@ -1,15 +1,16 @@
 package util
 
 import (
-	"github.com/gorilla/mux"
 	"runtime/debug"
 	"strings"
+
+	"github.com/gorilla/mux"
 )
 
 type RouteDescription struct {
-	Name string
+	Name    string
 	Methods string
-	Path string
+	Path    string
 }
 
 func ExtractRoutes(r *mux.Router) []RouteDescription {
@@ -19,7 +20,7 @@ func ExtractRoutes(r *mux.Router) []RouteDescription {
 		pathTemplate, _ := route.GetPathTemplate()
 		name := route.GetName()
 		m := strings.Join(methods, ", ")
-		ret = append(ret, RouteDescription { name, m, pathTemplate })
+		ret = append(ret, RouteDescription{name, m, pathTemplate})
 		return nil
 	})
 	return ret
@@ -27,7 +28,7 @@ func ExtractRoutes(r *mux.Router) []RouteDescription {
 
 func ExtractModules() *debug.BuildInfo {
 	bi, ok := debug.ReadBuildInfo()
-	if(!ok) {
+	if !ok {
 		return nil
 	}
 	return bi

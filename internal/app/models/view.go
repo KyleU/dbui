@@ -7,7 +7,7 @@ type View struct {
 }
 
 type ViewRegistry struct {
-	names  []string
+	names []string
 	views map[string]View
 }
 
@@ -33,7 +33,7 @@ func (s *ViewRegistry) Add(t ...View) {
 
 func newViewRegistry() ViewRegistry {
 	return ViewRegistry{
-		names:  []string{},
+		names: []string{},
 		views: map[string]View{},
 	}
 }

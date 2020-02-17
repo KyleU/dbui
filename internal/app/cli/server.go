@@ -5,15 +5,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-
 func NewServerCommand(appName string, version string, commitHash string) *cobra.Command {
 	var port uint16
 	var addr string
 
 	cmd := &cobra.Command{
-		Use:     "server",
-		Short:   "Starts the http server",
-		Args:    cobra.NoArgs,
+		Use:   "server",
+		Short: "Starts the http server",
+		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			info := InitApp(appName, version, commitHash)
 			return web.MakeServer(info, addr, port)

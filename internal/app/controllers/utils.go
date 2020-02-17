@@ -1,17 +1,11 @@
 package controllers
 
 import (
+	"net/http"
+
 	"github.com/kyleu/dbui/internal/app/util"
 	template "github.com/kyleu/dbui/internal/gen/templates"
-	"net/http"
 )
-
-func NotFound(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	w.WriteHeader(http.StatusNotFound)
-	ctx := util.ExtractContext(r, "Not Found")
-	template.NotFound(r, ctx, w)
-}
 
 func Health(w http.ResponseWriter, r *http.Request) {
 	act(w, r, "Routes", func(ctx util.RequestContext) (int, error) {

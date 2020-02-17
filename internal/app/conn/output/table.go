@@ -1,9 +1,10 @@
 package output
 
 import (
+	"strings"
+
 	"github.com/kyleu/dbui/internal/app/conn/results"
 	"github.com/olekukonko/tablewriter"
-	"strings"
 )
 
 func AsTable(rs *results.ResultSet) (string, error) {

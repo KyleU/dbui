@@ -4,7 +4,7 @@ import "fmt"
 
 type Column struct {
 	Name string
-	T FieldType
+	T    FieldType
 }
 
 func (c Column) String() string {

@@ -1,12 +1,13 @@
 package cli
 
 import (
-	"emperror.dev/errors"
 	"fmt"
+	"strings"
+
+	"emperror.dev/errors"
 	"github.com/kyleu/dbui/internal/app/conn"
 	"github.com/kyleu/dbui/internal/app/util"
 	"github.com/spf13/cobra"
-	"strings"
 )
 
 func NewQueryCommand(appName string, version string, commitHash string) *cobra.Command {
@@ -21,7 +22,7 @@ func NewQueryCommand(appName string, version string, commitHash string) *cobra.C
 		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			info := InitApp(appName, version, commitHash)
-			rs, err := conn.GetResult(info.Logger, getConnection(connNameArg), util.GetSql(inputArg))
+			rs, err := conn.GetResult(info.Logger, util.GetConnection(connNameArg), util.GetSQL(inputArg))
 			if err != nil {
 				return errors.WithStack(errors.Wrap(err, "Error retrieving result"))
 			}
@@ -40,13 +41,6 @@ func NewQueryCommand(appName string, version string, commitHash string) *cobra.C
 	flags.StringVarP(&outputArg, "output", "o", "", "output format, one of [table, markdown, csv, json, xml]")
 
 	return cmd
-}
-
-func getConnection(arg string) string {
-	if arg == "" {
-		arg = "default"
-	}
-	return arg
 }
 
 func getFormat(o string) string {

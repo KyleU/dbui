@@ -7,5 +7,5 @@ func MicrosToMillis(i int64) string {
 	if ms >= 20 {
 		return fmt.Sprintf("%d", ms)
 	}
-	return fmt.Sprintf("%d.%d", ms, i % 1000)
+	return fmt.Sprintf("%d.%d", ms, i%1000)
 }

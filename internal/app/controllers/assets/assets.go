@@ -11,11 +11,11 @@ import (
 )
 
 func init() {
-	mime.AddExtensionType(".ico", "image/x-icon")
-	mime.AddExtensionType(".eot", "font/eot")
-	mime.AddExtensionType(".tff", "font/tff")
-	mime.AddExtensionType(".woff", "application/font-woff")
-	mime.AddExtensionType(".woff2", "application/font-woff")
+	_ = mime.AddExtensionType(".ico", "image/x-icon")
+	_ = mime.AddExtensionType(".eot", "font/eot")
+	_ = mime.AddExtensionType(".tff", "font/tff")
+	_ = mime.AddExtensionType(".woff", "application/font-woff")
+	_ = mime.AddExtensionType(".woff2", "application/font-woff")
 }
 
 func Asset(base, path string) ([]byte, string, string, error) {
@@ -27,8 +27,8 @@ func Asset(base, path string) ([]byte, string, string, error) {
 	}
 	if data != nil {
 		w := gzip.NewWriter(&b)
-		_, err = w.Write(data)
-		err = w.Close()
+		_, _ = w.Write(data)
+		_ = w.Close()
 		data = b.Bytes()
 	}
 	sum := md5.Sum(data)

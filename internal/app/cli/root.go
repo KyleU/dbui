@@ -38,14 +38,14 @@ func InitApp(appName string, version string, commitHash string) util.AppInfo {
 	errorHandler := logurhandler.New(logger)
 	defer emperror.HandleRecover(errorHandler)
 
-	handler := emperror.WithDetails(util.AppErrorHandler{ Logger: logger }, "key", "value")
+	handler := emperror.WithDetails(util.AppErrorHandler{Logger: logger}, "key", "value")
 
 	return util.AppInfo{
-		AppName:    appName,
-		Debug:      verbose,
-		Version:    version,
-		CommitHash: commitHash,
-		Logger:     logger,
+		AppName:      appName,
+		Debug:        verbose,
+		Version:      version,
+		CommitHash:   commitHash,
+		Logger:       logger,
 		ErrorHandler: handler,
 	}
 }

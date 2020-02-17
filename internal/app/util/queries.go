@@ -1,12 +1,20 @@
 package util
 
 import (
-	"github.com/kyleu/dbui/internal/gen/queries"
 	"io/ioutil"
 	"strings"
+
+	"github.com/kyleu/dbui/internal/gen/queries"
 )
 
-func GetSql(in string) string {
+func GetConnection(arg string) string {
+	if arg == "" {
+		arg = "default"
+	}
+	return arg
+}
+
+func GetSQL(in string) string {
 	if len(in) == 0 {
 		return "select 'specify a sql string or file://path/filename.sql' as instructions"
 	}
@@ -36,9 +44,8 @@ func GetSql(in string) string {
 		}
 		if sb.Len() == 0 {
 			return "select 'Cannot load named query [" + qName + "]' as error"
-		} else {
-			return sb.String()
 		}
+		return sb.String()
 	} else if strings.HasPrefix(in, "file:") {
 		path := strings.TrimPrefix(in, "file:")
 		bytes, err := ioutil.ReadFile(path)

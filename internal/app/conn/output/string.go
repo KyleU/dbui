@@ -1,8 +1,9 @@
 package output
 
 import (
-	"github.com/kyleu/dbui/internal/app/conn/results"
 	"strings"
+
+	"github.com/kyleu/dbui/internal/app/conn/results"
 )
 
 func AsString(rs *results.ResultSet) (string, error) {
