@@ -1,12 +1,16 @@
-<%: func WorkspaceOverview(s models.Schema, ctx util.RequestContext, w io.Writer) (int, error) %>
+<%: func WorkspaceOverview(s schema.Schema, activeItem string, ctx util.RequestContext, w io.Writer) (int, error) %>
 
 <%~ "layout/basic.html" %>
 
 <%@ body { %>
-  <%+ "workspace/sidebar.html" %>
-  <div>
-    <h1 class="uk-heading-hero"><%= s.Name %></h1>
-    <div class="uk-text-lead">A work in progress</div>
+  <% WorkspaceSidebar(s, activeItem, ctx, _buffer) %>
+  <div id="content">
+    <div class="uk-container uk-container-expand">
+      <div class="uk-margin-medium-top">
+        <h1 class="uk-heading-hero"><%= s.Name %></h1>
+        <div class="uk-text-lead">A work in progress</div>
+      </div>
+    </div>
   </div>
   <script>window.onload = function() { connect("<%= s.ID %>") }</script>
 <% } %>

@@ -9,5 +9,5 @@ project_dir=${dir}/..
 cd $project_dir
 
 scripts/build-css.sh
-echo "Watching sass compilation for [crates/assets/stylesheets/style.scss]..."
+echo "Watching sass compilation for [web/stylesheets/style.scss]..."
 sass --watch --no-source-map web/stylesheets/style.scss web/assets/vendor/style.css

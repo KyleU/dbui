@@ -1,9 +1,23 @@
-package models
+package schema
 
-import "sort"
+import (
+	"fmt"
+	"sort"
+
+	"github.com/kyleu/dbui/internal/app/conn/results"
+)
 
 type Table struct {
-	Name string
+	Name    string
+	Columns []results.Column
+}
+
+func (t *Table) AddColumn(column results.Column) {
+	t.Columns = append(t.Columns, column)
+}
+
+func (t *Table) ItemID() string {
+	return fmt.Sprintf("table.%s", t.Name)
 }
 
 type TableRegistry struct {
@@ -13,6 +27,10 @@ type TableRegistry struct {
 
 func (s *TableRegistry) Names() []string {
 	return s.names
+}
+
+func (s *TableRegistry) Get(key string) Table {
+	return s.tables[key]
 }
 
 func (s *TableRegistry) Size() int {

@@ -10,6 +10,9 @@ type AppInfo struct {
 	Debug        bool
 	Version      string
 	CommitHash   string
+
+	CachePath    string
+
 	Logger       logur.LoggerFacade
 	ErrorHandler emperror.ErrorHandlerFacade
 }

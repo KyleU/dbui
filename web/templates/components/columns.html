@@ -1,0 +1,24 @@
+<%: func ComponentColumns(columns []results.Column, buffer *bytes.Buffer) %>
+<li>
+  <a class="uk-accordion-title" href="#"><%=v len(columns) %> Columns</a>
+  <div class="uk-accordion-content">
+    <table class="uk-table uk-table-small">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Type</th>
+        </tr>
+      </thead>
+      <% for idx, c := range columns {%>
+      <tbody>
+      <tr>
+        <td><%=v idx + 1 %></td>
+        <td><%= c.Name %></td>
+        <td title="<%= c.T.String() %>"><%= c.T.Desc().Title %></td>
+      </tr>
+      </tbody>
+      <% } %>
+    </table>
+  </div>
+</li>

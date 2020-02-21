@@ -9,16 +9,18 @@ import (
 )
 
 func SQLForm(w http.ResponseWriter, r *http.Request) {
-	act(w, r, "Ad-hoc SQL Query", func(ctx util.RequestContext) (int, error) {
+	act(w, r, func(ctx util.RequestContext) (int, error) {
+		ctx.Breadcrumbs = util.BreadcrumbsSimple(ctx.Route("sql.form"), "ad-hoc")
 		return template.SqlForm("", ctx, w)
 	})
 }
 
 func SQLRun(w http.ResponseWriter, r *http.Request) {
-	act(w, r, "SQL Results", func(ctx util.RequestContext) (int, error) {
+	act(w, r, func(ctx util.RequestContext) (int, error) {
 		_ = r.ParseForm()
 		sql := r.Form.Get("sql")
-		rs, err := conn.GetResult(ctx.Logger, util.GetConnection(""), util.GetSQL(sql))
+		rs, err := conn.GetResult(ctx.Logger, "", sql)
+		ctx.Breadcrumbs = util.BreadcrumbsSimple(ctx.Route("sql.form"), "ad-hoc")
 		return template.SqlResults(sql, rs, err, ctx, w)
 	})
 }

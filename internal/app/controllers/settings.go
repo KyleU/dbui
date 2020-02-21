@@ -8,7 +8,8 @@ import (
 )
 
 func Settings(w http.ResponseWriter, r *http.Request) {
-	act(w, r, "Settings", func(ctx util.RequestContext) (int, error) {
+	act(w, r, func(ctx util.RequestContext) (int, error) {
+		ctx.Breadcrumbs = util.BreadcrumbsSimple(ctx.Route("settings"), "settings")
 		return template.Settings(ctx, w)
 	})
 }

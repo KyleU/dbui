@@ -1,4 +1,10 @@
-<%: func InternalServerError(r *http.Request, ctx util.RequestContext, w io.Writer) (int, error) %>
+<%: func InternalServerError(msg string, trace errors.StackTrace, r *http.Request, ctx util.RequestContext, w io.Writer) (int, error) %>
+
+<%!
+  import (
+      "fmt"
+  )
+%>
 
 <%~ "layout/basic.html" %>
 
@@ -7,6 +13,20 @@
   <div class="uk-container">
     <div>
       <h1 class="uk-heading-hero">500 Internal Server Error</h1>
+      <div class="uk-text-lead"><%= msg %></div>
+      <div class="uk-margin-top">
+        <% if trace != nil { %>
+        <table>
+          <tbody>
+            <% for f, _ := range trace { %>
+            <tr>
+              <td><%=v f %></td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
+        <% } %>
+      </div>
     </div>
   </div>
 </div>

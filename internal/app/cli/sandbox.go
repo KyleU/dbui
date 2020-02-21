@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"github.com/kyleu/dbui/internal/app/conn/output"
 
 	"emperror.dev/errors"
 	"github.com/kyleu/dbui/internal/app/conn"
@@ -19,7 +20,7 @@ func NewSandboxCommand(appName string, version string, commitHash string) *cobra
 			if err != nil {
 				return errors.WithStack(errors.Wrap(err, "Error retrieving result"))
 			}
-			out, err := conn.OutputFor(rs, "table")
+			out, err := output.OutputFor(rs, "table")
 			if err != nil {
 				return errors.WithStack(errors.Wrap(err, "Error formatting output"))
 			}

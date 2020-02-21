@@ -1,4 +1,4 @@
-package models
+package schema
 
 type Schema struct {
 	ID     string

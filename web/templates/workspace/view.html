@@ -1,0 +1,25 @@
+<%: func WorkspaceView(s schema.Schema, v string, ctx util.RequestContext, w io.Writer) (int, error) %>
+
+<%~ "layout/basic.html" %>
+
+<%@ body { %>
+  <% view := s.Views.Get(v) %>
+  <% WorkspaceSidebar(s, "view." + v, ctx, _buffer) %>
+  <div id="content">
+    <div class="uk-container uk-container-expand">
+      <div class="uk-margin-medium-top">
+        <h1 class="uk-heading-hero">View [<%= v %>]</h1>
+        <div class="uk-text-lead">A work in progress</div>
+      </div>
+      <div class="uk-margin uk-card uk-card-body <%= ctx.Profile.Theme.CardClass() %>">
+        <ul uk-accordion>
+          <% ComponentColumns(view.Columns, _buffer) %>
+        </ul>
+      </div>
+      <div class="uk-margin-medium-top">
+        <a href="<%= ctx.Route("workspace.view.data", "p", s.ID, "v", v) %>">View Data</a>
+      </div>
+    </div>
+  </div>
+  <script>window.onload = function() { connect("<%= s.ID %>") }</script>
+<% } %>

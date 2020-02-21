@@ -1,12 +1,10 @@
 package cli
 
 import (
-	"fmt"
-	"strings"
-
 	"emperror.dev/errors"
+	"fmt"
 	"github.com/kyleu/dbui/internal/app/conn"
-	"github.com/kyleu/dbui/internal/app/util"
+	"github.com/kyleu/dbui/internal/app/conn/output"
 	"github.com/spf13/cobra"
 )
 
@@ -22,11 +20,11 @@ func NewQueryCommand(appName string, version string, commitHash string) *cobra.C
 		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			info := InitApp(appName, version, commitHash)
-			rs, err := conn.GetResult(info.Logger, util.GetConnection(connNameArg), util.GetSQL(inputArg))
+			rs, err := conn.GetResult(info.Logger, connNameArg, inputArg)
 			if err != nil {
 				return errors.WithStack(errors.Wrap(err, "Error retrieving result"))
 			}
-			out, err := conn.OutputFor(rs, getFormat(outputArg))
+			out, err := output.OutputFor(rs, outputArg)
 			if err != nil {
 				return errors.WithStack(errors.Wrap(err, "Error formatting query output"))
 			}
@@ -37,21 +35,9 @@ func NewQueryCommand(appName string, version string, commitHash string) *cobra.C
 
 	flags := cmd.Flags()
 	flags.StringVarP(&connNameArg, "conn", "c", "", "connection name or url")
-	flags.StringVarP(&inputArg, "input", "i", "", "SQL string or \"file://path/filename.sql\"")
+	flags.StringVarP(&inputArg, "input", "i", "", "SQL string or \"file:path/filename.sql\"")
 	flags.StringVarP(&outputArg, "output", "o", "", "output format, one of [table, markdown, csv, json, xml]")
 
 	return cmd
 }
 
-func getFormat(o string) string {
-	switch strings.ToLower(o) {
-	case "csv":
-		return "csv"
-	case "json":
-		return "json"
-	case "markdown":
-		return "markdown"
-	default:
-		return "table"
-	}
-}

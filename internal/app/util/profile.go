@@ -28,11 +28,18 @@ func ThemeFromString(s string) Theme {
 	return ThemeLight
 }
 
-func (t Theme) CSSClass() string {
+func (t Theme) BodyClass() string {
 	if t < endTypes {
-		return themeClasses[t]
+		return themeBodyClasses[t]
 	}
-	return themeClasses[ThemeLight]
+	return themeBodyClasses[ThemeLight]
+}
+
+func (t Theme) CardClass() string {
+	if t < endTypes {
+		return themeCardClasses[t]
+	}
+	return themeCardClasses[ThemeLight]
 }
 
 func (t Theme) Valid() bool {
@@ -45,9 +52,14 @@ var (
 		ThemeDark:  "Dark",
 	}
 
-	themeClasses = [...]string{
+	themeBodyClasses = [...]string{
 		ThemeLight: "uk-dark",
 		ThemeDark:  "uk-light",
+	}
+
+	themeCardClasses = [...]string{
+		ThemeLight: "uk-card-default",
+		ThemeDark:  "uk-card-secondary",
 	}
 )
 

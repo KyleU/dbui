@@ -11,14 +11,34 @@ import (
 	"logur.dev/logur"
 )
 
+type Breadcrumb struct {
+	Path  string
+	Title string
+}
+
+type Breadcrumbs []Breadcrumb
+
+func (bc Breadcrumbs) Title(ai AppInfo) string {
+	if len(bc) == 0 {
+		return ai.AppName
+	}
+	return bc[len(bc)-1].Title
+}
+
+func BreadcrumbsSimple(path string, title string) Breadcrumbs {
+	return []Breadcrumb{
+		{path, title},
+	}
+}
+
 type RequestContext struct {
-	AppInfo AppInfo
-	Logger  logur.LoggerFacade
-	Profile UserProfile
-	Routes  *mux.Router
-	Title   string
-	Flashes []string
-	Session sessions.Session
+	AppInfo     AppInfo
+	Logger      logur.LoggerFacade
+	Profile     UserProfile
+	Routes      *mux.Router
+	Breadcrumbs Breadcrumbs
+	Flashes     []string
+	Session     sessions.Session
 }
 
 func (r *RequestContext) Route(act string, pairs ...string) string {
@@ -47,17 +67,13 @@ var store = sessions.NewCookieStore([]byte(sessionKey))
 
 const sessionName = "dbui-session"
 
-func ExtractContext(r *http.Request, title string) RequestContext {
+func ExtractContext(r *http.Request) RequestContext {
 	ai := r.Context().Value("info").(AppInfo)
 	routes := r.Context().Value("routes").(*mux.Router)
 	prof := SystemProfile
 	session, err := store.Get(r, sessionName)
 	if err != nil {
 		session = sessions.NewSession(store, sessionName)
-	}
-
-	if title == "" {
-		title = ai.AppName
 	}
 
 	flashes := make([]string, 0)
@@ -68,13 +84,13 @@ func ExtractContext(r *http.Request, title string) RequestContext {
 	logger := logur.WithFields(ai.Logger, map[string]interface{}{"path": r.URL.Path, "method": r.Method})
 
 	return RequestContext{
-		AppInfo: ai,
-		Logger:  logger,
-		Profile: prof,
-		Routes:  routes,
-		Title:   title,
-		Flashes: flashes,
-		Session: *session,
+		AppInfo:     ai,
+		Logger:      logger,
+		Profile:     prof,
+		Routes:      routes,
+		Breadcrumbs: nil,
+		Flashes:     flashes,
+		Session:     *session,
 	}
 }
 

@@ -1,81 +1,127 @@
 package conn
 
 import (
-	"context"
 	"fmt"
 	"time"
 
 	"emperror.dev/errors"
-	"github.com/jackc/pgproto3/v2"
-	"github.com/jackc/pgtype"
-	"github.com/jackc/pgx/v4"
-	"github.com/kyleu/dbui/internal/app/conn/output"
-	"github.com/kyleu/dbui/internal/app/conn/results"
+	_ "github.com/jackc/pgx/v4/stdlib"
+	"github.com/jmoiron/sqlx"
 	"logur.dev/logur"
+
+	"github.com/kyleu/dbui/internal/app/conn/results"
+	"github.com/kyleu/dbui/internal/app/util"
 )
 
-func GetResult(logger logur.LoggerFacade, conn string, in string) (*results.ResultSet, error) {
-	return runQuery(logger, urlForConn(conn), in)
+func GetRows(conn string, input string) (*sqlx.DB, *sqlx.Rows, error) {
+	url := urlForConn(util.GetConnection(conn))
+	sqlText := util.GetSQL(input)
+
+	connection, _, err := connect(url)
+	if err != nil {
+		return nil, nil, err
+	}
+	stmt, _, err := prepare(*connection, sqlText)
+	if err != nil {
+		return nil, nil, err
+	}
+	rows, _, err := run(*stmt)
+	return connection, rows, err
 }
 
-func OutputFor(result *results.ResultSet, out string) (string, error) {
-	switch out {
-	case "string":
-		return output.AsString(result)
-	default:
-		return output.AsTable(result)
+func GetResult(logger logur.LoggerFacade, conn string, input string) (*results.ResultSet, error) {
+	url := urlForConn(util.GetConnection(conn))
+	sqlText := util.GetSQL(input)
+
+	connection, connected, err := connect(url)
+	defer func() {
+		if connection != nil {
+			_ = connection.Close()
+		}
+	}()
+
+	if err != nil {
+		return nil, err
 	}
+	stmt, prepared, err := prepare(*connection, sqlText)
+	if err != nil {
+		return nil, err
+	}
+	rows, elapsed, err := run(*stmt)
+	if err != nil {
+		return nil, err
+	}
+	return resultset(logger, sqlText, rows, connected, prepared, elapsed)
 }
 
 func urlForConn(conn string) string {
-	return "postgres://127.0.0.1:5432/dbui"
+	return "postgres://127.0.0.1:5432/dbui?sslmode=disable"
 }
 
-func runQuery(logger logur.LoggerFacade, url string, sql string) (*results.ResultSet, error) {
+func connect(url string) (*sqlx.DB, int64, error) {
 	startNanos := time.Now().UnixNano()
-	logger.Debug("Running sql query", map[string]interface{}{"sql": sql, "url": url})
-	ctx := context.Background()
-	conn, err := pgx.Connect(ctx, url)
-	if err != nil {
-		return nil, errors.WithStack(errors.Wrap(err, "Unable to connect to database"))
-	}
-	defer conn.Close(ctx)
-
+	conn, err := sqlx.Connect("pgx", url)
 	connected := (time.Now().UnixNano() - startNanos) / int64(time.Microsecond)
-
-	stmt, err := conn.Prepare(ctx, "test", sql)
 	if err != nil {
-		return nil, errors.WithStack(errors.Wrap(err, "Unable to prepare query"))
+		return nil, connected, errors.WithStack(errors.Wrap(err, "Unable to connect to database"))
 	}
+	return conn, connected, nil
+}
 
+func prepare(conn sqlx.DB, sqlText string) (*sqlx.Stmt, int64, error) {
+	startNanos := time.Now().UnixNano()
+	stmt, err := conn.Preparex(sqlText)
+	prepared := (time.Now().UnixNano() - startNanos) / int64(time.Microsecond)
+	if err != nil {
+		return nil, prepared, errors.WithStack(errors.Wrap(err, "Unable to prepare query"))
+	}
+	return stmt, prepared, nil
+}
+
+func run(stmt sqlx.Stmt) (*sqlx.Rows, int64, error) {
+	startNanos := time.Now().UnixNano()
+	rows, err := stmt.Queryx()
+	elapsed := (time.Now().UnixNano() - startNanos) / int64(time.Microsecond)
+	if err != nil {
+		return rows, elapsed, errors.WithStack(errors.Wrap(err, "Unable to execute query"))
+	}
+	return rows, elapsed, nil
+}
+
+func resultset(
+	logger logur.LoggerFacade, sqlText string, rows *sqlx.Rows,
+	connected int64, prepared int64, elapsed int64) (*results.ResultSet, error) {
 	rs := results.ResultSet{
-		SQL: sql,
+		SQL: sqlText,
 		Timing: results.ResultSetTiming{
 			Connected: connected,
+			Prepared:  prepared,
+			Elapsed:   elapsed,
 		},
 	}
 
-	fields := make([]results.Column, len(stmt.Fields))
-	for i, v := range stmt.Fields {
-		n := string(v.Name)
-		if n == "?column?" {
-			n = fmt.Sprintf("col%d", i+1)
-		}
-		fields[i] = results.Column{Name: n, T: typeFor(v, conn.ConnInfo())}
-	}
-	rs.Columns = fields
-
-	startNanos = time.Now().UnixNano()
-	rows, err := conn.Query(ctx, sql)
-	rs.Timing.Elapsed = (time.Now().UnixNano() - startNanos) / int64(time.Microsecond)
-	if err != nil {
-		return &rs, errors.WithStack(errors.Wrap(err, "Unable to execute query"))
-	}
-
+	fields := make([]results.Column, 0)
 	data := make([][]string, 0)
 
 	for rows.Next() {
-		values, err := rows.Values()
+		if len(fields) == 0 {
+			types, err := rows.ColumnTypes()
+			if err != nil {
+				return &rs, errors.WithStack(errors.Wrap(err, "Unable to extract column types from rows"))
+			}
+			for i, col := range types {
+				n := col.Name()
+				if n == "?column?" {
+					n = fmt.Sprintf("col%d", i+1)
+				}
+				t := results.FieldTypeForName(logger, col.Name(), col.DatabaseTypeName())
+				nullable, _ := col.Nullable()
+				fields = append(fields, results.Column{Name: n, T: t, Nullable: nullable})
+			}
+			rs.Columns = fields
+		}
+
+		values, err := rows.SliceScan()
 		if err != nil {
 			rs.Data = data
 			return &rs, errors.WithStack(errors.Wrap(err, "Unable to extract values from rows"))
@@ -90,41 +136,4 @@ func runQuery(logger logur.LoggerFacade, url string, sql string) (*results.Resul
 
 	rs.Data = data
 	return &rs, nil
-}
-
-func typeFor(f pgproto3.FieldDescription, info *pgtype.ConnInfo) results.FieldType {
-	r := results.TypeInvalid
-	t, ok := info.DataTypeForOID(f.DataTypeOID)
-	if ok {
-		switch t.Name {
-		case "bool":
-			r = results.TypeBool
-		case "timestamp", "timestamptz":
-			r = results.TypeTime
-		case "json":
-			r = results.TypeJSON
-		case "uuid":
-			r = results.TypeUUID
-		case "BYTES_TODO":
-			r = results.TypeBytes
-		case "ENUM_TODO":
-			r = results.TypeEnum
-		case "text", "varchar", "bpchar":
-			r = results.TypeString
-		case "int2":
-			r = results.TypeInt16
-		case "int4":
-			r = results.TypeInt32
-		case "int8":
-			r = results.TypeInt64
-		case "float4":
-			r = results.TypeFloat32
-		case "float8":
-			r = results.TypeFloat64
-		default:
-			println(string(f.Name) + ": " + t.Name)
-		}
-	}
-
-	return r
 }

@@ -17,14 +17,7 @@ COPY . /workspace
 
 ARG BUILD_TARGET
 
-RUN go get -u emperror.dev/emperror && \
-  go get -u github.com/pyros2097/go-embed && \
-  go get -u github.com/gorilla/mux && \
-  go get -u github.com/olekukonko/tablewriter && \
-  go get -u github.com/shiyanhui/hero/hero && \
-  go get -u  golang.org/x/mobile/cmd/gomobile && \
-  go get -u golang.org/x/tools/cmd/goimports && \
-  go get -u logur.dev/logur
+RUN /workspace/scripts/bootstrap.sh
 
 RUN set -xe && \
     if [[ "${BUILD_TARGET}" == "debug" ]]; then \

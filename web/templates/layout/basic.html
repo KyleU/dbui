@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-<%+ "layout/head.html" %>
-<body class="<%= ctx.Profile.Theme.CSSClass() %>">
-<%+ "layout/navbar.html" %>
+<% Head(ctx, _buffer) %>
+<body class="<%= ctx.Profile.Theme.BodyClass() %>">
+<% Navbar(ctx, _buffer) %>
 <div id="content" data-uk-height-viewport="expand: true">
 <% for _, flash := range ctx.Flashes { %>
   <% cls, content := util.ParseFlash(flash) %>

@@ -16,9 +16,10 @@ func GetConnection(arg string) string {
 
 func GetSQL(in string) string {
 	if len(in) == 0 {
-		return "select 'specify a sql string or file://path/filename.sql' as instructions"
+		return "select 'specify a sql string or file:path/filename.sql' as instructions"
 	}
-	if strings.HasPrefix(in, "named:") {
+	switch {
+	case strings.HasPrefix(in, "named:"):
 		sb := &strings.Builder{}
 		qName := strings.TrimPrefix(in, "named:")
 
@@ -46,14 +47,14 @@ func GetSQL(in string) string {
 			return "select 'Cannot load named query [" + qName + "]' as error"
 		}
 		return sb.String()
-	} else if strings.HasPrefix(in, "file:") {
+	case strings.HasPrefix(in, "file:"):
 		path := strings.TrimPrefix(in, "file:")
 		bytes, err := ioutil.ReadFile(path)
 		if err != nil {
 			return "select 'cannot read file [" + path + "]' as error"
 		}
 		return string(bytes)
-	} else {
+	default:
 		return in
 	}
 }

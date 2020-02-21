@@ -1,0 +1,24 @@
+<%: func WorkspaceTable(s schema.Schema, t string, ctx util.RequestContext, w io.Writer) (int, error) %>
+
+<%~ "layout/basic.html" %>
+
+<%@ body { %>
+  <% table := s.Tables.Get(t) %>
+  <% WorkspaceSidebar(s, "table." + t, ctx, _buffer) %>
+  <div id="content">
+    <div class="uk-container uk-container-expand">
+      <div class="uk-margin-medium-top">
+        <h1 class="uk-heading-hero">Table [<%= t %>]</h1>
+      </div>
+      <div class="uk-margin uk-card uk-card-body <%= ctx.Profile.Theme.CardClass() %>">
+        <ul uk-accordion>
+        <% ComponentColumns(table.Columns, _buffer) %>
+        </ul>
+      </div>
+      <div class="uk-margin-medium-top">
+        <a href="<%= ctx.Route("workspace.table.data", "p", s.ID, "t", t) %>">View Data</a>
+      </div>
+    </div>
+  </div>
+  <script>window.onload = function() { connect("<%= s.ID %>") }</script>
+<% } %>

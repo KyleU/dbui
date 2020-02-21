@@ -8,9 +8,9 @@ import (
 	"github.com/kyleu/dbui/internal/app/util"
 )
 
-func act(w http.ResponseWriter, r *http.Request, title string, f func(util.RequestContext) (int, error)) {
+func act(w http.ResponseWriter, r *http.Request, f func(util.RequestContext) (int, error)) {
 	startNanos := time.Now().UnixNano()
-	ctx := util.ExtractContext(r, title)
+	ctx := util.ExtractContext(r)
 
 	if len(ctx.Flashes) > 0 {
 		saveSession(w, r, ctx)
@@ -25,7 +25,7 @@ func act(w http.ResponseWriter, r *http.Request, title string, f func(util.Reque
 
 func redir(w http.ResponseWriter, r *http.Request, f func(util.RequestContext) (string, error)) {
 	startNanos := time.Now().UnixNano()
-	ctx := util.ExtractContext(r, "redirect")
+	ctx := util.ExtractContext(r)
 	url, err := f(ctx)
 	if err != nil {
 		ctx.Logger.Warn("Error running action")

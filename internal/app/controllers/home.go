@@ -9,7 +9,7 @@ import (
 )
 
 func Home(w http.ResponseWriter, r *http.Request) {
-	act(w, r, "Home", func(ctx util.RequestContext) (int, error) {
+	act(w, r, func(ctx util.RequestContext) (int, error) {
 		return template.Index(ctx, w)
 	})
 }
@@ -17,7 +17,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 var upgrader = websocket.Upgrader{}
 
 func Socket(w http.ResponseWriter, r *http.Request) {
-	ctx := util.ExtractContext(r, "WebSocket Connection")
+	ctx := util.ExtractContext(r)
 	c, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		ctx.Logger.Info("Unable to upgrade connection to websocket")
@@ -28,7 +28,6 @@ func Socket(w http.ResponseWriter, r *http.Request) {
 	for {
 		mt, message, err := c.ReadMessage()
 		if err != nil {
-			ctx.Logger.Info("Unable to read from websocket")
 			break
 		}
 		ctx.Logger.Info("Received message on websocket: " + string(message))
@@ -41,7 +40,8 @@ func Socket(w http.ResponseWriter, r *http.Request) {
 }
 
 func About(w http.ResponseWriter, r *http.Request) {
-	act(w, r, "About", func(ctx util.RequestContext) (int, error) {
+	act(w, r, func(ctx util.RequestContext) (int, error) {
+		ctx.Breadcrumbs = util.BreadcrumbsSimple(ctx.Route("about"), "about")
 		return template.About(ctx, w)
 	})
 }

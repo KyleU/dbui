@@ -1,26 +1,57 @@
+<%: func WorkspaceSidebar(s schema.Schema, activeItem string, ctx util.RequestContext, buffer *bytes.Buffer) %>
 <div class="sidebar-left" id="sidebar">
   <div id="nav-testbed">
     <ul class="uk-nav-default uk-nav-parent-icon uk-margin-medium" data-uk-nav="multiple: true">
-      <li class="uk-parent">
+      <%
+        overviewClass := ""
+        if activeItem == "overview" {
+          overviewClass = "uk-active"
+        }
+      %>
+      <li class="<%= overviewClass %>"><a href="<%= ctx.Route("workspace", "p", s.ID) %>">
+        <span class="uk-margin-small-right" data-uk-icon="icon: home"></span>
+        Overview
+      </a></li>
+      <%
+        active := ""
+        if strings.HasPrefix(activeItem, "table.") {
+          active = "uk-open"
+        }
+      %>
+      <li class="uk-parent <%= active %>">
         <a href="">
           <span class="uk-margin-small-right" data-uk-icon="icon: bookmark"></span>
           <span id="nav-table-count"><%=i s.Tables.Size() %></span> Tables
         </a>
         <ul class="uk-nav-sub" id="nav-tables">
           <% for _, t := range s.Tables.Names() { %>
+          <% if activeItem == "table." + t { %>
+          <li><a class="<%= ctx.Profile.LinkClass() %>" style="color: #000;" href="<%= ctx.Route("workspace.table", "p", s.ID, "t", t) %>"><%= t %></a></li>
+          <% } else { %>
           <li><a class="<%= ctx.Profile.LinkClass() %>" href="<%= ctx.Route("workspace.table", "p", s.ID, "t", t) %>"><%= t %></a></li>
+          <% } %>
           <% } %>
         </ul>
       </li>
       <% if s.Views.Size() > 0 { %>
-      <li class="uk-parent">
+      <%
+        active := ""
+        if strings.HasPrefix(activeItem, "view.") {
+          active = "uk-open"
+        }
+      %>
+      <li class="uk-parent <%= active %>">
         <a href="">
           <span class="uk-margin-small-right" data-uk-icon="icon: location"></span>
           <span id="nav-view-count"><%=i s.Views.Size() %></span> Views
         </a>
-        <ul class="uk-nav-sub" id="nav-views">
+        <ul class="uk-nav-sub uk-active" id="nav-views">
           <% for _, v := range s.Views.Names() { %>
+          <% if activeItem == "view." + v { %>
+          <li><a class="<%= ctx.Profile.LinkClass() %>" style="color: #000;" href="<%= ctx.Route("workspace.view", "p", s.ID, "v", v) %>"><%= v %></a></li>
+          <% } else { %>
           <li><a class="<%= ctx.Profile.LinkClass() %>" href="<%= ctx.Route("workspace.view", "p", s.ID, "v", v) %>"><%= v %></a></li>
+          <% } %>
           <% } %>
         </ul>
       </li>

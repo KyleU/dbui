@@ -1,9 +1,13 @@
-package models
+package schema
 
-import "sort"
+import (
+	"github.com/kyleu/dbui/internal/app/conn/results"
+	"sort"
+)
 
 type View struct {
 	Name string
+	Columns []results.Column
 }
 
 type ViewRegistry struct {
@@ -13,6 +17,10 @@ type ViewRegistry struct {
 
 func (s *ViewRegistry) Names() []string {
 	return s.names
+}
+
+func (s *ViewRegistry) Get(key string) View {
+	return s.views[key]
 }
 
 func (s *ViewRegistry) Size() int {

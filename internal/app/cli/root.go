@@ -40,7 +40,7 @@ func InitApp(appName string, version string, commitHash string) util.AppInfo {
 
 	handler := emperror.WithDetails(util.AppErrorHandler{Logger: logger}, "key", "value")
 
-	return util.AppInfo{
+	ai := util.AppInfo{
 		AppName:      appName,
 		Debug:        verbose,
 		Version:      version,
@@ -48,4 +48,6 @@ func InitApp(appName string, version string, commitHash string) util.AppInfo {
 		Logger:       logger,
 		ErrorHandler: handler,
 	}
+
+	return ai
 }

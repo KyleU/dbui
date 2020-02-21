@@ -7,6 +7,9 @@ dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 project_dir=${dir}/..
 cd $project_dir
 
+echo "=== outdated dependecies ==="
+go list -u -m -json all | go-mod-outdated -update
+
 echo "=== linting ==="
 golangci-lint run \
   -E deadcode \
@@ -24,16 +27,16 @@ golangci-lint run \
   -E dupl \
   -E funlen \
   -D gochecknoglobals \
-  -E gochecknoinits \
+  -D gochecknoinits \
   -E gocognit \
-  -E goconst \
+  -D goconst \
   -E gocritic \
   -E gocyclo \
   -E godox \
   -E gofmt \
   -E goimports \
-  -E golint \
-  -E gomnd \
+  -D golint \
+  -D gomnd \
   -E goprintffuncname \
   -D gosec \
   -E interfacer \
@@ -41,7 +44,7 @@ golangci-lint run \
   -E maligned \
   -E misspell \
   -E nakedret \
-  -E prealloc \
+  -D prealloc \
   -E rowserrcheck \
   -E scopelint \
   -E stylecheck \
