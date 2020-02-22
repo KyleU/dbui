@@ -10,6 +10,7 @@ import (
 
 func Home(w http.ResponseWriter, r *http.Request) {
 	act(w, r, func(ctx util.RequestContext) (int, error) {
+		ctx.Title = "Home"
 		return templates.Index(ctx, w)
 	})
 }
@@ -43,6 +44,7 @@ func Socket(w http.ResponseWriter, r *http.Request) {
 
 func About(w http.ResponseWriter, r *http.Request) {
 	act(w, r, func(ctx util.RequestContext) (int, error) {
+		ctx.Title = "About " + ctx.AppInfo.AppName
 		ctx.Breadcrumbs = util.BreadcrumbsSimple(ctx.Route("about"), "about")
 		return templates.About(ctx, w)
 	})

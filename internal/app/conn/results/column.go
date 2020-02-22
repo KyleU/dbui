@@ -17,5 +17,5 @@ func (c Column) TypeString() string {
 	if c.Nullable {
 		postfix = "?"
 	}
-	return fmt.Sprintf("%s%s", c.T, postfix)
+	return fmt.Sprintf("%s%s", c.T.Desc().Title, postfix)
 }

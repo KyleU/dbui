@@ -12128,8 +12128,28 @@ html.uk-dark {
   margin: 12px;
 }
 
-.resultset {
-  overflow: auto;
+.resultset th.column-header {
+  cursor: default;
+}
+.resultset th.column-header .title {
+  margin-right: 24px;
+  padding-top: 2px;
+}
+.resultset th.column-header:hover .sort-indicator {
+  display: block;
+}
+.resultset th.column-header:hover .current-sort {
+  display: none;
+}
+.resultset td.row-index {
+  color: #999;
+}
+.resultset .sort-indicator {
+  float: right;
+  display: none;
+}
+.resultset .current-sort {
+  float: right;
 }
 
 .error-owned {

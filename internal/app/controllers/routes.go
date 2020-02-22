@@ -35,8 +35,7 @@ func BuildRouter(info *util.AppInfo) (*mux.Router, error) {
 	r.Path("/q").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(WorkspaceTest))).Name("workspace.test")
 	r.Path("/q/{p}").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(Workspace))).Name("workspace")
 	r.Path("/q/{p}/t/{t}").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(WorkspaceTable))).Name("workspace.table")
-	r.Path("/q/{p}/v/{v}").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(WorkspaceView))).Name("workspace.view")
-	r.Path("/q/{p}/{t}/{n}/data").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(WorkspaceData))).Name("workspace.data")
+	r.Path("/q/{p}/t/{t}/data").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(WorkspaceData))).Name("workspace.data")
 
 	// Sandbox
 	sandbox := r.Path("/sandbox").Subrouter()

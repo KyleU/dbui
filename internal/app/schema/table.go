@@ -8,8 +8,9 @@ import (
 )
 
 type Table struct {
-	Name    string
-	Columns []results.Column
+	Name     string
+	Columns  []results.Column
+	ReadOnly bool
 }
 
 func (t *Table) AddColumn(column results.Column) {

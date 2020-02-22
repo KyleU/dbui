@@ -17,6 +17,7 @@ func NotFound(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(http.StatusNotFound)
 	ctx := util.ExtractContext(r)
+	ctx.Title = "Not Found"
 	ctx.Breadcrumbs = util.BreadcrumbsSimple(r.URL.Path, "not found")
 	args := map[string]interface{}{"status": 500}
 	ctx.Logger.Info(fmt.Sprintf("[%v %v] returned [%d]", r.Method, r.URL.Path, http.StatusNotFound), args)
@@ -36,6 +37,7 @@ func InternalServerError(router *mux.Router, info *util.AppInfo, w http.Response
 		rc := context.WithValue(r.Context(), routesKey, router)
 		rc = context.WithValue(rc, infoKey, info)
 		ctx := util.ExtractContext(r.WithContext(rc))
+		ctx.Title = "Server Error"
 		ctx.Breadcrumbs = util.BreadcrumbsSimple(r.URL.Path, "error")
 		tracer, ok := err.(stackTracer)
 		msg := err.(error).Error()

@@ -121,9 +121,35 @@ html.uk-dark {
 
 // Resultset
 .resultset {
-  overflow: auto;
-}
+  th.column-header {
+    cursor: default;
+    .title {
+      margin-right: 24px;
+      padding-top: 2px;
+    }
+  }
 
+  th.column-header:hover {
+    .sort-indicator {
+      display: block;
+    }
+    .current-sort {
+      display: none;
+    }
+  }
+
+  td.row-index {
+    color: #999
+  }
+
+  .sort-indicator {
+    float: right;
+    display: none;
+  }
+  .current-sort {
+    float: right;
+  }
+}
 // Errors
 .error-key {
 }

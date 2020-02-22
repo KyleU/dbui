@@ -1,0 +1,12 @@
+<%: func ResultColumnHeader(c results.Column, opts util.ResultOptions, buffer *bytes.Buffer) %>
+<th class="column-header" title="<%= c.TypeString() %><%= opts.SortTitleFor(c.Name) %>">
+  <% if opts.Sortable { %>
+  <% if opts.SortCol == c.Name { %>
+  <div class="current-sort"><span data-uk-icon="<%= opts.CurrentIconFor() %>"></span></div>
+  <% } %>
+  <div class="sort-indicator"><a class="<%= opts.Profile.LinkClass() %>" href="<%= opts.ToQueryString(c.Name) %>"><span data-uk-icon="<%= opts.SortIconFor(c.Name) %>"></span></a></div>
+  <div class="title"><a class="<%= opts.Profile.LinkClass() %>" href="<%= opts.ToQueryString(c.Name) %>"><%= c.Name %></a></div>
+  <% } else {%>
+  <div class="title"><%= c.Name %></div>
+  <% } %>
+</th>

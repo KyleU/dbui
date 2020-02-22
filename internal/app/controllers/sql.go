@@ -13,6 +13,7 @@ import (
 
 func SQLForm(w http.ResponseWriter, r *http.Request) {
 	act(w, r, func(ctx util.RequestContext) (int, error) {
+		ctx.Title = "Ad-hoc Query"
 		ctx.Breadcrumbs = util.BreadcrumbsSimple(ctx.Route("sql.form"), "ad-hoc")
 		return templates.SqlForm("", ctx, w)
 	})
@@ -37,6 +38,7 @@ func SQLRun(w http.ResponseWriter, r *http.Request) {
 		rs, err := conn.GetResult(ctx.Logger, connection, ms, sqlArg)
 		switch fmtArg {
 		case "html":
+			ctx.Title = "Ad-hoc Results"
 			ctx.Breadcrumbs = util.BreadcrumbsSimple(ctx.Route("sql.form"), "ad-hoc")
 			return templates.SqlResults(rs, err, ctx, w)
 		case "csv":

@@ -1,0 +1,33 @@
+<%: func ResultSetRender(results *results.ResultSet, opts util.ResultOptions, buffer *bytes.Buffer) %>
+<div class="uk-margin uk-card uk-card-body <%= opts.Profile.Theme.CardClass() %>">
+  Query
+  connected in
+  [<%= util.MicrosToMillis(opts.Profile.Locale, results.Timing.Connected) %>]
+  and returned
+  [<%= util.FormatInteger(opts.Profile.Locale, len(results.Data)) %>]
+  rows in
+  [<%= util.MicrosToMillis(opts.Profile.Locale, results.Timing.Elapsed) %>]
+</div>
+<div class="uk-margin uk-card uk-card-body <%= opts.Profile.Theme.CardClass() %>">
+  <% if len(results.Data) == 0 { %>
+  <i>No rows returned</i>
+  <% } else { %>
+  <div class="resultset uk-overflow-auto">
+    <table class="uk-table uk-table-divider uk-table-small">
+      <thead>
+      <tr>
+        <th>#</th>
+        <% for _, c := range results.Columns { %>
+        <% ResultColumnHeader(c, opts, buffer) %>
+        <% } %>
+      </tr>
+      </thead>
+      <tbody>
+      <% for idx, row := range results.Data { %>
+      <% ResultRow(row, idx, results.Columns, opts, buffer) %>
+      <% } %>
+      </tbody>
+    </table>
+  </div>
+  <% } %>
+</div>

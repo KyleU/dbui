@@ -1,46 +1,15 @@
-<%: func WorkspaceData(s *schema.Schema, model string, name string, results *results.ResultSet, ctx util.RequestContext, w io.Writer) (int, error) %>
+<%: func WorkspaceData(s *schema.Schema, name string, results *results.ResultSet, opts util.ResultOptions, ctx util.RequestContext, w io.Writer) (int, error) %>
 
 <%~ "layout/basic.html" %>
 
 <%@ body { %>
-  <% WorkspaceSidebar(s, model + "." + name, ctx, _buffer) %>
+  <% WorkspaceSidebar(s, "table." + name, ctx, _buffer) %>
   <div id="content">
     <div class="uk-container uk-container-expand">
       <div class="uk-margin-medium-top">
         <h1 class="uk-heading-hero"><%= name %> data</h1>
       </div>
-      <div class="uk-margin uk-card uk-card-body <%= ctx.Profile.Theme.CardClass() %>">
-        <div>
-          Query
-          connected in
-          [<%= util.MicrosToMillis(ctx.Profile.Locale, results.Timing.Connected) %>]
-          and returned
-          [<%= util.FormatInteger(ctx.Profile.Locale, len(results.Data)) %>]
-          rows in
-          [<%= util.MicrosToMillis(ctx.Profile.Locale, results.Timing.Elapsed) %>]
-        </div>
-      </div>
-      <div class="uk-margin uk-card uk-card-body <%= ctx.Profile.Theme.CardClass() %>">
-        <table class="uk-table uk-table-divider uk-table-small">
-          <thead>
-          <tr>
-            <% for _, c := range results.Columns { %>
-            <th title="<%= c.TypeString() %>"><%= c.Name %></th>
-            <% } %>
-          </tr>
-          </thead>
-          <tbody>
-          <% for _, row := range results.Data { %>
-          <tr>
-            <% for idx, cell := range row { %>
-            <td><%= results.Columns[idx].T.Desc().ToString(cell) %></td>
-            <% } %>
-          </tr>
-          <% } %>
-          </tbody>
-        </table>
-      </div>
-    </div>
+      <% ResultSetRender(results, opts, _buffer) %>
   </div>
   <script>window.onload = function() { connect("<%= s.ID %>") }</script>
 <% } %>

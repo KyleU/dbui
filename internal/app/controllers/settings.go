@@ -9,6 +9,7 @@ import (
 
 func Settings(w http.ResponseWriter, r *http.Request) {
 	act(w, r, func(ctx util.RequestContext) (int, error) {
+		ctx.Title = "Settings"
 		ctx.Breadcrumbs = util.BreadcrumbsSimple(ctx.Route("settings"), "settings")
 		return templates.Settings(ctx, w)
 	})

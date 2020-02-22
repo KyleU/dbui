@@ -14,17 +14,19 @@ var _sandboxes = []string{"gallery", "testbed"}
 
 func SandboxList(w http.ResponseWriter, r *http.Request) {
 	act(w, r, func(ctx util.RequestContext) (int, error) {
+		ctx.Title = "Sandboxes"
 		ctx.Breadcrumbs = util.BreadcrumbsSimple(ctx.Route("sandbox"), "sandbox")
 		return templates.SandboxList(_sandboxes, ctx, w)
 	})
 }
 
 func SandboxForm(w http.ResponseWriter, r *http.Request) {
-	key := mux.Vars(r)["key"]
 	act(w, r, func(ctx util.RequestContext) (int, error) {
+		key := mux.Vars(r)["key"]
 		if key == "testbed" {
 			return 0, errors.WithStack(errors.New("error!"))
 		}
+		ctx.Title = "[" + key + "] Sandbox"
 		bc := util.Breadcrumb{Path: ctx.Route("sandbox.run", "key", key), Title: key}
 		ctx.Breadcrumbs = append(util.BreadcrumbsSimple(ctx.Route("sandbox"), "sandbox"), bc)
 		return templates.SandboxForm(key, ctx, w)

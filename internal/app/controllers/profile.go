@@ -9,6 +9,7 @@ import (
 
 func Profile(w http.ResponseWriter, r *http.Request) {
 	act(w, r, func(ctx util.RequestContext) (int, error) {
+		ctx.Title = "User Profile"
 		ctx.Breadcrumbs = util.BreadcrumbsSimple(ctx.Route("profile"), "profile")
 		return templates.Profile(ctx, w)
 	})

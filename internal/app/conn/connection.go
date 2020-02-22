@@ -2,6 +2,7 @@ package conn
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"emperror.dev/errors"
@@ -82,6 +83,12 @@ func resultset(
 	data := make([][]interface{}, 0)
 
 	for rows.Next() {
+		values, err := rows.SliceScan()
+		if err != nil {
+			rs.Data = data
+			return &rs, errors.WithStack(errors.Wrap(err, "Unable to extract values from rows"))
+		}
+
 		if len(fields) == 0 {
 			types, err := rows.ColumnTypes()
 			if err != nil {
@@ -93,16 +100,17 @@ func resultset(
 					n = fmt.Sprintf("col%d", i+1)
 				}
 				t := results.FieldTypeForName(logger, col.Name(), col.DatabaseTypeName())
+				if t == results.TypeUnknown {
+					if strings.HasPrefix(values[i].(string), "{") {
+						t = results.TypeArrayUnknown
+					} else if strings.Contains(values[i].(string), "\"=>\"") {
+						t = results.TypeHStore
+					}
+				}
 				nullable, _ := col.Nullable()
 				fields = append(fields, results.Column{Name: n, T: t, Nullable: nullable})
 			}
 			rs.Columns = fields
-		}
-
-		values, err := rows.SliceScan()
-		if err != nil {
-			rs.Data = data
-			return &rs, errors.WithStack(errors.Wrap(err, "Unable to extract values from rows"))
 		}
 
 		data = append(data, values)

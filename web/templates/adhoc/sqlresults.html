@@ -10,36 +10,8 @@
       <% if results != nil { %>
       <div class="uk-margin uk-card uk-card-body <%= ctx.Profile.Theme.CardClass() %>">
         <pre><%= results.SQL %></pre>
-        <div>
-          Query
-          connected in
-          [<%= util.MicrosToMillis(ctx.Profile.Locale, results.Timing.Connected) %>]
-          and returned
-          [<%= util.FormatInteger(ctx.Profile.Locale, len(results.Data)) %>]
-          rows in
-          [<%= util.MicrosToMillis(ctx.Profile.Locale, results.Timing.Elapsed) %>]
-        </div>
       </div>
-      <div class="uk-margin uk-card uk-card-body <%= ctx.Profile.Theme.CardClass() %>">
-        <table class="uk-table uk-table-divider uk-table-small">
-          <thead>
-          <tr>
-            <% for _, c := range results.Columns { %>
-            <th title="<%= c.TypeString() %>"><%= c.Name %></th>
-            <% } %>
-          </tr>
-          </thead>
-          <tbody>
-            <% for _, row := range results.Data { %>
-            <tr>
-              <% for idx, cell := range row { %>
-              <td><%= results.Columns[idx].T.Desc().ToString(cell) %></td>
-              <% } %>
-            </tr>
-            <% } %>
-          </tbody>
-        </table>
-      </div>
+      <% ResultSetRender(results, util.NewResultOptions(ctx.Profile, false), _buffer) %>
       <% } %>
 
       <% if err != nil { %>

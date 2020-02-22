@@ -46,7 +46,6 @@ func LoadSchema(ai *util.AppInfo, id string) (Schema, error) {
 	}()
 
 	var tables = map[string]Table{}
-	var views = map[string]View{}
 	for rows.Next() {
 		var res ColumnResult
 		err := rows.StructScan(&res)
@@ -56,7 +55,7 @@ func LoadSchema(ai *util.AppInfo, id string) (Schema, error) {
 
 		table, ok := tables[res.Table]
 		if !ok {
-			table = Table{Name: res.Table}
+			table = Table{Name: res.Table, ReadOnly: res.Updatable == "No"}
 		}
 		tn := res.UDTName
 		if tn == "ARRAY" {
@@ -72,12 +71,6 @@ func LoadSchema(ai *util.AppInfo, id string) (Schema, error) {
 		ts = append(ts, table)
 	}
 	s.Tables.Add(ts...)
-
-	var vs []View
-	for _, view := range views {
-		vs = append(vs, view)
-	}
-	s.Views.Add(vs...)
 
 	return s, nil
 }

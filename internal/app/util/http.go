@@ -36,6 +36,7 @@ type RequestContext struct {
 	Logger      logur.LoggerFacade
 	Profile     UserProfile
 	Routes      *mux.Router
+	Title       string
 	Breadcrumbs Breadcrumbs
 	Flashes     []string
 	Session     sessions.Session
@@ -88,6 +89,7 @@ func ExtractContext(r *http.Request) RequestContext {
 		Logger:      logger,
 		Profile:     prof,
 		Routes:      routes,
+		Title:       ai.AppName,
 		Breadcrumbs: nil,
 		Flashes:     flashes,
 		Session:     *session,
