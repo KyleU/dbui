@@ -26,7 +26,13 @@
               <tr>
                 <td><%= r.Name %></td>
                 <td><%= r.Methods %></td>
-                <td><%= r.Path %></td>
+                <td>
+                <% if strings.Contains(r.Methods, "GET") && len(util.PathParams(r.Path)) == 0 { %>
+                  <a class="<%= ctx.Profile.LinkClass() %>" href="<%= r.Path %>"><%= r.Path %></a>
+                <% } else {%>
+                  <%= r.Path %>
+                <% } %>
+                </td>
               </tr>
               <% } %>
             <% } %>

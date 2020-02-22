@@ -37,32 +37,8 @@ func WorkspaceTable(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			return 0, err
 		}
-		tc := util.Breadcrumb{Path: ctx.Route("workspace.table", "p", s.ID, "t", t), Title: t}
-		ctx.Breadcrumbs = append(bc, tc)
+		ctx.Breadcrumbs = append(bc, tableBC(ctx, s.ID, t))
 		return templates.WorkspaceTable(s, t, ctx, w)
-	})
-}
-
-func WorkspaceTableData(w http.ResponseWriter, r *http.Request) {
-	p := mux.Vars(r)["p"]
-	t := mux.Vars(r)["t"]
-	act(w, r, func(ctx util.RequestContext) (int, error) {
-		s, bc, err := load(ctx, p, false)
-		if err != nil {
-			return 0, err
-		}
-		db, connectMS, err := ctx.AppInfo.ConfigService.GetConnection(s.ID)
-		if err != nil {
-			return 0, err
-		}
-		rs, err := conn.GetResult(ctx.AppInfo.Logger, db, connectMS, "select * from \"" + t + "\"")
-		if err != nil {
-			return 0, err
-		}
-		dc := util.Breadcrumb{Path: ctx.Route("workspace.table.data", "p", s.ID, "t", t), Title: "data"}
-		tc := util.Breadcrumb{Path: ctx.Route("workspace.table", "p", s.ID, "t", t), Title: t}
-		ctx.Breadcrumbs = append(bc, tc, dc)
-		return templates.WorkspaceData(s, "table", t, rs, ctx, w)
 	})
 }
 
@@ -74,15 +50,15 @@ func WorkspaceView(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			return 0, err
 		}
-		vc := util.Breadcrumb{Path: ctx.Route("workspace.view", "p", s.ID, "v", v), Title: v}
-		ctx.Breadcrumbs = append(bc, vc)
+		ctx.Breadcrumbs = append(bc, viewBC(ctx, s.ID, v))
 		return templates.WorkspaceView(s, v, ctx, w)
 	})
 }
 
-func WorkspaceViewData(w http.ResponseWriter, r *http.Request) {
+func WorkspaceData(w http.ResponseWriter, r *http.Request) {
 	p := mux.Vars(r)["p"]
-	v := mux.Vars(r)["v"]
+	model := mux.Vars(r)["t"]
+	name := mux.Vars(r)["n"]
 	act(w, r, func(ctx util.RequestContext) (int, error) {
 		s, bc, err := load(ctx, p, false)
 		if err != nil {
@@ -92,15 +68,29 @@ func WorkspaceViewData(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			return 0, err
 		}
-		rs, err := conn.GetResult(ctx.AppInfo.Logger, db, connectMS, "select * from \"" + v + "\"")
+		rs, err := conn.GetResult(ctx.AppInfo.Logger, db, connectMS, "select * from \"" + name + "\"")
 		if err != nil {
 			return 0, err
 		}
-		dc := util.Breadcrumb{Path: ctx.Route("workspace.view.data", "p", s.ID, "v", v), Title: "data"}
-		tc := util.Breadcrumb{Path: ctx.Route("workspace.view", "p", s.ID, "v", v), Title: v}
-		ctx.Breadcrumbs = append(bc, tc, dc)
-		return templates.WorkspaceData(s, "view", v, rs, ctx, w)
+		dc := util.Breadcrumb{Path: ctx.Route("workspace.data", "p", s.ID, "t", model, "n", name), Title: "data"}
+		var mc = util.Breadcrumb{}
+		switch model {
+		case "t":
+			mc = tableBC(ctx, s.ID, name)
+		case "v":
+			mc = viewBC(ctx, s.ID, name)
+		}
+		ctx.Breadcrumbs = append(bc, mc, dc)
+		return templates.WorkspaceData(s, model, name, rs, ctx, w)
 	})
+}
+
+func tableBC(ctx util.RequestContext, id string, name string) util.Breadcrumb {
+	return util.Breadcrumb{Path: ctx.Route("workspace.table", "p", id, "t", name), Title: name}
+}
+
+func viewBC(ctx util.RequestContext, id string, name string) util.Breadcrumb {
+	return util.Breadcrumb{Path: ctx.Route("workspace.view", "p", id, "v", name), Title: name}
 }
 
 func load(ctx util.RequestContext, p string, forceReload bool) (*schema.Schema, util.Breadcrumbs, error) {
