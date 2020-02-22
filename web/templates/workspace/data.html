@@ -1,15 +1,15 @@
-<%: func SqlResults(results *results.ResultSet, err error, ctx util.RequestContext, w io.Writer) (int, error) %>
+<%: func WorkspaceData(s *schema.Schema, model string, name string, results *results.ResultSet, ctx util.RequestContext, w io.Writer) (int, error) %>
 
 <%~ "layout/basic.html" %>
 
 <%@ body { %>
-<div class="uk-section uk-section-small">
-  <div class="uk-container">
-    <div>
-      <h1 class="uk-heading-hero">SQL Query Results</h1>
-      <% if results != nil { %>
+  <% WorkspaceSidebar(s, model + "." + name, ctx, _buffer) %>
+  <div id="content">
+    <div class="uk-container uk-container-expand">
+      <div class="uk-margin-medium-top">
+        <h1 class="uk-heading-hero"><%= model %> [<%= name %>] data</h1>
+      </div>
       <div class="uk-margin uk-card uk-card-body <%= ctx.Profile.Theme.CardClass() %>">
-        <pre><%= results.SQL %></pre>
         <div>
           Query
           connected in
@@ -30,24 +30,17 @@
           </tr>
           </thead>
           <tbody>
-            <% for _, row := range results.Data { %>
-            <tr>
-              <% for idx, cell := range row { %>
-              <td><%= results.Columns[idx].T.Desc().ToString(cell) %></td>
-              <% } %>
-            </tr>
+          <% for _, row := range results.Data { %>
+          <tr>
+            <% for idx, cell := range row { %>
+            <td><%= results.Columns[idx].T.Desc().ToString(cell) %></td>
             <% } %>
+          </tr>
+          <% } %>
           </tbody>
         </table>
       </div>
-      <% } %>
-
-      <% if err != nil { %>
-      <div class="uk-margin uk-card uk-card-body <%= ctx.Profile.Theme.CardClass() %>">
-        Error: <strong><%=v err %></strong>
-      </div>
-      <% } %>
     </div>
   </div>
-</div>
+  <script>window.onload = function() { connect("<%= s.ID %>") }</script>
 <% } %>

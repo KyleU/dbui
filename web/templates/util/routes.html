@@ -19,15 +19,15 @@
           <tbody>
             <% for _, r := range util.ExtractRoutes(ctx.Routes) { %>
               <% if r.Methods == "" { %>
-                <tr>
-                  <th colspan="3"><div class="uk-margin-top"><%= strings.TrimPrefix(r.Path, "/") %></div></th>
-                </tr>
+              <tr>
+                <th colspan="3"><div class="uk-margin-top"><%= strings.TrimPrefix(r.Path, "/") %></div></th>
+              </tr>
               <% } else {%>
-                <tr>
-                  <td><%= r.Name %></td>
-                  <td><%= r.Methods %></td>
-                  <td><%= r.Path %></td>
-                </tr>
+              <tr>
+                <td><%= r.Name %></td>
+                <td><%= r.Methods %></td>
+                <td><%= r.Path %></td>
+              </tr>
               <% } %>
             <% } %>
           </tbody>

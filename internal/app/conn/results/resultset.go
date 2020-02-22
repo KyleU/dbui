@@ -10,14 +10,14 @@ import (
 type ResultSet struct {
 	SQL     string
 	Columns []Column
-	Data    [][]string
+	Data    [][]interface{}
 	Timing  ResultSetTiming
 }
 
 type ResultSetTiming struct {
-	Connected int64
-	Prepared  int64
-	Elapsed   int64
+	Connected int
+	Prepared  int
+	Elapsed   int
 }
 
 func (rs *ResultSet) Debug(l logur.LoggerFacade) {

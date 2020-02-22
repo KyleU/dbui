@@ -5,12 +5,12 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/kyleu/dbui/internal/app/util"
-	template "github.com/kyleu/dbui/internal/gen/templates"
+	"github.com/kyleu/dbui/internal/gen/templates"
 )
 
 func Home(w http.ResponseWriter, r *http.Request) {
 	act(w, r, func(ctx util.RequestContext) (int, error) {
-		return template.Index(ctx, w)
+		return templates.Index(ctx, w)
 	})
 }
 
@@ -23,17 +23,19 @@ func Socket(w http.ResponseWriter, r *http.Request) {
 		ctx.Logger.Info("Unable to upgrade connection to websocket")
 		return
 	}
-	defer c.Close()
+	defer func() {
+		_ = c.Close()
+	}()
 
 	for {
 		mt, message, err := c.ReadMessage()
 		if err != nil {
 			break
 		}
-		ctx.Logger.Info("Received message on websocket: " + string(message))
+		ctx.Logger.Debug("Received message on websocket: " + string(message))
 		err = c.WriteMessage(mt, message)
 		if err != nil {
-			ctx.Logger.Info("Unable to write to websocket")
+			ctx.Logger.Warn("Unable to write to websocket")
 			break
 		}
 	}
@@ -42,6 +44,6 @@ func Socket(w http.ResponseWriter, r *http.Request) {
 func About(w http.ResponseWriter, r *http.Request) {
 	act(w, r, func(ctx util.RequestContext) (int, error) {
 		ctx.Breadcrumbs = util.BreadcrumbsSimple(ctx.Route("about"), "about")
-		return template.About(ctx, w)
+		return templates.About(ctx, w)
 	})
 }

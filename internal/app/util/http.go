@@ -18,7 +18,7 @@ type Breadcrumb struct {
 
 type Breadcrumbs []Breadcrumb
 
-func (bc Breadcrumbs) Title(ai AppInfo) string {
+func (bc Breadcrumbs) Title(ai *AppInfo) string {
 	if len(bc) == 0 {
 		return ai.AppName
 	}
@@ -32,7 +32,7 @@ func BreadcrumbsSimple(path string, title string) Breadcrumbs {
 }
 
 type RequestContext struct {
-	AppInfo     AppInfo
+	AppInfo     *AppInfo
 	Logger      logur.LoggerFacade
 	Profile     UserProfile
 	Routes      *mux.Router
@@ -68,7 +68,7 @@ var store = sessions.NewCookieStore([]byte(sessionKey))
 const sessionName = "dbui-session"
 
 func ExtractContext(r *http.Request) RequestContext {
-	ai := r.Context().Value("info").(AppInfo)
+	ai := r.Context().Value("info").(*AppInfo)
 	routes := r.Context().Value("routes").(*mux.Router)
 	prof := SystemProfile
 	session, err := store.Get(r, sessionName)

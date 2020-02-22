@@ -2,7 +2,8 @@ package schema
 
 import (
 	"database/sql"
-	"fmt"
+
+	"emperror.dev/errors"
 	"github.com/kyleu/dbui/internal/app/conn"
 	"github.com/kyleu/dbui/internal/app/conn/results"
 	"github.com/kyleu/dbui/internal/app/util"
@@ -10,31 +11,39 @@ import (
 
 var cache = map[string]Schema{}
 
-func GetSchema(ai util.AppInfo, id string, forceReload bool) Schema {
+func GetSchema(ai *util.AppInfo, id string, forceReload bool) (*Schema, error) {
 	c, ok := cache[id]
 	if ok && !forceReload {
-		return c
+		return &c, nil
 	}
-	c = LoadSchema(ai, id)
+	c, err := LoadSchema(ai, id)
+	if err != nil {
+		return &c, err
+	}
+
 	cache[id] = c
-	return c
+	return &c, nil
 }
 
-func LoadSchema(ai util.AppInfo, id string) Schema {
+func LoadSchema(ai *util.AppInfo, id string) (Schema, error) {
 	s := NewSchema(id, "Test Schema")
-
-	connection, rows, err := conn.GetRows(id, "named:list-columns")
+	connection, _, err := ai.ConfigService.GetConnection(id)
+	if err != nil {
+		return s, errors.WithStack(errors.Wrap(err, "Error connecting to ["+id+"]"))
+	}
 	defer func() {
-		_ = rows.Close()
 		if connection != nil {
 			_ = connection.Close()
 		}
 	}()
 
+	rows, err := conn.GetRows(connection, "named:list-columns")
 	if err != nil {
-		ai.Logger.Warn("Error loading schema")
-		return s
+		return s, errors.WithStack(errors.Wrap(err, "Error retrieving columns from ["+id+"]"))
 	}
+	defer func() {
+		_ = rows.Close()
+	}()
 
 	var tables = map[string]Table{}
 	var views = map[string]View{}
@@ -42,9 +51,7 @@ func LoadSchema(ai util.AppInfo, id string) Schema {
 		var res ColumnResult
 		err := rows.StructScan(&res)
 		if err != nil {
-			println(err.Error())
-			ai.Logger.Warn(fmt.Sprintf("Error scanning column results: %v", err))
-			return s
+			return s, errors.WithStack(errors.Wrap(err, "Error scanning column results from ["+id+"]"))
 		}
 
 		table, ok := tables[res.Table]
@@ -72,7 +79,7 @@ func LoadSchema(ai util.AppInfo, id string) Schema {
 	}
 	s.Views.Add(vs...)
 
-	return s
+	return s, nil
 }
 
 type ColumnResult struct {

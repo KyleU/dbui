@@ -37,7 +37,7 @@ endif
 
 .PHONY: compile-templates
 compile-templates:
-	hero -extensions .html -source web/templates -dest internal/gen/templates
+	hero -extensions .html -source web/templates -pkgname templates -dest internal/gen/templates
 	hero -extensions .sql -pkgname queries -source queries -dest internal/gen/queries
 
 .PHONY: build-%
@@ -46,7 +46,7 @@ ifeq (${VERBOSE}, 1)
 	go env
 endif
 
-	go build ${GOARGS} -tags "${GOTAGS}" -ldflags "${LDFLAGS}" -o ${BUILD_DIR}/$* ./cmd/$*
+	CGO_ENABLED=1 go build ${GOARGS} -tags "${GOTAGS}" -ldflags "${LDFLAGS}" -o ${BUILD_DIR}/$* ./cmd/$*
 
 .PHONY: build
 build: goversion compile-templates ## Build all binaries
@@ -55,7 +55,7 @@ ifeq (${VERBOSE}, 1)
 endif
 
 	@mkdir -p ${BUILD_DIR}
-	go build ${GOARGS} -tags "${GOTAGS}" -ldflags "${LDFLAGS}" -o ${BUILD_DIR}/ ./cmd/...
+	CGO_ENABLED=1 go build ${GOARGS} -tags "${GOTAGS}" -ldflags "${LDFLAGS}" -o ${BUILD_DIR}/ ./cmd/...
 
 .PHONY: build-release
 build-release: ## Build all binaries without debug information

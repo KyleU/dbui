@@ -1,8 +1,9 @@
 package cli
 
 import (
-	"emperror.dev/errors"
 	"fmt"
+
+	"emperror.dev/errors"
 	"github.com/kyleu/dbui/internal/app/conn"
 	"github.com/kyleu/dbui/internal/app/conn/output"
 	"github.com/spf13/cobra"
@@ -19,8 +20,16 @@ func NewQueryCommand(appName string, version string, commitHash string) *cobra.C
 		Short:   "Runs the provided sql, displaying or saving the result",
 		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			info := InitApp(appName, version, commitHash)
-			rs, err := conn.GetResult(info.Logger, connNameArg, inputArg)
+			info, err := InitApp(appName, version, commitHash)
+			if err != nil {
+				return errors.WithStack(errors.Wrap(err, "Error initializing application"))
+			}
+
+			connection, ms, err := info.ConfigService.GetConnection(connNameArg)
+			if err != nil {
+				return errors.WithStack(errors.Wrap(err, "Error opening connection"))
+			}
+			rs, err := conn.GetResult(info.Logger, connection, ms, inputArg)
 			if err != nil {
 				return errors.WithStack(errors.Wrap(err, "Error retrieving result"))
 			}
@@ -40,4 +49,3 @@ func NewQueryCommand(appName string, version string, commitHash string) *cobra.C
 
 	return cmd
 }
-

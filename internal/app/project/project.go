@@ -1,12 +1,8 @@
 package project
 
 import (
-	"github.com/kyleu/dbui/internal/app/util"
-	"github.com/pkg/errors"
 	"sort"
 )
-
-var	initialized bool
 
 type Project struct {
 	Key   string
@@ -14,8 +10,8 @@ type Project struct {
 }
 
 type Registry struct {
-	names       []string
-	projects    map[string]Project
+	names    []string
+	projects map[string]Project
 }
 
 func (s *Registry) Names() []string {
@@ -42,22 +38,3 @@ func (s *Registry) Add(t ...Project) {
 	s.names = acc
 }
 
-func InitRegistry(info util.AppInfo) (*Registry, error) {
-	if initialized {
-		return nil, errors.New("Project registry is already initialized")
-	}
-
-	r := Registry{
-		names:    []string{},
-		projects: map[string]Project{},
-	}
-
-	path := util.FilePath("dbui.db")
-	if util.FileExists(path) {
-		initialized = true
-	} else {
-
-	}
-
-	return r, nil
-}

@@ -1,5 +1,7 @@
 package util
 
+import "golang.org/x/text/language"
+
 var AllColors = []string{"clear", "grey", "bluegrey", "red", "orange", "yellow", "green", "blue", "purple"}
 
 type Theme uint8
@@ -28,11 +30,11 @@ func ThemeFromString(s string) Theme {
 	return ThemeLight
 }
 
-func (t Theme) BodyClass() string {
+func (t Theme) BackgroundClass() string {
 	if t < endTypes {
-		return themeBodyClasses[t]
+		return themeBackgroundClasses[t]
 	}
-	return themeBodyClasses[ThemeLight]
+	return themeBackgroundClasses[ThemeLight]
 }
 
 func (t Theme) CardClass() string {
@@ -52,7 +54,7 @@ var (
 		ThemeDark:  "Dark",
 	}
 
-	themeBodyClasses = [...]string{
+	themeBackgroundClasses = [...]string{
 		ThemeLight: "uk-dark",
 		ThemeDark:  "uk-light",
 	}
@@ -68,6 +70,7 @@ type UserProfile struct {
 	Theme     Theme
 	NavColor  string
 	LinkColor string
+	Locale    language.Tag
 }
 
 func (p *UserProfile) LinkClass() string {
@@ -82,5 +85,6 @@ func NewUserProfile() UserProfile {
 		Theme:     ThemeLight,
 		NavColor:  "bluegrey",
 		LinkColor: "bluegrey",
+		Locale:    language.AmericanEnglish,
 	}
 }

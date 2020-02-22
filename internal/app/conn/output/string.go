@@ -1,6 +1,7 @@
 package output
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/kyleu/dbui/internal/app/conn/results"
@@ -20,7 +21,7 @@ func AsString(rs *results.ResultSet) (string, error) {
 			if cIdx > 0 {
 				sb.WriteRune(',')
 			}
-			sb.WriteString(cell)
+			sb.WriteString(fmt.Sprintf("%v", cell))
 		}
 	}
 	return sb.String(), nil

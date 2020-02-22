@@ -1,4 +1,4 @@
-package util
+package conn
 
 import (
 	"io/ioutil"
@@ -7,14 +7,14 @@ import (
 	"github.com/kyleu/dbui/internal/gen/queries"
 )
 
-func GetConnection(arg string) string {
+func getConnection(arg string) string {
 	if arg == "" {
 		arg = "default"
 	}
 	return arg
 }
 
-func GetSQL(in string) string {
+func getSQL(in string) string {
 	if len(in) == 0 {
 		return "select 'specify a sql string or file:path/filename.sql' as instructions"
 	}
@@ -51,7 +51,7 @@ func GetSQL(in string) string {
 		path := strings.TrimPrefix(in, "file:")
 		bytes, err := ioutil.ReadFile(path)
 		if err != nil {
-			return "select 'cannot read file [" + path + "]' as error"
+			return "select 'cannot read file [" + path + "] (" + err.Error() + ")' as error"
 		}
 		return string(bytes)
 	default:

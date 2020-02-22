@@ -30,12 +30,12 @@ h4 {
   padding: 0;
 }
 
-body.uk-light {
+html.uk-light {
   background-color: $dark_bg_color;
 }
 
-body.uk-dark {
-  background-color: #fff;
+html.uk-dark {
+  background-color: $light_bg_color;
 }
 
 // Sidebar
@@ -47,6 +47,7 @@ body.uk-dark {
   width: 240px !important;
   padding: 40px;
   overflow: auto;
+  z-index: 1000;
 
   .status-panel {
     position: fixed;
@@ -121,4 +122,15 @@ body.uk-dark {
 // Resultset
 .resultset {
   overflow: auto;
+}
+
+// Errors
+.error-key {
+}
+.error-owned {
+  color: green;
+}
+.error-location {
+  margin-left: 16px;
+  margin-bottom: 16px;
 }

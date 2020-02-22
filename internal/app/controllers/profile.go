@@ -4,13 +4,13 @@ import (
 	"net/http"
 
 	"github.com/kyleu/dbui/internal/app/util"
-	template "github.com/kyleu/dbui/internal/gen/templates"
+	"github.com/kyleu/dbui/internal/gen/templates"
 )
 
 func Profile(w http.ResponseWriter, r *http.Request) {
 	act(w, r, func(ctx util.RequestContext) (int, error) {
 		ctx.Breadcrumbs = util.BreadcrumbsSimple(ctx.Route("profile"), "profile")
-		return template.Profile(ctx, w)
+		return templates.Profile(ctx, w)
 	})
 }
 

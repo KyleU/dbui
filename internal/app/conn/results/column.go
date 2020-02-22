@@ -9,9 +9,13 @@ type Column struct {
 }
 
 func (c Column) String() string {
+	return fmt.Sprintf("%s:%s", c.TypeString())
+}
+
+func (c Column) TypeString() string {
 	postfix := ""
 	if c.Nullable {
-		postfix = "+"
+		postfix = "?"
 	}
-	return fmt.Sprintf("%s:%s%s", c.Name, c.T, postfix)
+	return fmt.Sprintf("%s%s", c.T, postfix)
 }

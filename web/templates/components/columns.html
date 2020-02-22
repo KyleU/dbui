@@ -10,15 +10,15 @@
           <th>Type</th>
         </tr>
       </thead>
-      <% for idx, c := range columns {%>
       <tbody>
+      <% for idx, c := range columns {%>
       <tr>
         <td><%=v idx + 1 %></td>
         <td><%= c.Name %></td>
         <td title="<%= c.T.String() %>"><%= c.T.Desc().Title %></td>
       </tr>
-      </tbody>
       <% } %>
+      </tbody>
     </table>
   </div>
 </li>

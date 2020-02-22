@@ -5,6 +5,9 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/kyleu/dbui/internal/gen/templates"
+	"golang.org/x/text/language"
+
 	"github.com/kyleu/dbui/internal/app/util"
 )
 
@@ -18,7 +21,8 @@ func act(w http.ResponseWriter, r *http.Request, f func(util.RequestContext) (in
 
 	_, err := f(ctx)
 	if err != nil {
-		ctx.Logger.Warn("Error running action")
+		ctx.Logger.Warn(fmt.Sprintf("Error running action: %+v", err))
+		_, _ = templates.InternalServerError(err.(error).Error(), err.(stackTracer).StackTrace(), r, ctx, w)
 	}
 	logComplete(startNanos, ctx, http.StatusOK, r)
 }
@@ -37,9 +41,9 @@ func redir(w http.ResponseWriter, r *http.Request, f func(util.RequestContext) (
 
 func logComplete(startNanos int64, ctx util.RequestContext, status int, r *http.Request) {
 	delta := (time.Now().UnixNano() - startNanos) / int64(time.Microsecond)
-	ms := util.MicrosToMillis(delta)
+	ms := util.MicrosToMillis(language.AmericanEnglish, int(delta))
 	args := map[string]interface{}{"elapsed": delta, "status": status}
-	ctx.Logger.Debug(fmt.Sprintf("[%v %v] returned [%v] in [%vms]", r.Method, r.URL.Path, status, ms), args)
+	ctx.Logger.Debug(fmt.Sprintf("[%v %v] returned [%v] in [%v]", r.Method, r.URL.Path, status, ms), args)
 }
 
 func saveSession(w http.ResponseWriter, r *http.Request, ctx util.RequestContext) {

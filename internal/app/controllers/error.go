@@ -10,7 +10,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/kyleu/dbui/internal/app/util"
-	template "github.com/kyleu/dbui/internal/gen/templates"
+	"github.com/kyleu/dbui/internal/gen/templates"
 )
 
 func NotFound(w http.ResponseWriter, r *http.Request) {
@@ -20,14 +20,14 @@ func NotFound(w http.ResponseWriter, r *http.Request) {
 	ctx.Breadcrumbs = util.BreadcrumbsSimple(r.URL.Path, "not found")
 	args := map[string]interface{}{"status": 500}
 	ctx.Logger.Info(fmt.Sprintf("[%v %v] returned [%d]", r.Method, r.URL.Path, http.StatusNotFound), args)
-	_, _ = template.NotFound(r, ctx, w)
+	_, _ = templates.NotFound(r, ctx, w)
 }
 
 type stackTracer interface {
 	StackTrace() errors.StackTrace
 }
 
-func InternalServerError(router *mux.Router, info util.AppInfo, w http.ResponseWriter, r *http.Request) {
+func InternalServerError(router *mux.Router, info *util.AppInfo, w http.ResponseWriter, r *http.Request) {
 	defer lastChanceError(w)
 
 	if err := recover(); err != nil {
@@ -40,19 +40,19 @@ func InternalServerError(router *mux.Router, info util.AppInfo, w http.ResponseW
 		tracer, ok := err.(stackTracer)
 		msg := err.(error).Error()
 		if ok {
-			_, _ = template.InternalServerError(msg, tracer.StackTrace(), r, ctx, w)
+			_, _ = templates.InternalServerError(msg, tracer.StackTrace(), r, ctx, w)
 		} else {
-			_, _ = template.InternalServerError(msg, nil, r, ctx, w)
+			_, _ = templates.InternalServerError(msg, nil, r, ctx, w)
 		}
 		args := map[string]interface{}{"status": 500}
 		st := http.StatusInternalServerError
-		ctx.Logger.Warn(fmt.Sprintf("[%v %v] returned [%d]: %s", r.Method, r.URL.Path, st, msg), args)
+		ctx.Logger.Warn(fmt.Sprintf("[%v %v] returned [%d]: %+v", r.Method, r.URL.Path, st, err), args)
 	}
 }
 
 func lastChanceError(w io.Writer) {
 	if err := recover(); err != nil {
-		println("PANIC AT THE SERVER!!!!")
+		println(fmt.Sprintf("Error while processing error handler: %+v", err))
 		_, _ = w.Write([]byte("Internal Server Error"))
 	}
 }

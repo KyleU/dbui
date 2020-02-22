@@ -16,15 +16,22 @@
       <div class="uk-text-lead"><%= msg %></div>
       <div class="uk-margin-top">
         <% if trace != nil { %>
-        <table>
-          <tbody>
-            <% for f, _ := range trace { %>
+          <table class="uk-table uk-table-divider">
+            <tbody>
+            <% for _, f := range util.TraceDetail(trace) { %>
             <tr>
-              <td><%=v f %></td>
+              <td>
+                <% if strings.Contains(f.Key, ctx.AppInfo.AppName) { %>
+                <div class="error-key error-owned"><%=v f.Key %></div>
+                <% } else { %>
+                <div class="error-key"><%=v f.Key %></div>
+                <% } %>
+                <div class="error-location"><%=v f.Loc %></div>
+              </td>
             </tr>
             <% } %>
-          </tbody>
-        </table>
+            </tbody>
+          </table>
         <% } %>
       </div>
     </div>

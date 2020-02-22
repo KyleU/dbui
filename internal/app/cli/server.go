@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/kyleu/dbui/internal/app/util"
+
 	"emperror.dev/errors"
 	"github.com/gorilla/handlers"
 	"github.com/kyleu/dbui/internal/app/controllers"
-	"github.com/kyleu/dbui/internal/app/util"
 	"github.com/spf13/cobra"
 )
 
@@ -20,7 +21,11 @@ func NewServerCommand(appName string, version string, commitHash string) *cobra.
 		Short: "Starts the http server",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			info := InitApp(appName, version, commitHash)
+			info, err := InitApp(appName, version, commitHash)
+			if err != nil {
+				return errors.WithStack(errors.Wrap(err, "Error initializing application"))
+			}
+
 			return makeServer(info, addr, port)
 		},
 	}
@@ -32,7 +37,7 @@ func NewServerCommand(appName string, version string, commitHash string) *cobra.
 	return cmd
 }
 
-func makeServer(info util.AppInfo, address string, port uint16) error {
+func makeServer(info *util.AppInfo, address string, port uint16) error {
 	routes, err := controllers.BuildRouter(info)
 	if err != nil {
 		return errors.WithStack(errors.WithMessage(err, "Unable to construct routes"))

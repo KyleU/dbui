@@ -7,7 +7,7 @@ dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 project_dir=${dir}/..
 cd $project_dir
 
-bin/build-css
-# bin/build-client
+scripts/build-css.sh
+scripts/build-client.sh
 make build-release
-build/release/dbui
+build/release/dbui server

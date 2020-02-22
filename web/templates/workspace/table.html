@@ -1,4 +1,4 @@
-<%: func WorkspaceTable(s schema.Schema, t string, ctx util.RequestContext, w io.Writer) (int, error) %>
+<%: func WorkspaceTable(s *schema.Schema, t string, ctx util.RequestContext, w io.Writer) (int, error) %>
 
 <%~ "layout/basic.html" %>
 
@@ -16,7 +16,7 @@
         </ul>
       </div>
       <div class="uk-margin-medium-top">
-        <a href="<%= ctx.Route("workspace.table.data", "p", s.ID, "t", t) %>">View Data</a>
+        <a class="<%= ctx.Profile.LinkClass() %>" href="<%= ctx.Route("workspace.table.data", "p", s.ID, "t", t) %>">View Data</a>
       </div>
     </div>
   </div>

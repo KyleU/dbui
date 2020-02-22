@@ -4,15 +4,16 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/kyleu/dbui/internal/app/util"
+
+	"github.com/gorilla/mux"
 	"github.com/sagikazarmark/ocmux"
 )
 
 const routesKey = "routes"
 const infoKey = "info"
 
-func BuildRouter(info util.AppInfo) (*mux.Router, error) {
+func BuildRouter(info *util.AppInfo) (*mux.Router, error) {
 	r := mux.NewRouter()
 	r.Use(ocmux.Middleware())
 
@@ -64,7 +65,7 @@ func BuildRouter(info util.AppInfo) (*mux.Router, error) {
 	return r, nil
 }
 
-func addContext(router *mux.Router, info util.AppInfo, next http.Handler) http.Handler {
+func addContext(router *mux.Router, info *util.AppInfo, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer InternalServerError(router, info, w, r)
 		ctx := context.WithValue(r.Context(), routesKey, router)

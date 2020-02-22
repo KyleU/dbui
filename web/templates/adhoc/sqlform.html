@@ -7,14 +7,34 @@
   <div class="uk-container">
     <div>
       <h1 class="uk-heading-hero">Ad-hoc SQL Query</h1>
-      <div>
         <form action="" method="post">
           <fieldset class="uk-fieldset">
-            <p><textarea name="sql" class="uk-textarea"><%= sql %></textarea></p>
-            <button class="uk-button uk-button-default" type="submit">Run SQL</button>
+            <div class="uk-margin">
+              <select name="conn" class="uk-select">
+                <option value="_url">Custom Connection</option>
+                <option value="_root">System Database</option>
+                <option value="test">Test Database</option>
+              </select>
+            </div>
+            <div class="uk-margin">
+              <input name="url" class="uk-input" type="text" placeholder="Connection URL">
+            </div>
+            <div class="uk-margin">
+              <select name="fmt" class="uk-select">
+                <option value="">HTML</option>
+                <option value="csv">CSV</option>
+                <option value="json">JSON</option>
+                <option value="xlsx">Excel</option>
+              </select>
+            </div>
+            <div class="uk-margin">
+              <p><textarea name="sql" class="uk-textarea" placeholder="SQL"><%= sql %></textarea></p>
+            </div>
+            <div class="uk-margin">
+              <button class="uk-button uk-button-default" type="submit">Run SQL</button>
+            </div>
           </fieldset>
-        </form>
-      </div>
+      </form>
     </div>
   </div>
 </div>

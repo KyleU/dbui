@@ -5,44 +5,36 @@ import (
 	"time"
 
 	"emperror.dev/errors"
-	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/jmoiron/sqlx"
 	"logur.dev/logur"
 
 	"github.com/kyleu/dbui/internal/app/conn/results"
-	"github.com/kyleu/dbui/internal/app/util"
 )
 
-func GetRows(conn string, input string) (*sqlx.DB, *sqlx.Rows, error) {
-	url := urlForConn(util.GetConnection(conn))
-	sqlText := util.GetSQL(input)
-
-	connection, _, err := connect(url)
+func Connect(engine string, url string) (*sqlx.DB, int, error) {
+	startNanos := time.Now().UnixNano()
+	conn, err := sqlx.Connect(engine, url)
+	connected := (time.Now().UnixNano() - startNanos) / int64(time.Microsecond)
 	if err != nil {
-		return nil, nil, err
+		return nil, int(connected), errors.WithStack(errors.Wrap(err, "Unable to connect to database"))
 	}
-	stmt, _, err := prepare(*connection, sqlText)
-	if err != nil {
-		return nil, nil, err
-	}
-	rows, _, err := run(*stmt)
-	return connection, rows, err
+	return conn, int(connected), nil
 }
 
-func GetResult(logger logur.LoggerFacade, conn string, input string) (*results.ResultSet, error) {
-	url := urlForConn(util.GetConnection(conn))
-	sqlText := util.GetSQL(input)
+func GetRows(connection *sqlx.DB, input string) (*sqlx.Rows, error) {
+	sqlText := getSQL(input)
 
-	connection, connected, err := connect(url)
-	defer func() {
-		if connection != nil {
-			_ = connection.Close()
-		}
-	}()
-
+	stmt, _, err := prepare(*connection, sqlText)
 	if err != nil {
 		return nil, err
 	}
+	rows, _, err := run(*stmt)
+	return rows, err
+}
+
+func GetResult(logger logur.LoggerFacade, connection *sqlx.DB, connectionMs int, input string) (*results.ResultSet, error) {
+	sqlText := getSQL(input)
+
 	stmt, prepared, err := prepare(*connection, sqlText)
 	if err != nil {
 		return nil, err
@@ -51,46 +43,32 @@ func GetResult(logger logur.LoggerFacade, conn string, input string) (*results.R
 	if err != nil {
 		return nil, err
 	}
-	return resultset(logger, sqlText, rows, connected, prepared, elapsed)
+	return resultset(logger, sqlText, rows, connectionMs, prepared, elapsed)
 }
 
-func urlForConn(conn string) string {
-	return "postgres://127.0.0.1:5432/dbui?sslmode=disable"
-}
-
-func connect(url string) (*sqlx.DB, int64, error) {
-	startNanos := time.Now().UnixNano()
-	conn, err := sqlx.Connect("pgx", url)
-	connected := (time.Now().UnixNano() - startNanos) / int64(time.Microsecond)
-	if err != nil {
-		return nil, connected, errors.WithStack(errors.Wrap(err, "Unable to connect to database"))
-	}
-	return conn, connected, nil
-}
-
-func prepare(conn sqlx.DB, sqlText string) (*sqlx.Stmt, int64, error) {
+func prepare(conn sqlx.DB, sqlText string) (*sqlx.Stmt, int, error) {
 	startNanos := time.Now().UnixNano()
 	stmt, err := conn.Preparex(sqlText)
 	prepared := (time.Now().UnixNano() - startNanos) / int64(time.Microsecond)
 	if err != nil {
-		return nil, prepared, errors.WithStack(errors.Wrap(err, "Unable to prepare query"))
+		return nil, int(prepared), errors.WithStack(errors.Wrap(err, "Unable to prepare query"))
 	}
-	return stmt, prepared, nil
+	return stmt, int(prepared), nil
 }
 
-func run(stmt sqlx.Stmt) (*sqlx.Rows, int64, error) {
+func run(stmt sqlx.Stmt) (*sqlx.Rows, int, error) {
 	startNanos := time.Now().UnixNano()
 	rows, err := stmt.Queryx()
 	elapsed := (time.Now().UnixNano() - startNanos) / int64(time.Microsecond)
 	if err != nil {
-		return rows, elapsed, errors.WithStack(errors.Wrap(err, "Unable to execute query"))
+		return rows, int(elapsed), errors.WithStack(errors.Wrap(err, "Unable to execute query"))
 	}
-	return rows, elapsed, nil
+	return rows, int(elapsed), nil
 }
 
 func resultset(
 	logger logur.LoggerFacade, sqlText string, rows *sqlx.Rows,
-	connected int64, prepared int64, elapsed int64) (*results.ResultSet, error) {
+	connected int, prepared int, elapsed int) (*results.ResultSet, error) {
 	rs := results.ResultSet{
 		SQL: sqlText,
 		Timing: results.ResultSetTiming{
@@ -101,7 +79,7 @@ func resultset(
 	}
 
 	fields := make([]results.Column, 0)
-	data := make([][]string, 0)
+	data := make([][]interface{}, 0)
 
 	for rows.Next() {
 		if len(fields) == 0 {
@@ -127,11 +105,7 @@ func resultset(
 			return &rs, errors.WithStack(errors.Wrap(err, "Unable to extract values from rows"))
 		}
 
-		row := make([]string, len(values))
-		for i, v := range values {
-			row[i] = fmt.Sprintf("%v", v)
-		}
-		data = append(data, row)
+		data = append(data, values)
 	}
 
 	rs.Data = data

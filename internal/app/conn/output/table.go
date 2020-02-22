@@ -1,6 +1,7 @@
 package output
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/kyleu/dbui/internal/app/conn/results"
@@ -16,7 +17,11 @@ func AsTable(rs *results.ResultSet) (string, error) {
 	}
 	table.SetHeader(columnNames)
 	for _, row := range rs.Data {
-		table.Append(row)
+		str := make([]string, len(row))
+		for _, c := range row {
+			str = append(str, fmt.Sprintf("%v", c))
+		}
+		table.Append(str)
 	}
 	table.Render()
 	return tableString.String(), nil

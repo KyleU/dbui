@@ -1,12 +1,13 @@
 package schema
 
 import (
-	"github.com/kyleu/dbui/internal/app/conn/results"
 	"sort"
+
+	"github.com/kyleu/dbui/internal/app/conn/results"
 )
 
 type View struct {
-	Name string
+	Name    string
 	Columns []results.Column
 }
 
