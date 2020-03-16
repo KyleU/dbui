@@ -12,10 +12,12 @@ import (
 
 var verbose bool
 
+const AppName = "dbui"
+
 // Configure configures a root command.
 func Configure(version string, commitHash string) cobra.Command {
 	rootCmd := cobra.Command{
-		Use:   "dbui",
+		Use:   AppName,
 		Short: "Command line interface for dbui",
 		Long:  "A work in progress...",
 	}
@@ -33,7 +35,7 @@ func Configure(version string, commitHash string) cobra.Command {
 	return rootCmd
 }
 
-func InitApp(appName string, version string, commitHash string) (*util.AppInfo, error) {
+func InitApp(appName string, version string, commitHash string) (*config.AppInfo, error) {
 	logger := util.InitLogging(verbose)
 	logger = logur.WithFields(logger, map[string]interface{}{"debug": verbose, "version": version, "commit": commitHash})
 
@@ -47,7 +49,7 @@ func InitApp(appName string, version string, commitHash string) (*util.AppInfo, 
 		return nil, errors.WithStack(errors.Wrap(err, "Error creating config service"))
 	}
 
-	ai := util.AppInfo{
+	ai := config.AppInfo{
 		AppName:       appName,
 		Debug:         verbose,
 		Version:       version,

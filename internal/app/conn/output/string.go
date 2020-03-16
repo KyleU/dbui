@@ -8,7 +8,7 @@ import (
 )
 
 func AsString(rs *results.ResultSet) (string, error) {
-	var sb strings.Builder
+	sb := &strings.Builder{}
 	for cIdx, col := range rs.Columns {
 		if cIdx > 0 {
 			sb.WriteRune(',')

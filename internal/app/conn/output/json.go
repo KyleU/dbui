@@ -8,7 +8,7 @@ import (
 )
 
 func AsJson(rs *results.ResultSet) (string, error) {
-	var sb strings.Builder
+	sb := &strings.Builder{}
 	sb.WriteString("[\n")
 	for _, row := range rs.Data {
 		sb.WriteString("  {\n")

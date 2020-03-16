@@ -1,4 +1,4 @@
-<%: func SqlResults(results *results.ResultSet, err error, ctx util.RequestContext, w io.Writer) (int, error) %>
+<%: func SqlResults(results *results.ResultSet, err error, ctx web.RequestContext, w io.Writer) (int, error) %>
 
 <%~ "layout/basic.html" %>
 
@@ -11,7 +11,7 @@
       <div class="uk-margin uk-card uk-card-body <%= ctx.Profile.Theme.CardClass() %>">
         <pre><%= results.SQL %></pre>
       </div>
-      <% ResultSetRender(results, util.NewResultOptions(ctx.Profile, false), _buffer) %>
+      <% ResultSetRender(results, web.NewResultOptions(ctx.Profile, false), _buffer) %>
       <% } %>
 
       <% if err != nil { %>

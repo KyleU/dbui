@@ -2,9 +2,8 @@ package controllers
 
 import (
 	"context"
+	"github.com/kyleu/dbui/internal/app/config"
 	"net/http"
-
-	"github.com/kyleu/dbui/internal/app/util"
 
 	"github.com/gorilla/mux"
 	"github.com/sagikazarmark/ocmux"
@@ -13,7 +12,7 @@ import (
 const routesKey = "routes"
 const infoKey = "info"
 
-func BuildRouter(info *util.AppInfo) (*mux.Router, error) {
+func BuildRouter(info *config.AppInfo) (*mux.Router, error) {
 	r := mux.NewRouter()
 	r.Use(ocmux.Middleware())
 
@@ -55,15 +54,15 @@ func BuildRouter(info *util.AppInfo) (*mux.Router, error) {
 	r.Path("/routes").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(Routes))).Name("routes")
 
 	// Assets
-	r.Path("/favicon.ico").Methods(http.MethodGet).HandlerFunc(Favicon).Name("favicon")
-	r.PathPrefix("/assets").Methods(http.MethodGet).HandlerFunc(Static).Name("assets")
+	r.Path("/favicon.ico").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(Favicon))).Name("favicon")
+	r.PathPrefix("/assets").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(Static))).Name("assets")
 
 	r.PathPrefix("").Handler(addContext(r, info, http.HandlerFunc(NotFound)))
 
 	return r, nil
 }
 
-func addContext(router *mux.Router, info *util.AppInfo, next http.Handler) http.Handler {
+func addContext(router *mux.Router, info *config.AppInfo, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer InternalServerError(router, info, w, r)
 		ctx := context.WithValue(r.Context(), routesKey, router)

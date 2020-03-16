@@ -1,6 +1,6 @@
 #!/bin/bash
 
-## Starts the http server, reloading on changes
+## Starts the web server, reloading on changes
 
 SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$SOURCE" ] ; do SOURCE="$(readlink "$SOURCE")"; done

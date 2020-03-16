@@ -1,4 +1,4 @@
-<%: func InternalServerError(msg string, trace errors.StackTrace, r *http.Request, ctx util.RequestContext, w io.Writer) (int, error) %>
+<%: func InternalServerError(msg string, trace errors.StackTrace, r *http.Request, ctx web.RequestContext, w io.Writer) (int, error) %>
 
 <%!
   import (

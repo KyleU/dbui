@@ -3,22 +3,23 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"github.com/kyleu/dbui/internal/app/config"
+	"github.com/kyleu/dbui/internal/app/web"
 	"io"
 	"net/http"
 
 	"emperror.dev/errors"
 
 	"github.com/gorilla/mux"
-	"github.com/kyleu/dbui/internal/app/util"
 	"github.com/kyleu/dbui/internal/gen/templates"
 )
 
 func NotFound(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(http.StatusNotFound)
-	ctx := util.ExtractContext(r)
+	ctx := web.ExtractContext(r)
 	ctx.Title = "Not Found"
-	ctx.Breadcrumbs = util.BreadcrumbsSimple(r.URL.Path, "not found")
+	ctx.Breadcrumbs = web.BreadcrumbsSimple(r.URL.Path, "not found")
 	args := map[string]interface{}{"status": 500}
 	ctx.Logger.Info(fmt.Sprintf("[%v %v] returned [%d]", r.Method, r.URL.Path, http.StatusNotFound), args)
 	_, _ = templates.NotFound(r, ctx, w)
@@ -28,7 +29,7 @@ type stackTracer interface {
 	StackTrace() errors.StackTrace
 }
 
-func InternalServerError(router *mux.Router, info *util.AppInfo, w http.ResponseWriter, r *http.Request) {
+func InternalServerError(router *mux.Router, info *config.AppInfo, w http.ResponseWriter, r *http.Request) {
 	defer lastChanceError(w)
 
 	if err := recover(); err != nil {
@@ -36,9 +37,9 @@ func InternalServerError(router *mux.Router, info *util.AppInfo, w http.Response
 		w.WriteHeader(http.StatusInternalServerError)
 		rc := context.WithValue(r.Context(), routesKey, router)
 		rc = context.WithValue(rc, infoKey, info)
-		ctx := util.ExtractContext(r.WithContext(rc))
+		ctx := web.ExtractContext(r.WithContext(rc))
 		ctx.Title = "Server Error"
-		ctx.Breadcrumbs = util.BreadcrumbsSimple(r.URL.Path, "error")
+		ctx.Breadcrumbs = web.BreadcrumbsSimple(r.URL.Path, "error")
 		tracer, ok := err.(stackTracer)
 		msg := err.(error).Error()
 		if ok {

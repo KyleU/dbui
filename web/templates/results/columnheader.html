@@ -1,4 +1,4 @@
-<%: func ResultColumnHeader(c results.Column, opts util.ResultOptions, buffer *bytes.Buffer) %>
+<%: func ResultColumnHeader(c results.Column, opts web.ResultOptions, buffer *bytes.Buffer) %>
 <th class="column-header" title="<%= c.TypeString() %><%= opts.SortTitleFor(c.Name) %>">
   <% if opts.Sortable { %>
   <% if opts.SortCol == c.Name { %>

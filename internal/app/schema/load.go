@@ -2,16 +2,16 @@ package schema
 
 import (
 	"database/sql"
+	"github.com/kyleu/dbui/internal/app/config"
 
 	"emperror.dev/errors"
 	"github.com/kyleu/dbui/internal/app/conn"
 	"github.com/kyleu/dbui/internal/app/conn/results"
-	"github.com/kyleu/dbui/internal/app/util"
 )
 
 var cache = map[string]Schema{}
 
-func GetSchema(ai *util.AppInfo, id string, forceReload bool) (*Schema, error) {
+func GetSchema(ai *config.AppInfo, id string, forceReload bool) (*Schema, error) {
 	c, ok := cache[id]
 	if ok && !forceReload {
 		return &c, nil
@@ -25,7 +25,7 @@ func GetSchema(ai *util.AppInfo, id string, forceReload bool) (*Schema, error) {
 	return &c, nil
 }
 
-func LoadSchema(ai *util.AppInfo, id string) (Schema, error) {
+func LoadSchema(ai *config.AppInfo, id string) (Schema, error) {
 	s := NewSchema(id, "Test Schema")
 	connection, _, err := ai.ConfigService.GetConnection(id)
 	if err != nil {

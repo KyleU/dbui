@@ -1,26 +1,26 @@
 package controllers
 
 import (
+	"github.com/kyleu/dbui/internal/app/web"
 	"net/http"
 
 	"emperror.dev/errors"
 	"github.com/kyleu/dbui/internal/app/conn/output"
 
 	"github.com/kyleu/dbui/internal/app/conn"
-	"github.com/kyleu/dbui/internal/app/util"
 	"github.com/kyleu/dbui/internal/gen/templates"
 )
 
 func SQLForm(w http.ResponseWriter, r *http.Request) {
-	act(w, r, func(ctx util.RequestContext) (int, error) {
+	act(w, r, func(ctx web.RequestContext) (int, error) {
 		ctx.Title = "Ad-hoc Query"
-		ctx.Breadcrumbs = util.BreadcrumbsSimple(ctx.Route("sql.form"), "ad-hoc")
+		ctx.Breadcrumbs = web.BreadcrumbsSimple(ctx.Route("sql.form"), "ad-hoc")
 		return templates.SqlForm("", ctx, w)
 	})
 }
 
 func SQLRun(w http.ResponseWriter, r *http.Request) {
-	act(w, r, func(ctx util.RequestContext) (int, error) {
+	act(w, r, func(ctx web.RequestContext) (int, error) {
 		_ = r.ParseForm()
 		sqlArg := r.Form.Get("sql")
 		connArg := r.Form.Get("conn")
@@ -39,7 +39,7 @@ func SQLRun(w http.ResponseWriter, r *http.Request) {
 		switch fmtArg {
 		case "html":
 			ctx.Title = "Ad-hoc Results"
-			ctx.Breadcrumbs = util.BreadcrumbsSimple(ctx.Route("sql.form"), "ad-hoc")
+			ctx.Breadcrumbs = web.BreadcrumbsSimple(ctx.Route("sql.form"), "ad-hoc")
 			return templates.SqlResults(rs, err, ctx, w)
 		case "csv":
 			content, err := output.AsString(rs)

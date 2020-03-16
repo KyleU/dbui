@@ -1,4 +1,4 @@
-<%: func ResultRow(row []interface{}, rowIndex int, columns []results.Column, opts util.ResultOptions, buffer *bytes.Buffer) %>
+<%: func ResultRow(row []interface{}, rowIndex int, columns []results.Column, opts web.ResultOptions, buffer *bytes.Buffer) %>
 <tr>
   <td class="row-index"><%= util.FormatInteger(opts.Profile.Locale, rowIndex + 1) %></td>
   <% for idx, cell := range row { %>

@@ -1,6 +1,7 @@
 package conn
 
 import (
+	"database/sql"
 	"fmt"
 	"strings"
 	"time"
@@ -14,12 +15,43 @@ import (
 
 func Connect(engine string, url string) (*sqlx.DB, int, error) {
 	startNanos := time.Now().UnixNano()
-	conn, err := sqlx.Connect(engine, url)
+	conn, err := sqlx.Open(engine, url)
 	connected := (time.Now().UnixNano() - startNanos) / int64(time.Microsecond)
 	if err != nil {
 		return nil, int(connected), errors.WithStack(errors.Wrap(err, "Unable to connect to database"))
 	}
 	return conn, int(connected), nil
+}
+
+func Execute(connection *sqlx.DB, connectionMs int, input string) (*results.StatementResult, error) {
+	sqlText := getSQL(input)
+
+	stmt, prepared, err := prepare(*connection, sqlText)
+	if err != nil {
+		return nil, err
+	}
+	result, elapsed, err := exec(*stmt)
+	if err != nil {
+		return nil, err
+	}
+	affected, err := result.RowsAffected()
+	if err != nil {
+		affected = 0
+	}
+	lastId, err := result.LastInsertId()
+	if err != nil {
+		lastId = 0
+	}
+	return &results.StatementResult{
+		SQL:          sqlText,
+		RowsAffected: affected,
+		ReturnedId:   lastId,
+		Timing: results.ResultSetTiming{
+			Connected: connectionMs,
+			Prepared:  prepared,
+			Elapsed:   elapsed,
+		},
+	}, nil
 }
 
 func GetRows(connection *sqlx.DB, input string) (*sqlx.Rows, error) {
@@ -29,7 +61,7 @@ func GetRows(connection *sqlx.DB, input string) (*sqlx.Rows, error) {
 	if err != nil {
 		return nil, err
 	}
-	rows, _, err := run(*stmt)
+	rows, _, err := query(*stmt)
 	return rows, err
 }
 
@@ -40,7 +72,7 @@ func GetResult(logger logur.LoggerFacade, connection *sqlx.DB, connectionMs int,
 	if err != nil {
 		return nil, err
 	}
-	rows, elapsed, err := run(*stmt)
+	rows, elapsed, err := query(*stmt)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +89,7 @@ func prepare(conn sqlx.DB, sqlText string) (*sqlx.Stmt, int, error) {
 	return stmt, int(prepared), nil
 }
 
-func run(stmt sqlx.Stmt) (*sqlx.Rows, int, error) {
+func query(stmt sqlx.Stmt) (*sqlx.Rows, int, error) {
 	startNanos := time.Now().UnixNano()
 	rows, err := stmt.Queryx()
 	elapsed := (time.Now().UnixNano() - startNanos) / int64(time.Microsecond)
@@ -67,9 +99,19 @@ func run(stmt sqlx.Stmt) (*sqlx.Rows, int, error) {
 	return rows, int(elapsed), nil
 }
 
+func exec(stmt sqlx.Stmt) (sql.Result, int, error) {
+	startNanos := time.Now().UnixNano()
+	result, err := stmt.Exec()
+	elapsed := (time.Now().UnixNano() - startNanos) / int64(time.Microsecond)
+	if err != nil {
+		return result, int(elapsed), errors.WithStack(errors.Wrap(err, "Unable to execute query"))
+	}
+	return result, int(elapsed), nil
+}
+
 func resultset(
-	logger logur.LoggerFacade, sqlText string, rows *sqlx.Rows,
-	connected int, prepared int, elapsed int) (*results.ResultSet, error) {
+		logger logur.LoggerFacade, sqlText string, rows *sqlx.Rows,
+		connected int, prepared int, elapsed int) (*results.ResultSet, error) {
 	rs := results.ResultSet{
 		SQL: sqlText,
 		Timing: results.ResultSetTiming{

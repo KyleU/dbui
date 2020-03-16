@@ -2,9 +2,8 @@ package cli
 
 import (
 	"fmt"
+	"github.com/kyleu/dbui/internal/app/config"
 	"net/http"
-
-	"github.com/kyleu/dbui/internal/app/util"
 
 	"emperror.dev/errors"
 	"github.com/gorilla/handlers"
@@ -26,7 +25,7 @@ func NewServerCommand(appName string, version string, commitHash string) *cobra.
 				return errors.WithStack(errors.Wrap(err, "Error initializing application"))
 			}
 
-			return makeServer(info, addr, port)
+			return MakeServer(info, addr, port)
 		},
 	}
 
@@ -37,7 +36,7 @@ func NewServerCommand(appName string, version string, commitHash string) *cobra.
 	return cmd
 }
 
-func makeServer(info *util.AppInfo, address string, port uint16) error {
+func MakeServer(info *config.AppInfo, address string, port uint16) error {
 	routes, err := controllers.BuildRouter(info)
 	if err != nil {
 		return errors.WithStack(errors.WithMessage(err, "Unable to construct routes"))

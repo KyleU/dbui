@@ -22,7 +22,7 @@ type ResultSetTiming struct {
 
 func (rs *ResultSet) Debug(l logur.LoggerFacade) {
 	l.Debug(fmt.Sprintf("Returned ResultSet with [%d] columns and [%d] rows", len(rs.Columns), len(rs.Data)))
-	var sb strings.Builder
+	sb := &strings.Builder{}
 	for idx, c := range rs.Columns {
 		_, _ = sb.WriteString(c.Name + ": " + c.T.String())
 		if idx < len(rs.Columns)-1 {

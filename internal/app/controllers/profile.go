@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/kyleu/dbui/internal/app/web"
 	"net/http"
 
 	"github.com/kyleu/dbui/internal/app/util"
@@ -8,15 +9,15 @@ import (
 )
 
 func Profile(w http.ResponseWriter, r *http.Request) {
-	act(w, r, func(ctx util.RequestContext) (int, error) {
+	act(w, r, func(ctx web.RequestContext) (int, error) {
 		ctx.Title = "User Profile"
-		ctx.Breadcrumbs = util.BreadcrumbsSimple(ctx.Route("profile"), "profile")
+		ctx.Breadcrumbs = web.BreadcrumbsSimple(ctx.Route("profile"), "profile")
 		return templates.Profile(ctx, w)
 	})
 }
 
 func ProfileSave(w http.ResponseWriter, r *http.Request) {
-	redir(w, r, func(ctx util.RequestContext) (string, error) {
+	redir(w, r, func(ctx web.RequestContext) (string, error) {
 		_ = r.ParseForm()
 		util.SystemProfile.Name = r.Form.Get("username")
 		util.SystemProfile.Theme = util.ThemeFromString(r.Form.Get("theme"))

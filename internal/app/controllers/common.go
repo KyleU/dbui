@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"github.com/kyleu/dbui/internal/app/web"
 	"net/http"
 	"time"
 
@@ -11,9 +12,9 @@ import (
 	"github.com/kyleu/dbui/internal/app/util"
 )
 
-func act(w http.ResponseWriter, r *http.Request, f func(util.RequestContext) (int, error)) {
+func act(w http.ResponseWriter, r *http.Request, f func(web.RequestContext) (int, error)) {
 	startNanos := time.Now().UnixNano()
-	ctx := util.ExtractContext(r)
+	ctx := web.ExtractContext(r)
 
 	if len(ctx.Flashes) > 0 {
 		saveSession(w, r, ctx)
@@ -27,9 +28,9 @@ func act(w http.ResponseWriter, r *http.Request, f func(util.RequestContext) (in
 	logComplete(startNanos, ctx, http.StatusOK, r)
 }
 
-func redir(w http.ResponseWriter, r *http.Request, f func(util.RequestContext) (string, error)) {
+func redir(w http.ResponseWriter, r *http.Request, f func(web.RequestContext) (string, error)) {
 	startNanos := time.Now().UnixNano()
-	ctx := util.ExtractContext(r)
+	ctx := web.ExtractContext(r)
 	url, err := f(ctx)
 	if err != nil {
 		ctx.Logger.Warn("Error running action")
@@ -39,14 +40,14 @@ func redir(w http.ResponseWriter, r *http.Request, f func(util.RequestContext) (
 	logComplete(startNanos, ctx, http.StatusFound, r)
 }
 
-func logComplete(startNanos int64, ctx util.RequestContext, status int, r *http.Request) {
+func logComplete(startNanos int64, ctx web.RequestContext, status int, r *http.Request) {
 	delta := (time.Now().UnixNano() - startNanos) / int64(time.Microsecond)
 	ms := util.MicrosToMillis(language.AmericanEnglish, int(delta))
 	args := map[string]interface{}{"elapsed": delta, "status": status}
 	ctx.Logger.Debug(fmt.Sprintf("[%v %v] returned [%v] in [%v]", r.Method, r.URL.Path, status, ms), args)
 }
 
-func saveSession(w http.ResponseWriter, r *http.Request, ctx util.RequestContext) {
+func saveSession(w http.ResponseWriter, r *http.Request, ctx web.RequestContext) {
 	err := ctx.Session.Save(r, w)
 	if err != nil {
 		ctx.Logger.Warn("Unable to save session to response")

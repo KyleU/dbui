@@ -1,7 +1,9 @@
-package util
+package web
 
 import (
 	"fmt"
+	"github.com/kyleu/dbui/internal/app/config"
+	"github.com/kyleu/dbui/internal/app/util"
 	"net/http"
 	"os"
 	"strings"
@@ -18,7 +20,7 @@ type Breadcrumb struct {
 
 type Breadcrumbs []Breadcrumb
 
-func (bc Breadcrumbs) Title(ai *AppInfo) string {
+func (bc Breadcrumbs) Title(ai *config.AppInfo) string {
 	if len(bc) == 0 {
 		return ai.AppName
 	}
@@ -32,9 +34,9 @@ func BreadcrumbsSimple(path string, title string) Breadcrumbs {
 }
 
 type RequestContext struct {
-	AppInfo     *AppInfo
+	AppInfo     *config.AppInfo
 	Logger      logur.LoggerFacade
-	Profile     UserProfile
+	Profile     util.UserProfile
 	Routes      *mux.Router
 	Title       string
 	Breadcrumbs Breadcrumbs
@@ -69,9 +71,9 @@ var store = sessions.NewCookieStore([]byte(sessionKey))
 const sessionName = "dbui-session"
 
 func ExtractContext(r *http.Request) RequestContext {
-	ai := r.Context().Value("info").(*AppInfo)
+	ai := r.Context().Value("info").(*config.AppInfo)
 	routes := r.Context().Value("routes").(*mux.Router)
-	prof := SystemProfile
+	prof := util.SystemProfile
 	session, err := store.Get(r, sessionName)
 	if err != nil {
 		session = sessions.NewSession(store, sessionName)

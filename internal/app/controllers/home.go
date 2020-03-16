@@ -1,15 +1,15 @@
 package controllers
 
 import (
+	"github.com/kyleu/dbui/internal/app/web"
 	"net/http"
 
 	"github.com/gorilla/websocket"
-	"github.com/kyleu/dbui/internal/app/util"
 	"github.com/kyleu/dbui/internal/gen/templates"
 )
 
 func Home(w http.ResponseWriter, r *http.Request) {
-	act(w, r, func(ctx util.RequestContext) (int, error) {
+	act(w, r, func(ctx web.RequestContext) (int, error) {
 		ctx.Title = "Home"
 		return templates.Index(ctx, w)
 	})
@@ -18,7 +18,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 var upgrader = websocket.Upgrader{}
 
 func Socket(w http.ResponseWriter, r *http.Request) {
-	ctx := util.ExtractContext(r)
+	ctx := web.ExtractContext(r)
 	c, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		ctx.Logger.Info("Unable to upgrade connection to websocket")
@@ -43,9 +43,9 @@ func Socket(w http.ResponseWriter, r *http.Request) {
 }
 
 func About(w http.ResponseWriter, r *http.Request) {
-	act(w, r, func(ctx util.RequestContext) (int, error) {
+	act(w, r, func(ctx web.RequestContext) (int, error) {
 		ctx.Title = "About " + ctx.AppInfo.AppName
-		ctx.Breadcrumbs = util.BreadcrumbsSimple(ctx.Route("about"), "about")
+		ctx.Breadcrumbs = web.BreadcrumbsSimple(ctx.Route("about"), "about")
 		return templates.About(ctx, w)
 	})
 }

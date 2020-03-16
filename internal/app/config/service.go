@@ -2,6 +2,8 @@ package config
 
 import (
 	"fmt"
+	"github.com/kyleu/dbui/internal/gen/queries"
+	"strings"
 
 	"emperror.dev/errors"
 	_ "github.com/jackc/pgx/v4/stdlib"
@@ -13,8 +15,7 @@ import (
 
 type Service struct {
 	Path   string
-	db     *sqlx.DB
-	logger logur.LoggerFacade
+	Logger logur.LoggerFacade
 }
 
 func (s *Service) GetConnection(connArg string) (*sqlx.DB, int, error) {
@@ -23,7 +24,7 @@ func (s *Service) GetConnection(connArg string) (*sqlx.DB, int, error) {
 	switch connArg {
 	case "_root":
 		engine = "sqlite3"
-		url = ConfigPath(s.logger, "dbui.db")
+		url = ConfigPath(s.Logger, "dbui.db")
 	case "test":
 		engine = "pgx"
 		url = "postgres://127.0.0.1:5432/dbui?sslmode=disable"
@@ -44,9 +45,9 @@ func NewService(logger logur.LoggerFacade) (*Service, error) {
 	defer func() {
 		_ = db.Close()
 	}()
-	svc := Service{Path: path, db: db, logger: logger}
+	svc := Service{Path: path, Logger: logger}
 
-	err = initIfNeeded(svc)
+	err = initIfNeeded(db, svc.Logger)
 	if err != nil {
 		logger.Warn(fmt.Sprintf("Error initializing config database: %+v", err))
 		return nil, err
@@ -56,13 +57,18 @@ func NewService(logger logur.LoggerFacade) (*Service, error) {
 	return &svc, nil
 }
 
-func initIfNeeded(svc Service) error {
-	rows, err := conn.GetRows(svc.db, "select 1")
-	if err != nil {
-		return err
-	}
-	for rows.Next() {
-		svc.logger.Error("ROW!")
-	}
+func initIfNeeded(db *sqlx.DB, logger logur.LoggerFacade) error {
+	exec("burn-it-down", db, logger, func(sb *strings.Builder) { queries.ResetConfigDatabase(sb) })
+	exec("create-table-project", db, logger, func(sb *strings.Builder) { queries.CreateTableProject(sb) })
 	return nil
+}
+
+func exec(name string, db *sqlx.DB, logger logur.LoggerFacade, f func(*strings.Builder)) {
+	sb := &strings.Builder{}
+	f(sb)
+	result, err := conn.Execute(db, 0, sb.String())
+	if err != nil {
+		panic(err)
+	}
+	logger.Debug(fmt.Sprintf("Ran [%s] in [%vms], [%v] rows affected", name, result.Timing.Elapsed, result.RowsAffected))
 }

@@ -1,15 +1,18 @@
-package util
+package web
 
-import "strings"
+import (
+	"github.com/kyleu/dbui/internal/app/util"
+	"strings"
+)
 
 type ResultOptions struct {
-	Profile  UserProfile
+	Profile  util.UserProfile
 	Sortable bool
 	SortCol  string
 	SortAsc  bool
 }
 
-func NewResultOptions(profile UserProfile, sortable bool) ResultOptions {
+func NewResultOptions(profile util.UserProfile, sortable bool) ResultOptions {
 	return ResultOptions{Profile: profile, Sortable: sortable, SortCol: "", SortAsc: true}
 }
 
@@ -37,7 +40,7 @@ func (opts *ResultOptions) SortTitleFor(name string) string {
 	return ""
 }
 
-func FromQueryString(profile UserProfile, sortable bool, q map[string][]string) ResultOptions {
+func FromQueryString(profile util.UserProfile, sortable bool, q map[string][]string) ResultOptions {
 	col, ok := q["sc"]
 	sortCol := ""
 	sortAsc := true
@@ -82,7 +85,7 @@ func (opts *ResultOptions) ToQueryString(nameOverride string) string {
 }
 
 func (opts *ResultOptions) ToSQL(engine string, name string) string {
-	var sb strings.Builder
+	sb := &strings.Builder{}
 	sb.WriteString("select * from \"")
 	sb.WriteString(name)
 	sb.WriteString("\"")

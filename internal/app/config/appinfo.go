@@ -1,8 +1,7 @@
-package util
+package config
 
 import (
 	"emperror.dev/emperror"
-	"github.com/kyleu/dbui/internal/app/config"
 	"logur.dev/logur"
 )
 
@@ -14,7 +13,7 @@ type AppInfo struct {
 	CachePath     string
 	Logger        logur.LoggerFacade
 	ErrorHandler  emperror.ErrorHandlerFacade
-	ConfigService *config.Service
+	ConfigService *Service
 }
 
 func (a *AppInfo) Valid() bool {

@@ -3,12 +3,16 @@ FROM golang:1.13.0-alpine AS builder
 
 ENV GOFLAGS="-mod=readonly"
 
-RUN apk add --update --no-cache ca-certificates make git curl mercurial bzr
+RUN apk add --update --no-cache ca-certificates make git curl build-base
 
 RUN mkdir -p /workspace
 WORKDIR /workspace
 
 ARG GOPROXY
+
+RUN go get -u github.com/pyros2097/go-embed
+RUN go get -u github.com/shiyanhui/hero/hero
+RUN go get -u golang.org/x/tools/cmd/goimports
 
 COPY go.* /workspace/
 RUN go mod download
@@ -16,8 +20,6 @@ RUN go mod download
 COPY . /workspace
 
 ARG BUILD_TARGET
-
-RUN /workspace/scripts/bootstrap.sh
 
 RUN set -xe && \
     if [[ "${BUILD_TARGET}" == "debug" ]]; then \
