@@ -120,7 +120,7 @@ func FieldTypeForName(logger logur.LoggerFacade, name string, t string) FieldTyp
 	case "xml":
 		r = TypeXML
 	default:
-		logger.Warn("Unhandled data type [" + t + "] for column [" + name + "]")
+		logger.Debug("Unhandled data type [" + t + "] for column [" + name + "]")
 	}
 	return r
 }
@@ -167,7 +167,7 @@ func arrayTypeFor(logger logur.LoggerFacade, name string, t string) FieldType {
 	case "uuid":
 		r = TypeArrayUUID
 	default:
-		logger.Warn("Unhandled array data type [" + t + "] for column [" + name + "]")
+		logger.Debug("Unhandled array data type [" + t + "] for column [" + name + "]")
 	}
 	return r
 }

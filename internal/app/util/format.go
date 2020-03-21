@@ -28,11 +28,18 @@ func PluralChoice(plural string, single string, v int) string {
 	return plural
 }
 
+func BoolUnicode(b bool) string {
+	if b {
+		return "✓"
+	}
+	return "✗"
+}
+
 var re *regexp.Regexp
 
 func PathParams(s string) []string {
 	if re == nil {
-		re, _ = regexp.Compile("{([^}]*)}")
+		re = regexp.MustCompile("{([^}]*)}")
 	}
 	matches := re.FindAll([]byte(s), -1)
 

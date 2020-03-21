@@ -4,21 +4,31 @@ import "golang.org/x/text/language"
 
 var AllColors = []string{"clear", "grey", "bluegrey", "red", "orange", "yellow", "green", "blue", "purple"}
 
-type Theme uint8
+type Theme struct {
+	Name            string
+	BackgroundClass string
+	CardClass       string
+	LogoPath        string
+}
 
-const (
-	ThemeLight Theme = iota
-	ThemeDark
-	endTypes
-)
+var ThemeLight = Theme{
+	Name:            "light",
+	BackgroundClass: "uk-dark",
+	CardClass:       "uk-card-default",
+	LogoPath:        "/assets/logo.png",
+}
+
+var ThemeDark = Theme{
+	Name:            "dark",
+	BackgroundClass: "uk-light",
+	CardClass:       "uk-card-secondary",
+	LogoPath:        "/assets/logo-white.png",
+}
 
 var AllThemes = []Theme{ThemeLight, ThemeDark}
 
 func (t Theme) String() string {
-	if t < endTypes {
-		return themeNames[t]
-	}
-	return themeNames[ThemeLight]
+	return t.Name
 }
 
 func ThemeFromString(s string) Theme {
@@ -29,41 +39,6 @@ func ThemeFromString(s string) Theme {
 	}
 	return ThemeLight
 }
-
-func (t Theme) BackgroundClass() string {
-	if t < endTypes {
-		return themeBackgroundClasses[t]
-	}
-	return themeBackgroundClasses[ThemeLight]
-}
-
-func (t Theme) CardClass() string {
-	if t < endTypes {
-		return themeCardClasses[t]
-	}
-	return themeCardClasses[ThemeLight]
-}
-
-func (t Theme) Valid() bool {
-	return t > ThemeLight && t < endTypes
-}
-
-var (
-	themeNames = [...]string{
-		ThemeLight: "Light",
-		ThemeDark:  "Dark",
-	}
-
-	themeBackgroundClasses = [...]string{
-		ThemeLight: "uk-dark",
-		ThemeDark:  "uk-light",
-	}
-
-	themeCardClasses = [...]string{
-		ThemeLight: "uk-card-default",
-		ThemeDark:  "uk-card-secondary",
-	}
-)
 
 type UserProfile struct {
 	Name      string

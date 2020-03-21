@@ -8,14 +8,14 @@
     <div>
       <h1 class="uk-heading-hero">SQL Query Results</h1>
       <% if results != nil { %>
-      <div class="uk-margin uk-card uk-card-body <%= ctx.Profile.Theme.CardClass() %>">
+      <div class="uk-margin uk-card uk-card-body <%= ctx.Profile.Theme.CardClass %>">
         <pre><%= results.SQL %></pre>
       </div>
       <% ResultSetRender(results, web.NewResultOptions(ctx.Profile, false), _buffer) %>
       <% } %>
 
       <% if err != nil { %>
-      <div class="uk-margin uk-card uk-card-body <%= ctx.Profile.Theme.CardClass() %>">
+      <div class="uk-margin uk-card uk-card-body <%= ctx.Profile.Theme.CardClass %>">
         Error: <strong><%=v err %></strong>
       </div>
       <% } %>

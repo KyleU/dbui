@@ -28,6 +28,9 @@ h4 {
 // Content
 #content {
   padding: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 html.uk-light, body.uk-light {
@@ -55,7 +58,7 @@ html.uk-dark, body.uk-dark {
   }
 }
 
-.sidebar-left + #content {
+.sidebar-left + #workspace {
   padding-left: 240px;
 }
 

@@ -10,7 +10,7 @@
         <div class="uk-margin-top">
           <% switch key { %>
           <% case "gallery": %>
-            <%+ "sandbox/gallery.html" %>
+            <% SandboxGallery(ctx, _buffer) %>
           <% default: %>
             TODO!
           <% } %>

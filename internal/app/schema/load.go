@@ -2,6 +2,7 @@ package schema
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/kyleu/dbui/internal/app/config"
 
 	"emperror.dev/errors"
@@ -37,7 +38,7 @@ func LoadSchema(ai *config.AppInfo, id string) (Schema, error) {
 		}
 	}()
 
-	rows, err := conn.GetRows(connection, "named:list-columns")
+	tx, rows, err := conn.GetRowsNoTx(ai.Logger, connection, "named:list-columns")
 	if err != nil {
 		return s, errors.WithStack(errors.Wrap(err, "Error retrieving columns from ["+id+"]"))
 	}
@@ -64,6 +65,11 @@ func LoadSchema(ai *config.AppInfo, id string) (Schema, error) {
 		t := results.FieldTypeForName(ai.Logger, res.Name, tn)
 		table.AddColumn(results.Column{T: t, Name: res.Name, Nullable: res.IsNullable()})
 		tables[table.Name] = table
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		ai.Logger.Warn(fmt.Sprintf("Error comitting config database transaction: %+v", err))
 	}
 
 	var ts []Table

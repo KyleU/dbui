@@ -29,7 +29,7 @@ func Configure(version string, commitHash string) cobra.Command {
 		NewServerCommand(rootCmd.Use, version, commitHash),
 		NewQueryCommand(rootCmd.Use, version, commitHash),
 		NewSandboxCommand(rootCmd.Use, version, commitHash),
-		NewVersionCommand(),
+		NewVersionCommand(version),
 	)
 
 	return rootCmd

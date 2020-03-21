@@ -5,12 +5,12 @@
 <%@ body { %>
   <% table := s.Tables.Get(name) %>
   <% WorkspaceSidebar(s, "table." + name, ctx, _buffer) %>
-  <div id="content">
+  <div id="workspace">
     <div class="uk-container uk-container-expand">
       <div class="uk-margin-medium-top">
         <h1 class="uk-heading-hero"><%= name %></h1>
       </div>
-      <div class="uk-margin uk-card uk-card-body <%= ctx.Profile.Theme.CardClass() %>">
+      <div class="uk-margin uk-card uk-card-body <%= ctx.Profile.Theme.CardClass %>">
         <ul uk-accordion>
         <% ComponentColumns(table.Columns, _buffer) %>
         </ul>

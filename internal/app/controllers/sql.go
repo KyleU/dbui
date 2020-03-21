@@ -35,7 +35,7 @@ func SQLRun(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			return 0, errors.WithStack(errors.Wrap(err, "Error opening connection"))
 		}
-		rs, err := conn.GetResult(ctx.Logger, connection, ms, sqlArg)
+		rs, err := conn.GetResultNoTx(ctx.Logger, connection, ms, sqlArg)
 		switch fmtArg {
 		case "html":
 			ctx.Title = "Ad-hoc Results"

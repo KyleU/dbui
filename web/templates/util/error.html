@@ -12,28 +12,30 @@
 <div class="uk-section uk-section-small">
   <div class="uk-container">
     <div>
-      <h1 class="uk-heading-hero">500 Internal Server Error</h1>
-      <div class="uk-text-lead"><%= msg %></div>
-      <div class="uk-margin-top">
-        <% if trace != nil { %>
-          <table class="uk-table uk-table-divider">
-            <tbody>
-            <% for _, f := range util.TraceDetail(trace) { %>
-            <tr>
-              <td>
-                <% if strings.Contains(f.Key, ctx.AppInfo.AppName) { %>
-                <div class="error-key error-owned"><%=v f.Key %></div>
-                <% } else { %>
-                <div class="error-key"><%=v f.Key %></div>
-                <% } %>
-                <div class="error-location"><%=v f.Loc %></div>
-              </td>
-            </tr>
-            <% } %>
-            </tbody>
-          </table>
-        <% } %>
-      </div>
+      <h1 class="uk-heading-hero"><%= msg %></h1>
+      <div class="uk-text-lead">Internal Server Error</div>
+      <% if trace != nil { %>
+        <div class="uk-margin-top">
+          <div class="uk-card <%= ctx.Profile.Theme.CardClass %> uk-card-body">
+            <table class="uk-table uk-table-divider">
+              <tbody>
+              <% for _, f := range util.TraceDetail(trace) { %>
+              <tr>
+                <td>
+                  <% if strings.Contains(f.Key, ctx.AppInfo.AppName) { %>
+                  <div class="error-key error-owned"><%=v f.Key %></div>
+                  <% } else { %>
+                  <div class="error-key"><%=v f.Key %></div>
+                  <% } %>
+                  <div class="error-location"><%=v f.Loc %></div>
+                </td>
+              </tr>
+              <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      <% } %>
     </div>
   </div>
 </div>

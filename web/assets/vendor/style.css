@@ -12052,6 +12052,9 @@ h4 {
 
 #content {
   padding: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 html.uk-light, html.uk-section-primary:not(.uk-preserve-color), html.uk-section-secondary:not(.uk-preserve-color), html.uk-tile-primary:not(.uk-preserve-color), html.uk-tile-secondary:not(.uk-preserve-color), html.uk-card-primary.uk-card-body, .uk-card-primary > html:not([class*=uk-card-media]), html.uk-card-secondary.uk-card-body, .uk-card-secondary > html:not([class*=uk-card-media]), html.uk-overlay-primary, html.uk-offcanvas-bar, body.uk-light, body.uk-section-primary:not(.uk-preserve-color), body.uk-section-secondary:not(.uk-preserve-color), body.uk-tile-primary:not(.uk-preserve-color), body.uk-tile-secondary:not(.uk-preserve-color), body.uk-card-primary.uk-card-body, .uk-card-primary > body:not([class*=uk-card-media]), body.uk-card-secondary.uk-card-body, .uk-card-secondary > body:not([class*=uk-card-media]), body.uk-overlay-primary, body.uk-offcanvas-bar {
@@ -12077,7 +12080,7 @@ html.uk-dark, body.uk-dark {
   bottom: 40px;
 }
 
-.sidebar-left + #content {
+.sidebar-left + #workspace {
   padding-left: 240px;
 }
 

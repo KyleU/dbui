@@ -23,6 +23,9 @@ func act(w http.ResponseWriter, r *http.Request, f func(web.RequestContext) (int
 	_, err := f(ctx)
 	if err != nil {
 		ctx.Logger.Warn(fmt.Sprintf("Error running action: %+v", err))
+		if ctx.Title == "" {
+			ctx.Title = "Error"
+		}
 		_, _ = templates.InternalServerError(err.(error).Error(), err.(stackTracer).StackTrace(), r, ctx, w)
 	}
 	logComplete(startNanos, ctx, http.StatusOK, r)
@@ -32,12 +35,17 @@ func redir(w http.ResponseWriter, r *http.Request, f func(web.RequestContext) (s
 	startNanos := time.Now().UnixNano()
 	ctx := web.ExtractContext(r)
 	url, err := f(ctx)
-	if err != nil {
-		ctx.Logger.Warn("Error running action")
+	if err == nil {
+		w.Header().Set("Location", url)
+		w.WriteHeader(http.StatusFound)
+		logComplete(startNanos, ctx, http.StatusFound, r)
+	} else {
+		ctx.Logger.Warn(fmt.Sprintf("Error running redirect: %+v", err))
+		if ctx.Title == "" {
+			ctx.Title = "Error"
+		}
+		_, _ = templates.InternalServerError(err.(error).Error(), err.(stackTracer).StackTrace(), r, ctx, w)
 	}
-	w.Header().Set("Location", url)
-	w.WriteHeader(http.StatusFound)
-	logComplete(startNanos, ctx, http.StatusFound, r)
 }
 
 func logComplete(startNanos int64, ctx web.RequestContext, status int, r *http.Request) {

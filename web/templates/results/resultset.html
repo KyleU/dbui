@@ -1,5 +1,5 @@
 <%: func ResultSetRender(results *results.ResultSet, opts web.ResultOptions, buffer *bytes.Buffer) %>
-<div class="uk-margin uk-card uk-card-body <%= opts.Profile.Theme.CardClass() %>">
+<div class="uk-margin uk-card uk-card-body <%= opts.Profile.Theme.CardClass %>">
   Query
   connected in
   [<%= util.MicrosToMillis(opts.Profile.Locale, results.Timing.Connected) %>]
@@ -8,7 +8,7 @@
   rows in
   [<%= util.MicrosToMillis(opts.Profile.Locale, results.Timing.Elapsed) %>]
 </div>
-<div class="uk-margin uk-card uk-card-body <%= opts.Profile.Theme.CardClass() %>">
+<div class="uk-margin uk-card uk-card-body <%= opts.Profile.Theme.CardClass %>">
   <% if len(results.Data) == 0 { %>
   <i>No rows returned</i>
   <% } else { %>
@@ -16,7 +16,7 @@
     <table class="uk-table uk-table-divider uk-table-small">
       <thead>
       <tr>
-        <th>#</th>
+        <th title="row number">#</th>
         <% for _, c := range results.Columns { %>
         <% ResultColumnHeader(c, opts, buffer) %>
         <% } %>

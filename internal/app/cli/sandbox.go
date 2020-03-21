@@ -24,7 +24,7 @@ func NewSandboxCommand(appName string, version string, commitHash string) *cobra
 			if err != nil {
 				return errors.WithStack(errors.Wrap(err, "Error opening connection"))
 			}
-			rs, err := conn.GetResult(info.Logger, connection, ms, "")
+			rs, err := conn.GetResultNoTx(info.Logger, connection, ms, "")
 			if err != nil {
 				return errors.WithStack(errors.Wrap(err, "Error retrieving result"))
 			}

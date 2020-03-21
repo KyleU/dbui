@@ -57,13 +57,13 @@ func WorkspaceData(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			return 0, err
 		}
-		rs, err := conn.GetResult(ctx.AppInfo.Logger, db, connectMS, opts.ToSQL(s.Engine, name))
+		rs, err := conn.GetResultNoTx(ctx.AppInfo.Logger, db, connectMS, opts.ToSQL(s.Engine, name))
 		if err != nil {
 			return 0, err
 		}
 		dc := web.Breadcrumb{Path: ctx.Route("workspace.data", "p", s.ID, "t", name), Title: "data"}
 		ctx.Title = "[" + name + "] Data"
-		var tc= tableBC(ctx, s.ID, name)
+		var tc = tableBC(ctx, s.ID, name)
 		ctx.Breadcrumbs = append(bc, tc, dc)
 		return templates.WorkspaceData(s, name, rs, opts, ctx, w)
 	})
@@ -71,10 +71,6 @@ func WorkspaceData(w http.ResponseWriter, r *http.Request) {
 
 func tableBC(ctx web.RequestContext, id string, name string) web.Breadcrumb {
 	return web.Breadcrumb{Path: ctx.Route("workspace.table", "p", id, "t", name), Title: name}
-}
-
-func viewBC(ctx web.RequestContext, id string, name string) web.Breadcrumb {
-	return web.Breadcrumb{Path: ctx.Route("workspace.view", "p", id, "v", name), Title: name}
 }
 
 func load(ctx web.RequestContext, p string, forceReload bool) (*schema.Schema, web.Breadcrumbs, error) {

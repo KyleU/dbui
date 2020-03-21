@@ -23,7 +23,7 @@ func Connect(engine string, url string) (*sqlx.DB, int, error) {
 	return conn, int(connected), nil
 }
 
-func Execute(connection *sqlx.DB, connectionMs int, input string) (*results.StatementResult, error) {
+func Execute(connection *sqlx.Tx, connectionMs int, input string) (*results.StatementResult, error) {
 	sqlText := getSQL(input)
 
 	stmt, prepared, err := prepare(*connection, sqlText)
@@ -54,7 +54,7 @@ func Execute(connection *sqlx.DB, connectionMs int, input string) (*results.Stat
 	}, nil
 }
 
-func GetRows(connection *sqlx.DB, input string) (*sqlx.Rows, error) {
+func GetRows(connection *sqlx.Tx, input string) (*sqlx.Rows, error) {
 	sqlText := getSQL(input)
 
 	stmt, _, err := prepare(*connection, sqlText)
@@ -65,7 +65,20 @@ func GetRows(connection *sqlx.DB, input string) (*sqlx.Rows, error) {
 	return rows, err
 }
 
-func GetResult(logger logur.LoggerFacade, connection *sqlx.DB, connectionMs int, input string) (*results.ResultSet, error) {
+func GetRowsNoTx(logger logur.LoggerFacade, db *sqlx.DB, input string) (*sqlx.Tx, *sqlx.Rows, error) {
+	tx, err := db.Beginx()
+	if err != nil {
+		logger.Warn(fmt.Sprintf("Error opening database transaction: %+v", err))
+		return nil, nil, err
+	}
+	rows, err := GetRows(tx, input)
+	if err != nil {
+		_ = tx.Rollback()
+	}
+	return tx, rows, err
+}
+
+func GetResult(logger logur.LoggerFacade, connection *sqlx.Tx, connectionMs int, input string) (*results.ResultSet, error) {
 	sqlText := getSQL(input)
 
 	stmt, prepared, err := prepare(*connection, sqlText)
@@ -79,7 +92,25 @@ func GetResult(logger logur.LoggerFacade, connection *sqlx.DB, connectionMs int,
 	return resultset(logger, sqlText, rows, connectionMs, prepared, elapsed)
 }
 
-func prepare(conn sqlx.DB, sqlText string) (*sqlx.Stmt, int, error) {
+func GetResultNoTx(logger logur.LoggerFacade, db *sqlx.DB, connectionMs int, input string) (*results.ResultSet, error) {
+	tx, err := db.Beginx()
+	if err != nil {
+		logger.Warn(fmt.Sprintf("Error opening database transaction: %+v", err))
+		return nil, err
+	}
+	rs, err := GetResult(logger, tx, connectionMs, input)
+	if err != nil {
+		_ = tx.Rollback()
+		return rs, err
+	}
+	err = tx.Commit()
+	if err != nil {
+		logger.Warn(fmt.Sprintf("Error comitting config database transaction: %+v", err))
+	}
+	return rs, err
+}
+
+func prepare(conn sqlx.Tx, sqlText string) (*sqlx.Stmt, int, error) {
 	startNanos := time.Now().UnixNano()
 	stmt, err := conn.Preparex(sqlText)
 	prepared := (time.Now().UnixNano() - startNanos) / int64(time.Microsecond)

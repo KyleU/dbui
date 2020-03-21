@@ -7,8 +7,8 @@ dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 project_dir=${dir}/..
 cd $project_dir
 
-echo "=== outdated dependecies ==="
-go list -u -m -json all | go-mod-outdated -update
+# echo "=== outdated dependecies ==="
+# go list -u -m -json all | go-mod-outdated -update
 
 echo "=== linting ==="
 golangci-lint run \

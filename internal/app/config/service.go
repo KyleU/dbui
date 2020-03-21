@@ -14,8 +14,8 @@ import (
 )
 
 type Service struct {
-	Path   string
-	Logger logur.LoggerFacade
+	configDB *sqlx.DB
+	logger logur.LoggerFacade
 }
 
 func (s *Service) GetConnection(connArg string) (*sqlx.DB, int, error) {
@@ -24,7 +24,7 @@ func (s *Service) GetConnection(connArg string) (*sqlx.DB, int, error) {
 	switch connArg {
 	case "_root":
 		engine = "sqlite3"
-		url = ConfigPath(s.Logger, "dbui.db")
+		url = ConfigPath(s.logger, "dbui.db")
 	case "test":
 		engine = "pgx"
 		url = "postgres://127.0.0.1:5432/dbui?sslmode=disable"
@@ -45,9 +45,9 @@ func NewService(logger logur.LoggerFacade) (*Service, error) {
 	defer func() {
 		_ = db.Close()
 	}()
-	svc := Service{Path: path, Logger: logger}
+	svc := Service{configDB: db, logger: logger}
 
-	err = initIfNeeded(db, svc.Logger)
+	err = initIfNeeded(db, logger)
 	if err != nil {
 		logger.Warn(fmt.Sprintf("Error initializing config database: %+v", err))
 		return nil, err
@@ -58,15 +58,26 @@ func NewService(logger logur.LoggerFacade) (*Service, error) {
 }
 
 func initIfNeeded(db *sqlx.DB, logger logur.LoggerFacade) error {
-	exec("burn-it-down", db, logger, func(sb *strings.Builder) { queries.ResetConfigDatabase(sb) })
-	exec("create-table-project", db, logger, func(sb *strings.Builder) { queries.CreateTableProject(sb) })
+	tx, err := db.Beginx()
+	if err != nil {
+		logger.Warn(fmt.Sprintf("Error opening config database transaction: %+v", err))
+		return err
+	}
+	exec("burn-it-down", tx, logger, func(sb *strings.Builder) { queries.ResetConfigDatabase(sb) })
+	exec("create-table-project", tx, logger, func(sb *strings.Builder) { queries.CreateTableProject(sb) })
+	exec("insert-data-project", tx, logger, func(sb *strings.Builder) { queries.InsertDataProject(sb) })
+	err = tx.Commit()
+	if err != nil {
+		logger.Warn(fmt.Sprintf("Error comitting config database transaction: %+v", err))
+		return err
+	}
 	return nil
 }
 
-func exec(name string, db *sqlx.DB, logger logur.LoggerFacade, f func(*strings.Builder)) {
+func exec(name string, tx *sqlx.Tx, logger logur.LoggerFacade, f func(*strings.Builder)) {
 	sb := &strings.Builder{}
 	f(sb)
-	result, err := conn.Execute(db, 0, sb.String())
+	result, err := conn.Execute(tx, 0, sb.String())
 	if err != nil {
 		panic(err)
 	}
