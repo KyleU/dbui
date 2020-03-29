@@ -13,5 +13,5 @@ type StatementResult struct {
 }
 
 func (rs *StatementResult) Debug(l logur.LoggerFacade) {
-	l.Debug(fmt.Sprintf("Returned statement result that affected [%d] rows", 0))
+	l.Debug(fmt.Sprintf("Returned statement result that affected [%d] rows", rs.RowsAffected))
 }

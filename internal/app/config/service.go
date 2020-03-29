@@ -14,24 +14,14 @@ import (
 )
 
 type Service struct {
-	configDB *sqlx.DB
-	logger logur.LoggerFacade
+	ProjectRegistry *ProjectRegistry
+	configDB        *sqlx.DB
+	logger          logur.LoggerFacade
 }
 
 func (s *Service) GetConnection(connArg string) (*sqlx.DB, int, error) {
-	engine := ""
-	url := ""
-	switch connArg {
-	case "_root":
-		engine = "sqlite3"
-		url = ConfigPath(s.logger, "dbui.db")
-	case "test":
-		engine = "pgx"
-		url = "postgres://127.0.0.1:5432/dbui?sslmode=disable"
-	default:
-		return nil, 0, errors.WithStack(errors.New("Unknown database [" + connArg + "]"))
-	}
-	db, elapsed, err := conn.Connect(engine, url)
+	p := s.ProjectRegistry.Get(connArg)
+	db, elapsed, err := conn.Connect(p.EngineString, p.Url)
 	return db, elapsed, errors.WithStack(errors.Wrap(err, "Error connecting to database"))
 }
 
@@ -45,11 +35,19 @@ func NewService(logger logur.LoggerFacade) (*Service, error) {
 	defer func() {
 		_ = db.Close()
 	}()
-	svc := Service{configDB: db, logger: logger}
+
+	pr := NewRegistry(logger, db)
+	svc := Service{ProjectRegistry: pr, configDB: db, logger: logger}
 
 	err = initIfNeeded(db, logger)
 	if err != nil {
 		logger.Warn(fmt.Sprintf("Error initializing config database: %+v", err))
+		return nil, err
+	}
+
+	err = pr.Refresh()
+	if err != nil {
+		logger.Warn(fmt.Sprintf("Error initializing project registry: %+v", err))
 		return nil, err
 	}
 

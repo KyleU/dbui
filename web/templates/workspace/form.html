@@ -1,0 +1,74 @@
+<%: func WorkspaceForm(p config.Project, ctx web.RequestContext, w io.Writer) (int, error) %>
+
+<%~ "layout/basic.html" %>
+
+<%@ body { %>
+<div class="uk-section uk-section-small">
+  <div class="uk-container">
+    <div class="uk-card <%= ctx.Profile.Theme.CardClass %> uk-card-body">
+      <h3 class="uk-card-title">
+        <% if len(p.Key) == 0 { %>
+        New Project
+        <% } else { %>
+        Edit <%= p.Key %>
+        <% } %>
+      </h3>
+      <form class="uk-form-stacked" method="post" action="">
+        <fieldset class="uk-fieldset">
+          <div class="uk-margin">
+            <label class="uk-form-label" for="form-key">Key</label>
+            <div class="uk-form-controls">
+              <input class="uk-input" id="form-key" name="key" type="text" value="<%= p.Key %>">
+            </div>
+          </div>
+          <div class="uk-margin">
+            <label class="uk-form-label" for="form-title">Title</label>
+            <div class="uk-form-controls">
+              <input class="uk-input" id="form-title" name="title" type="text" value="<%= p.Title %>">
+            </div>
+          </div>
+          <div class="uk-margin">
+            <label class="uk-form-label" for="form-description">Description</label>
+            <div class="uk-form-controls">
+              <input class="uk-input" id="form-description" name="description" type="text" value="<%= p.Description %>">
+            </div>
+          </div>
+          <div class="uk-margin">
+            <label class="uk-form-label" for="form-owner">Owner</label>
+            <div class="uk-form-controls">
+              <input class="uk-input" id="form-owner" name="owner" type="text" value="<%=v p.Owner %>">
+            </div>
+          </div>
+          <div class="uk-margin">
+            <label class="uk-form-label" for="form-engine">Engine</label>
+            <div class="uk-form-controls">
+              <input class="uk-input" id="form-engine" name="engine" type="text" value="<%= p.Engine().Key %>">
+            </div>
+          </div>
+          <div class="uk-margin">
+            <label class="uk-form-label" for="form-url">URL</label>
+            <div class="uk-form-controls">
+              <input class="uk-input" id="form-url" name="url" type="text" value="<%= p.Url %>">
+            </div>
+          </div>
+          <div class="uk-margin">
+            <label class="uk-form-label" for="form-username">Username</label>
+            <div class="uk-form-controls">
+              <input class="uk-input" id="form-username" name="username" type="text" value="<%= p.Username.String %>">
+            </div>
+          </div>
+          <div class="uk-margin">
+            <label class="uk-form-label" for="form-password">Password</label>
+            <div class="uk-form-controls">
+              <input class="uk-input" id="form-password" name="password" type="password" value="<%= p.Password.String %>">
+            </div>
+          </div>
+          <div class="uk-margin">
+            <button class="uk-button uk-button-default" type="submit">Save Project</button>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+</div>
+<% } %>

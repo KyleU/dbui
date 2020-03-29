@@ -172,7 +172,14 @@ func resultset(
 				if n == "?column?" {
 					n = fmt.Sprintf("col%d", i+1)
 				}
-				t := results.FieldTypeForName(logger, col.Name(), col.DatabaseTypeName())
+				dt := col.DatabaseTypeName()
+				args := ""
+				if strings.Contains(dt, "(") {
+					args = dt[strings.Index(dt, "("):]
+					dt = dt[0:strings.Index(dt, "(")]
+					args = strings.TrimSpace(strings.TrimPrefix(strings.TrimSuffix(args, ")"), "("))
+				}
+				t := results.FieldTypeForName(logger, col.Name(), dt)
 				if t == results.TypeUnknown {
 					if strings.HasPrefix(values[i].(string), "{") {
 						t = results.TypeArrayUnknown
@@ -181,7 +188,31 @@ func resultset(
 					}
 				}
 				nullable, _ := col.Nullable()
-				fields = append(fields, results.Column{Name: n, T: t, Nullable: nullable})
+				p, s, _ := col.DecimalSize()
+				l, _ := col.Length()
+				if l > 1000000 {
+					l = 0
+				}
+				if len(args) > 0 {
+					p2, s2, l2 := results.ParseArgs(t, args)
+					if p == 0 {
+						p = p2
+					}
+					if s == 0 {
+						s = s2
+					}
+					if l == 0 {
+						l = l2
+					}
+				}
+				fields = append(fields, results.Column{
+					Name: n,
+					T: t,
+					Nullable: nullable,
+					Precision: p,
+					Scale: s,
+					Length: l,
+				})
 			}
 			rs.Columns = fields
 		}

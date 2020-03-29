@@ -1,6 +1,9 @@
 package controllers
 
 import (
+	"database/sql"
+	"github.com/gofrs/uuid"
+	"github.com/kyleu/dbui/internal/app/config"
 	"github.com/kyleu/dbui/internal/app/conn"
 	"github.com/kyleu/dbui/internal/app/web"
 	"net/http"
@@ -27,6 +30,52 @@ func Workspace(w http.ResponseWriter, r *http.Request) {
 		ctx.Title = s.Name
 		ctx.Breadcrumbs = bc
 		return templates.WorkspaceOverview(s, "overview", ctx, w)
+	})
+}
+
+func WorkspaceAddForm(w http.ResponseWriter, r *http.Request) {
+	act(w, r, func(ctx web.RequestContext) (int, error) {
+		ctx.Title = "New Workspace"
+		bc := web.BreadcrumbsSimple(ctx.Route("workspace.add.form"), "new")
+		ctx.Breadcrumbs = bc
+		p := config.Project{
+			EngineString: "pgx",
+		}
+		return templates.WorkspaceForm(p, ctx, w)
+	})
+}
+
+func WorkspaceAdd(w http.ResponseWriter, r *http.Request) {
+	redir(w, r, func(ctx web.RequestContext) (string, error) {
+		_ = r.ParseForm()
+		key := r.Form.Get("key")
+		if key == "" {
+			return ctx.Route("workspace.add.form"), nil
+		}
+		owner, err := uuid.FromString(r.Form.Get("owner"))
+		if err != nil {
+			return ctx.Route("workspace.add.form"), nil
+		}
+		username := sql.NullString{
+			String: r.Form.Get("username"),
+			Valid:  true,
+		}
+		password := sql.NullString{
+			String: r.Form.Get("password"),
+			Valid:  true,
+		}
+		p := config.Project{
+			Key:          key,
+			Title:        r.Form.Get("title"),
+			Description:  r.Form.Get("description"),
+			Owner:        owner,
+			EngineString: r.Form.Get("engine"),
+			Url:          r.Form.Get("url"),
+			Username:     username,
+			Password:     password,
+		}
+		ctx.AppInfo.ConfigService.ProjectRegistry.Add(p)
+		return ctx.Route("workspace", "p", key), nil
 	})
 }
 
@@ -78,6 +127,10 @@ func load(ctx web.RequestContext, p string, forceReload bool) (*schema.Schema, w
 	if err != nil {
 		return nil, nil, err
 	}
-	bc := web.BreadcrumbsSimple(ctx.Route("workspace", "p", s.ID), s.ID)
+	key := s.ID
+	if key == "_root" {
+		key = "system"
+	}
+	bc := web.BreadcrumbsSimple(ctx.Route("workspace", "p", s.ID), key)
 	return s, bc, nil
 }

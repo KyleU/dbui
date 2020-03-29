@@ -27,6 +27,8 @@ func getSQL(in string) string {
 			switch strings.TrimPrefix(qName, "list-") {
 			case "columns":
 				queries.ListColumns(sb)
+			case "columns-sqlite":
+				queries.ListColumnsSqlite(sb)
 			case "databases":
 				queries.ListDatabases(sb)
 			case "indexes":

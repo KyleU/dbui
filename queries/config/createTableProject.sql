@@ -4,7 +4,9 @@ create table if not exists projects (
   description text,
   owner uuid,
   engine varchar(64) not null,
-  url text not null
+  url text not null,
+  username varchar(512),
+  password varchar(512)
 );
 
 -- <%: func CreateTableProject(w io.Writer) %>
