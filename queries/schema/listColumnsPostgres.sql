@@ -26,4 +26,4 @@ from information_schema.columns c left join information_schema.element_types e o
 where table_schema = 'public'
 order by c.table_schema, c.table_name, c.ordinal_position;
 
--- <%: func ListColumns(w io.Writer) %>
+-- <%: func ListColumnsPostgres(w io.Writer) %>

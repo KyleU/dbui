@@ -1,10 +1,9 @@
 package controllers
 
 import (
-	"database/sql"
-	"github.com/gofrs/uuid"
-	"github.com/kyleu/dbui/internal/app/config"
+	"emperror.dev/errors"
 	"github.com/kyleu/dbui/internal/app/conn"
+	"github.com/kyleu/dbui/internal/app/conn/output"
 	"github.com/kyleu/dbui/internal/app/web"
 	"net/http"
 
@@ -25,7 +24,7 @@ func Workspace(w http.ResponseWriter, r *http.Request) {
 		p := mux.Vars(r)["p"]
 		s, bc, err := load(ctx, p, false)
 		if err != nil {
-			return 0, err
+			return 0, errors.WithStack(errors.Wrap(err, "error loading workspace [" + p + "]"))
 		}
 		ctx.Title = s.Name
 		ctx.Breadcrumbs = bc
@@ -33,49 +32,72 @@ func Workspace(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func WorkspaceAddForm(w http.ResponseWriter, r *http.Request) {
+func WorkspaceAdhocForm(w http.ResponseWriter, r *http.Request) {
 	act(w, r, func(ctx web.RequestContext) (int, error) {
-		ctx.Title = "New Workspace"
-		bc := web.BreadcrumbsSimple(ctx.Route("workspace.add.form"), "new")
-		ctx.Breadcrumbs = bc
-		p := config.Project{
-			EngineString: "pgx",
+		p := mux.Vars(r)["p"]
+		sqlSet, _ := r.URL.Query()["sql"]
+		sql := ""
+		if len(sqlSet) > 0 {
+			sql = sqlSet[0]
 		}
-		return templates.WorkspaceForm(p, ctx, w)
+		s, bc, err := load(ctx, p, false)
+		if err != nil {
+			return 0, errors.WithStack(errors.Wrap(err, "error loading workspace [" + p + "]"))
+		}
+		ctx.Title = "New Query"
+		ctx.Breadcrumbs = append(bc, web.Breadcrumb{Path: ctx.Route("workspace.adhoc.form", "p", p), Title: "query"})
+		return templates.WorkspaceAdhoc(s, sql, nil, ctx, w)
 	})
 }
 
-func WorkspaceAdd(w http.ResponseWriter, r *http.Request) {
-	redir(w, r, func(ctx web.RequestContext) (string, error) {
-		_ = r.ParseForm()
-		key := r.Form.Get("key")
-		if key == "" {
-			return ctx.Route("workspace.add.form"), nil
-		}
-		owner, err := uuid.FromString(r.Form.Get("owner"))
+func WorkspaceAdhoc(w http.ResponseWriter, r *http.Request) {
+	act(w, r, func(ctx web.RequestContext) (int, error) {
+		p := mux.Vars(r)["p"]
+		s, bc, err := load(ctx, p, false)
 		if err != nil {
-			return ctx.Route("workspace.add.form"), nil
+			return 0, errors.WithStack(errors.Wrap(err, "error loading workspace [" + p + "]"))
 		}
-		username := sql.NullString{
-			String: r.Form.Get("username"),
-			Valid:  true,
+
+		_ = r.ParseForm()
+		sqlArg := r.Form.Get("sql")
+		fmtArg := r.Form.Get("fmt")
+		if fmtArg == "" {
+			fmtArg = "html"
 		}
-		password := sql.NullString{
-			String: r.Form.Get("password"),
-			Valid:  true,
+		connection, ms, err := ctx.AppInfo.ConfigService.GetConnection(s.ID)
+		if err != nil {
+			return 0, errors.WithStack(errors.Wrap(err, "error opening connection"))
 		}
-		p := config.Project{
-			Key:          key,
-			Title:        r.Form.Get("title"),
-			Description:  r.Form.Get("description"),
-			Owner:        owner,
-			EngineString: r.Form.Get("engine"),
-			Url:          r.Form.Get("url"),
-			Username:     username,
-			Password:     password,
+
+		rs, err := conn.RunQueryNoTx(ctx.Logger, connection, ms, conn.Adhoc(sqlArg))
+		if err != nil {
+			return 0, errors.WithStack(errors.Wrap(err, "error running query"))
 		}
-		ctx.AppInfo.ConfigService.ProjectRegistry.Add(p)
-		return ctx.Route("workspace", "p", key), nil
+
+		switch fmtArg {
+		case "html":
+			ctx.Title = "Query Results"
+			ctx.Breadcrumbs = append(bc, web.Breadcrumb{Path: ctx.Route("workspace.adhoc.form", "p", p), Title: "query"})
+			return templates.WorkspaceAdhoc(s, sqlArg, rs, ctx, w)
+			// return templates.SqlResults(rs, err, ctx, w)
+		case "csv":
+			content, err := output.AsString(rs)
+			if err != nil {
+				return 0, errors.WithStack(errors.Wrap(err, "error formatting csv output"))
+			}
+			w.Header().Set("Content-Type", "text/csv; charset=utf-8")
+			w.Header().Set("Content-Disposition", "attachment; filename=\"export.csv\"")
+			return w.Write([]byte(content))
+		case "json":
+			content, err := output.AsJson(rs)
+			if err != nil {
+				return 0, errors.WithStack(errors.Wrap(err, "error formatting json output"))
+			}
+			w.Header().Set("Content-Type", "text/json; charset=utf-8")
+			return w.Write([]byte(content))
+		default:
+			return 0, errors.New("Invalid output format [" + fmtArg + "]")
+		}
 	})
 }
 
@@ -85,7 +107,7 @@ func WorkspaceTable(w http.ResponseWriter, r *http.Request) {
 		t := mux.Vars(r)["t"]
 		s, bc, err := load(ctx, p, false)
 		if err != nil {
-			return 0, err
+			return 0, errors.WithStack(errors.Wrap(err, "error loading workspace [" + p + "]"))
 		}
 		ctx.Title = "Table [" + t + "]"
 		ctx.Breadcrumbs = append(bc, tableBC(ctx, s.ID, t))
@@ -100,16 +122,22 @@ func WorkspaceData(w http.ResponseWriter, r *http.Request) {
 		opts := web.FromQueryString(ctx.Profile, true, r.URL.Query())
 		s, bc, err := load(ctx, p, false)
 		if err != nil {
-			return 0, err
+			return 0, errors.WithStack(errors.Wrap(err, "error loading workspace [" + p + "]"))
 		}
 		db, connectMS, err := ctx.AppInfo.ConfigService.GetConnection(s.ID)
 		if err != nil {
-			return 0, err
+			return 0, errors.WithStack(errors.Wrap(err, "error opening connection to [" + s.ID + "]"))
 		}
-		rs, err := conn.GetResultNoTx(ctx.AppInfo.Logger, db, connectMS, opts.ToSQL(s.Engine, name))
+		rs, err := conn.RunQueryNoTx(ctx.AppInfo.Logger, db, connectMS, conn.Adhoc(opts.ToSQL(name)))
 		if err != nil {
-			return 0, err
+			return 0, errors.WithStack(errors.Wrap(err, "error running query against project [" + p + "]"))
 		}
+
+		table := s.Tables.Get(name)
+		if table != nil {
+			rs.Columns = table.Columns
+		}
+
 		dc := web.Breadcrumb{Path: ctx.Route("workspace.data", "p", s.ID, "t", name), Title: "data"}
 		ctx.Title = "[" + name + "] Data"
 		var tc = tableBC(ctx, s.ID, name)
@@ -125,7 +153,7 @@ func tableBC(ctx web.RequestContext, id string, name string) web.Breadcrumb {
 func load(ctx web.RequestContext, p string, forceReload bool) (*schema.Schema, web.Breadcrumbs, error) {
 	s, err := schema.GetSchema(ctx.AppInfo, p, forceReload)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, errors.WithStack(errors.Wrap(err, "error loading workspace [" + p + "]"))
 	}
 	key := s.ID
 	if key == "_root" {

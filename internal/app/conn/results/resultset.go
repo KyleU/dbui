@@ -31,3 +31,22 @@ func (rs *ResultSet) Debug(l logur.LoggerFacade) {
 	}
 	l.Debug("Columns: " + sb.String())
 }
+
+func (rs *ResultSet) PrimaryKeys() []string {
+	ret := make([]string, 0)
+	for _, x := range rs.Columns {
+		if x.PrimaryKey {
+			ret = append(ret, x.Name)
+		}
+	}
+	return ret
+}
+
+func (rs *ResultSet) Col(name string) *Column {
+	for _, x := range rs.Columns {
+		if x.Name == name {
+			return &x
+		}
+	}
+	return nil
+}

@@ -1,0 +1,28 @@
+<%: func ComponentIndexes(indexes []results.Index, buffer *bytes.Buffer) %>
+<li>
+  <a class="uk-accordion-title" href="#"><%= util.PluralChoice("Index", "Indexes", len(indexes)) %></a>
+  <div class="uk-accordion-content">
+    <table class="uk-table uk-table-small">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>PK</th>
+          <th>Unique</th>
+          <th>Columns</th>
+        </tr>
+      </thead>
+      <tbody>
+      <% for idx, x := range indexes { %>
+      <tr>
+        <td><%=v idx + 1 %></td>
+        <td><%= x.Index %></td>
+        <td><% ComponentBoolean(x.PrimaryKey, "primary key", "not a primary key", buffer) %></td>
+        <td><% ComponentBoolean(x.Unique, "unique", "not unique", buffer) %></td>
+        <td><%= strings.Join(x.Columns, ", ") %></td>
+      </tr>
+      <% } %>
+      </tbody>
+    </table>
+  </div>
+</li>

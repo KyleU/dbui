@@ -29,14 +29,16 @@ func BuildRouter(info *config.AppInfo) (*mux.Router, error) {
 	settings.Methods(http.MethodPost).Handler(addContext(r, info, http.HandlerFunc(SettingsSave))).Name("settings.save")
 
 	// Project
-	projects := r.PathPrefix("/projects").Subrouter()
-	projects.Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(WorkspaceTest))).Name("project.list")
-	r.Path("/q").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(WorkspaceTest))).Name("workspace.test")
-	r.Path("/q/new").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(WorkspaceAddForm))).Name("workspace.add.form")
-	r.Path("/q/new").Methods(http.MethodPost).Handler(addContext(r, info, http.HandlerFunc(WorkspaceAdd))).Name("workspace.add")
-	r.Path("/q/{p}").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(Workspace))).Name("workspace")
-	r.Path("/q/{p}/t/{t}").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(WorkspaceTable))).Name("workspace.table")
-	r.Path("/q/{p}/t/{t}/data").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(WorkspaceData))).Name("workspace.data")
+	projects := r.PathPrefix("/workspace").Subrouter()
+	projects.Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(WorkspaceTest))).Name("workspace.list")
+	r.Path("/w").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(WorkspaceTest))).Name("workspace.test")
+	r.Path("/w/new").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(WorkspaceAddForm))).Name("workspace.add.form")
+	r.Path("/w/new").Methods(http.MethodPost).Handler(addContext(r, info, http.HandlerFunc(WorkspaceAdd))).Name("workspace.add")
+	r.Path("/w/{p}").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(Workspace))).Name("workspace")
+	r.Path("/w/{p}/adhoc").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(WorkspaceAdhocForm))).Name("workspace.adhoc.form")
+	r.Path("/w/{p}/adhoc").Methods(http.MethodPost).Handler(addContext(r, info, http.HandlerFunc(WorkspaceAdhoc))).Name("workspace.adhoc")
+	r.Path("/w/{p}/t/{t}").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(WorkspaceTable))).Name("workspace.table")
+	r.Path("/w/{p}/t/{t}/data").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(WorkspaceData))).Name("workspace.data")
 
 	// Sandbox
 	sandbox := r.Path("/sandbox").Subrouter()

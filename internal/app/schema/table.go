@@ -10,11 +10,16 @@ import (
 type Table struct {
 	Name     string
 	Columns  []results.Column
+	Indexes  []results.Index
 	ReadOnly bool
 }
 
 func (t *Table) AddColumn(column results.Column) {
 	t.Columns = append(t.Columns, column)
+}
+
+func (t *Table) AddIndex(index results.Index) {
+	t.Indexes = append(t.Indexes, index)
 }
 
 func (t *Table) ItemID() string {
@@ -30,8 +35,12 @@ func (s *TableRegistry) Names() []string {
 	return s.names
 }
 
-func (s *TableRegistry) Get(key string) Table {
-	return s.tables[key]
+func (s *TableRegistry) Get(key string) *Table {
+	t, ok := s.tables[key]
+	if !ok {
+		return nil
+	}
+	return &t
 }
 
 func (s *TableRegistry) Size() int {

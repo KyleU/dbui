@@ -7,11 +7,21 @@
         if activeItem == "overview" {
           overviewClass = "uk-active"
         }
+        adhocClass := ""
+        if activeItem == "adhoc" {
+          adhocClass = "uk-active"
+        }
       %>
       <li class="<%= overviewClass %>">
         <a href="<%= ctx.Route("workspace", "p", s.ID) %>">
           <span class="uk-margin-small-right" data-uk-icon="icon: home"></span>
           Overview
+        </a>
+      </li>
+      <li class="<%= adhocClass %>">
+        <a href="<%= ctx.Route("workspace.adhoc.form", "p", s.ID) %>">
+          <span class="uk-margin-small-right" data-uk-icon="icon: pencil"></span>
+          New Query
         </a>
       </li>
       <%

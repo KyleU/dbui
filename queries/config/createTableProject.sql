@@ -1,4 +1,4 @@
-create table if not exists projects (
+create table projects (
   key varchar(512) not null primary key,
   title varchar(512) not null,
   description text,

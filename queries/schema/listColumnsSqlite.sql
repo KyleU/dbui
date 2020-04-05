@@ -10,4 +10,4 @@ order by
   m.name,
   p.cid;
 
--- <%: func ListColumnsSqlite(w io.Writer) %>
+-- <%: func ListColumnsSQLite(w io.Writer) %>

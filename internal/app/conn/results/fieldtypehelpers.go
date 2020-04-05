@@ -51,7 +51,7 @@ func FieldTypeForName(logger logur.LoggerFacade, name string, t string) FieldTyp
 		r = TypeInt8
 	case "int2", "smallint":
 		r = TypeInt16
-	case "int4", "integer":
+	case "int4", "integer", "int":
 		r = TypeInt32
 	case "int4range":
 		r = TypeInt32Range

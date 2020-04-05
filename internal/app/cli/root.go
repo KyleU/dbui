@@ -46,7 +46,7 @@ func InitApp(appName string, version string, commitHash string) (*config.AppInfo
 
 	cfg, err := config.NewService(logger)
 	if err != nil {
-		return nil, errors.WithStack(errors.Wrap(err, "Error creating config service"))
+		return nil, errors.WithStack(errors.Wrap(err, "error creating config service"))
 	}
 
 	ai := config.AppInfo{

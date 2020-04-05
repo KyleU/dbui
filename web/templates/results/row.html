@@ -1,7 +1,13 @@
-<%: func ResultRow(row []interface{}, rowIndex int, columns []results.Column, opts web.ResultOptions, buffer *bytes.Buffer) %>
+<%: func ResultRow(row []interface{}, rowIndex int, columns []results.Column, opts web.ResultOptions, ctx web.RequestContext, buffer *bytes.Buffer) %>
 <tr>
   <td class="row-index"><%= util.FormatInteger(opts.Profile.Locale, rowIndex + 1) %></td>
   <% for idx, cell := range row { %>
-  <td><%= columns[idx].T.Desc().ToString(cell) %></td>
+  <td>
+    <% if columns[idx].PrimaryKey { %>
+    <a class="<%= ctx.Profile.LinkClass() %>" href=""><%= columns[idx].T.Desc().ToString(cell) %></a>
+    <% } else { %>
+    <%= columns[idx].T.Desc().ToString(cell) %>
+    <% } %>
+  </td>
   <% } %>
 </tr>

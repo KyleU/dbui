@@ -13,26 +13,26 @@ import (
 	"github.com/kyleu/dbui/internal/app/conn/results"
 )
 
-func Connect(engine string, url string) (*sqlx.DB, int, error) {
+func Connect(engine Engine, url string) (*sqlx.DB, int, error) {
 	startNanos := time.Now().UnixNano()
-	conn, err := sqlx.Open(engine, url)
+	conn, err := sqlx.Open(engine.Key, url)
 	connected := (time.Now().UnixNano() - startNanos) / int64(time.Microsecond)
 	if err != nil {
-		return nil, int(connected), errors.WithStack(errors.Wrap(err, "Unable to connect to database"))
+		return nil, int(connected), errors.WithStack(errors.Wrap(err, "unable to connect to database"))
 	}
 	return conn, int(connected), nil
 }
 
-func Execute(connection *sqlx.Tx, connectionMs int, input string) (*results.StatementResult, error) {
-	sqlText := getSQL(input)
+func Execute(logger logur.LoggerFacade, tx *sqlx.Tx, connectionMs int, q Query) (*results.StatementResult, error) {
+	sqlText := getSQL(q.SQL)
 
-	stmt, prepared, err := prepare(*connection, sqlText)
+	prepped, prepared, err := prepare(logger, *tx, sqlText)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(errors.Wrap(err, "error preparing query for execution"))
 	}
-	result, elapsed, err := exec(*stmt)
+	result, elapsed, err := exec(*prepped, q.Values)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(errors.Wrap(err, "error executing query"))
 	}
 	affected, err := result.RowsAffected()
 	if err != nil {
@@ -54,95 +54,125 @@ func Execute(connection *sqlx.Tx, connectionMs int, input string) (*results.Stat
 	}, nil
 }
 
-func GetRows(connection *sqlx.Tx, input string) (*sqlx.Rows, error) {
-	sqlText := getSQL(input)
-
-	stmt, _, err := prepare(*connection, sqlText)
-	if err != nil {
-		return nil, err
-	}
-	rows, _, err := query(*stmt)
-	return rows, err
-}
-
-func GetRowsNoTx(logger logur.LoggerFacade, db *sqlx.DB, input string) (*sqlx.Tx, *sqlx.Rows, error) {
+func ExecuteNoTx(logger logur.LoggerFacade, db *sqlx.DB, q Query) (*results.StatementResult, error) {
 	tx, err := db.Beginx()
 	if err != nil {
-		logger.Warn(fmt.Sprintf("Error opening database transaction: %+v", err))
-		return nil, nil, err
+		return nil, errors.WithStack(errors.Wrap(err, "error opening transaction"))
 	}
-	rows, err := GetRows(tx, input)
-	if err != nil {
+	res, err := Execute(logger, tx, 0, q)
+	if err == nil {
+		_ = tx.Commit()
+	} else {
 		_ = tx.Rollback()
 	}
-	return tx, rows, err
+	return res, errors.WithStack(errors.Wrap(err, "error executing query"))
 }
 
-func GetResult(logger logur.LoggerFacade, connection *sqlx.Tx, connectionMs int, input string) (*results.ResultSet, error) {
-	sqlText := getSQL(input)
+func GetRows(logger logur.LoggerFacade, tx *sqlx.Tx, q Query, rowFn func(rows *sqlx.Rows) error) (int, error) {
+	sqlText := getSQL(q.SQL)
 
-	stmt, prepared, err := prepare(*connection, sqlText)
+	res, _, err := prepare(logger, *tx, sqlText)
 	if err != nil {
-		return nil, err
+		return 0, errors.WithStack(errors.Wrap(err, "error opening transaction"))
 	}
-	rows, elapsed, err := query(*stmt)
+	rows, elapsed, err := query(*res, q.Values)
 	if err != nil {
-		return nil, err
+		return elapsed, errors.WithStack(errors.Wrap(err, "error running query"))
 	}
+	defer func() {
+		_ = rows.Close()
+		_ = tx.Commit()
+	}()
+	for rows.Next() {
+		err = rowFn(rows)
+		if err != nil {
+			return 0, errors.WithStack(errors.Wrap(err, "error executing row function"))
+		}
+	}
+	return elapsed, nil
+}
+
+func GetRowsNoTx(logger logur.LoggerFacade, db *sqlx.DB, q Query, rowFn func(rows *sqlx.Rows) error) (int, error) {
+	tx, err := db.Beginx()
+	if err != nil {
+		return 0, errors.WithStack(errors.Wrap(err, "error opening transaction"))
+	}
+	res, err := GetRows(logger, tx, q, rowFn)
+	if err == nil {
+		_ = tx.Commit()
+	} else {
+		_ = tx.Rollback()
+	}
+	return res, errors.WithStack(errors.Wrap(err, "error getting rows from query"))
+}
+
+func RunQuery(logger logur.LoggerFacade, tx *sqlx.Tx, connectionMs int, q Query) (*results.ResultSet, error) {
+	sqlText := getSQL(q.SQL)
+
+	res, prepared, err := prepare(logger, *tx, sqlText)
+	if err != nil {
+		return nil, errors.WithStack(errors.Wrap(err, "error preparing query"))
+	}
+	rows, elapsed, err := query(*res, q.Values)
+	if err != nil {
+		return nil, errors.WithStack(errors.Wrap(err, "error executing query"))
+	}
+	defer func() {
+		_ = rows.Close()
+	}()
 	return resultset(logger, sqlText, rows, connectionMs, prepared, elapsed)
 }
 
-func GetResultNoTx(logger logur.LoggerFacade, db *sqlx.DB, connectionMs int, input string) (*results.ResultSet, error) {
+func RunQueryNoTx(logger logur.LoggerFacade, db *sqlx.DB, connectionMs int, q Query) (*results.ResultSet, error) {
 	tx, err := db.Beginx()
 	if err != nil {
-		logger.Warn(fmt.Sprintf("Error opening database transaction: %+v", err))
-		return nil, err
+		logger.Warn(fmt.Sprintf("error opening database transaction: %+v", err))
+		return nil, errors.WithStack(errors.Wrap(err, "error opening transaction"))
 	}
-	rs, err := GetResult(logger, tx, connectionMs, input)
-	if err != nil {
+	rs, err := RunQuery(logger, tx, connectionMs, q)
+	if err == nil {
+		_ = tx.Commit()
+	} else {
 		_ = tx.Rollback()
-		return rs, err
 	}
-	err = tx.Commit()
-	if err != nil {
-		logger.Warn(fmt.Sprintf("Error comitting config database transaction: %+v", err))
-	}
-	return rs, err
+	return rs, errors.WithStack(errors.Wrap(err, "error executing query"))
 }
 
-func prepare(conn sqlx.Tx, sqlText string) (*sqlx.Stmt, int, error) {
+func prepare(logger logur.LoggerFacade, conn sqlx.Tx, sqlText string) (*sqlx.Stmt, int, error) {
 	startNanos := time.Now().UnixNano()
 	stmt, err := conn.Preparex(sqlText)
 	prepared := (time.Now().UnixNano() - startNanos) / int64(time.Microsecond)
 	if err != nil {
-		return nil, int(prepared), errors.WithStack(errors.Wrap(err, "Unable to prepare query"))
+		logger.Warn(fmt.Sprintf("error preparing SQL [%v]", sqlText))
+		return nil, int(prepared), errors.WithStack(errors.Wrap(err, "unable to prepare query"))
 	}
 	return stmt, int(prepared), nil
 }
 
-func query(stmt sqlx.Stmt) (*sqlx.Rows, int, error) {
+func query(stmt sqlx.Stmt, args []interface{}) (*sqlx.Rows, int, error) {
 	startNanos := time.Now().UnixNano()
-	rows, err := stmt.Queryx()
+	rows, err := stmt.Queryx(args...)
 	elapsed := (time.Now().UnixNano() - startNanos) / int64(time.Microsecond)
 	if err != nil {
-		return rows, int(elapsed), errors.WithStack(errors.Wrap(err, "Unable to execute query"))
+		return rows, int(elapsed), errors.WithStack(errors.Wrap(err, "unable to execute query"))
 	}
 	return rows, int(elapsed), nil
 }
 
-func exec(stmt sqlx.Stmt) (sql.Result, int, error) {
+func exec(stmt sqlx.Stmt, args []interface{}) (sql.Result, int, error) {
 	startNanos := time.Now().UnixNano()
-	result, err := stmt.Exec()
+	result, err := stmt.Exec(args...)
 	elapsed := (time.Now().UnixNano() - startNanos) / int64(time.Microsecond)
 	if err != nil {
-		return result, int(elapsed), errors.WithStack(errors.Wrap(err, "Unable to execute query"))
+		return result, int(elapsed), errors.WithStack(errors.Wrap(err, "unable to execute query"))
 	}
 	return result, int(elapsed), nil
 }
 
 func resultset(
 		logger logur.LoggerFacade, sqlText string, rows *sqlx.Rows,
-		connected int, prepared int, elapsed int) (*results.ResultSet, error) {
+		connected int, prepared int, elapsed int,
+) (*results.ResultSet, error) {
 	rs := results.ResultSet{
 		SQL: sqlText,
 		Timing: results.ResultSetTiming{
@@ -159,13 +189,13 @@ func resultset(
 		values, err := rows.SliceScan()
 		if err != nil {
 			rs.Data = data
-			return &rs, errors.WithStack(errors.Wrap(err, "Unable to extract values from rows"))
+			return &rs, errors.WithStack(errors.Wrap(err, "unable to extract values from rows"))
 		}
 
 		if len(fields) == 0 {
 			types, err := rows.ColumnTypes()
 			if err != nil {
-				return &rs, errors.WithStack(errors.Wrap(err, "Unable to extract column types from rows"))
+				return &rs, errors.WithStack(errors.Wrap(err, "unable to extract column types from rows"))
 			}
 			for i, col := range types {
 				n := col.Name()
@@ -206,12 +236,14 @@ func resultset(
 					}
 				}
 				fields = append(fields, results.Column{
-					Name: n,
-					T: t,
-					Nullable: nullable,
-					Precision: p,
-					Scale: s,
-					Length: l,
+					Name:       n,
+					T:          t,
+					Nullable:   nullable,
+					PrimaryKey: false,
+					Indexed:    false,
+					Precision:  p,
+					Scale:      s,
+					Length:     l,
 				})
 			}
 			rs.Columns = fields

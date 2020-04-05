@@ -1,19 +1,21 @@
 package web
 
 import (
+	"github.com/kyleu/dbui/internal/app/conn"
 	"github.com/kyleu/dbui/internal/app/util"
 	"strings"
 )
 
 type ResultOptions struct {
 	Profile  util.UserProfile
+	Engine   conn.Engine
 	Sortable bool
 	SortCol  string
 	SortAsc  bool
 }
 
-func NewResultOptions(profile util.UserProfile, sortable bool) ResultOptions {
-	return ResultOptions{Profile: profile, Sortable: sortable, SortCol: "", SortAsc: true}
+func NewResultOptions(profile util.UserProfile, engine conn.Engine, sortable bool) ResultOptions {
+	return ResultOptions{Profile: profile, Engine: engine, Sortable: sortable, SortCol: "", SortAsc: true}
 }
 
 func (opts *ResultOptions) SortIconFor(name string) string {
@@ -64,7 +66,7 @@ func (opts *ResultOptions) ToQueryString(nameOverride string) string {
 
 	if nameOverride != "" {
 		ret = append(ret, "sc="+nameOverride)
-		if opts.SortCol == nameOverride {
+		if opts.SortCol == nameOverride && opts.SortAsc {
 			ret = append(ret, "so=d")
 		} else {
 			ret = append(ret, "so=a")
@@ -84,11 +86,17 @@ func (opts *ResultOptions) ToQueryString(nameOverride string) string {
 	return prefix + strings.Join(ret, "&")
 }
 
-func (opts *ResultOptions) ToSQL(engine string, name string) string {
+func (opts *ResultOptions) ToSQL(name string) string {
 	sb := &strings.Builder{}
-	sb.WriteString("select * from \"")
-	sb.WriteString(name)
-	sb.WriteString("\"")
+	sb.WriteString("select * from ")
+	switch opts.Engine {
+	case conn.PostgreSQL:
+		sb.WriteString("\"")
+		sb.WriteString(name)
+		sb.WriteString("\"")
+	default:
+		sb.WriteString(name)
+	}
 	if opts.SortCol != "" {
 		sb.WriteString(" order by \"")
 		sb.WriteString(opts.SortCol)

@@ -9,7 +9,7 @@
       <div class="uk-margin-medium-top">
         <h1 class="uk-heading-hero"><%= name %> data</h1>
       </div>
-      <% ResultSetRender(results, opts, _buffer) %>
+      <% ResultSetRender(results, opts, ctx, _buffer) %>
   </div>
   <script>window.onload = function() { connect("<%= s.ID %>") }</script>
 <% } %>

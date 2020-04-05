@@ -1,7 +1,6 @@
 package config
 
 import (
-	"logur.dev/logur"
 	"path/filepath"
 
 	"github.com/kirsle/configdir"
@@ -9,13 +8,10 @@ import (
 
 var cfgDir = ""
 
-func ConfigPath(logger logur.LoggerFacade, filename string) string {
+func ConfigPath(filename string) string {
 	if cfgDir == "" {
 		cfgDir = configdir.LocalConfig("dbui")
-		err := configdir.MakePath(cfgDir)
-		if err != nil {
-			logger.Error("Unable to make path [" + cfgDir + "]")
-		}
+		_ = configdir.MakePath(cfgDir)
 	}
 	return filepath.Join(cfgDir, filename)
 }

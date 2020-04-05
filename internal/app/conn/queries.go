@@ -1,17 +1,23 @@
 package conn
 
 import (
+	"github.com/kyleu/dbui/internal/gen/queries"
 	"io/ioutil"
 	"strings"
-
-	"github.com/kyleu/dbui/internal/gen/queries"
 )
 
-func getConnection(arg string) string {
-	if arg == "" {
-		arg = "default"
+type Query struct {
+	Key string
+	SQL string
+	Values []interface{}
+}
+
+func Adhoc(sql string, values ...interface{}) Query {
+	return Query{
+		Key:    "adhoc",
+		SQL:    sql,
+		Values: values,
 	}
-	return arg
 }
 
 func getSQL(in string) string {
@@ -25,16 +31,14 @@ func getSQL(in string) string {
 
 		if strings.HasPrefix(qName, "list-") {
 			switch strings.TrimPrefix(qName, "list-") {
-			case "columns":
-				queries.ListColumns(sb)
+			case "columns-postgres":
+				queries.ListColumnsPostgres(sb)
+			case "columns-mysql":
+				queries.ListColumnsMySQL(sb)
 			case "columns-sqlite":
-				queries.ListColumnsSqlite(sb)
-			case "databases":
-				queries.ListDatabases(sb)
-			case "indexes":
-				queries.ListIndexes(sb)
-			case "tables":
-				queries.ListTables(sb)
+				queries.ListColumnsSQLite(sb)
+			case "indexes-postgres":
+				queries.ListIndexesPostgres(sb)
 			}
 		}
 		if strings.HasPrefix(qName, "example-") {

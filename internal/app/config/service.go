@@ -10,6 +10,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/kyleu/dbui/internal/app/conn"
 	_ "github.com/mattn/go-sqlite3"
+  _ "github.com/go-sql-driver/mysql"
 	"logur.dev/logur"
 )
 
@@ -21,34 +22,31 @@ type Service struct {
 
 func (s *Service) GetConnection(connArg string) (*sqlx.DB, int, error) {
 	p := s.ProjectRegistry.Get(connArg)
-	db, elapsed, err := conn.Connect(p.EngineString, p.Url)
-	return db, elapsed, errors.WithStack(errors.Wrap(err, "Error connecting to database"))
+	db, elapsed, err := conn.Connect(p.Engine(), p.URL)
+	return db, elapsed, errors.WithStack(errors.Wrap(err, "error connecting to database"))
 }
 
 func NewService(logger logur.LoggerFacade) (*Service, error) {
-	path := ConfigPath(logger, "dbui.db")
-	db, _, err := conn.Connect("sqlite3", path)
+	path := ConfigPath("dbui.db")
+	db, _, err := conn.Connect(conn.SQLite, path)
 	if err != nil {
-		logger.Warn(fmt.Sprintf("Error opening config database: %+v", err))
-		return nil, err
+		return nil, errors.WithStack(errors.Wrap(err, "error opening config database"))
 	}
 	defer func() {
 		_ = db.Close()
 	}()
 
-	pr := NewRegistry(logger, db)
+	pr := NewRegistry(logger)
 	svc := Service{ProjectRegistry: pr, configDB: db, logger: logger}
 
 	err = initIfNeeded(db, logger)
 	if err != nil {
-		logger.Warn(fmt.Sprintf("Error initializing config database: %+v", err))
-		return nil, err
+		return nil, errors.WithStack(errors.Wrap(err, "error initializing config database"))
 	}
 
-	err = pr.Refresh()
+	err = pr.Refresh(db)
 	if err != nil {
-		logger.Warn(fmt.Sprintf("Error initializing project registry: %+v", err))
-		return nil, err
+		return nil, errors.WithStack(errors.Wrap(err, "error initializing project registry"))
 	}
 
 	logger.Debug("Config service started at [" + path + "]")
@@ -56,26 +54,16 @@ func NewService(logger logur.LoggerFacade) (*Service, error) {
 }
 
 func initIfNeeded(db *sqlx.DB, logger logur.LoggerFacade) error {
-	tx, err := db.Beginx()
-	if err != nil {
-		logger.Warn(fmt.Sprintf("Error opening config database transaction: %+v", err))
-		return err
-	}
-	exec("burn-it-down", tx, logger, func(sb *strings.Builder) { queries.ResetConfigDatabase(sb) })
-	exec("create-table-project", tx, logger, func(sb *strings.Builder) { queries.CreateTableProject(sb) })
-	exec("insert-data-project", tx, logger, func(sb *strings.Builder) { queries.InsertDataProject(sb) })
-	err = tx.Commit()
-	if err != nil {
-		logger.Warn(fmt.Sprintf("Error comitting config database transaction: %+v", err))
-		return err
-	}
+	exec("burn-it-down", db, logger, func(sb *strings.Builder) { queries.ResetConfigDatabase(sb) })
+	exec("create-table-project", db, logger, func(sb *strings.Builder) { queries.CreateTableProject(sb) })
+	exec("insert-data-project", db, logger, func(sb *strings.Builder) { queries.InsertDataProject(sb) })
 	return nil
 }
 
-func exec(name string, tx *sqlx.Tx, logger logur.LoggerFacade, f func(*strings.Builder)) {
+func exec(name string, db *sqlx.DB, logger logur.LoggerFacade, f func(*strings.Builder)) {
 	sb := &strings.Builder{}
 	f(sb)
-	result, err := conn.Execute(tx, 0, sb.String())
+	result, err := conn.ExecuteNoTx(logger, db, conn.Adhoc(sb.String()))
 	if err != nil {
 		panic(err)
 	}

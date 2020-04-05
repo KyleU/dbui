@@ -15,12 +15,11 @@
             <% if len(ctx.AppInfo.ConfigService.ProjectRegistry.Names()) == 0 { %>
               <tr><td>No projects available</td></tr>
             <% } %>
-            <tr>
-              <td><a class="<%= ctx.Profile.LinkClass() %>" href="<%= ctx.Route("workspace", "p", "_root") %>">system</a></td>
-            </tr>
-            <% for _, k := range ctx.AppInfo.ConfigService.ProjectRegistry.Names() { %>
+            <% var reg = ctx.AppInfo.ConfigService.ProjectRegistry %>
+            <% for _, k := range reg.Names() { %>
+              <% var proj = reg.Get(k) %>
               <tr>
-                <td><a class="<%= ctx.Profile.LinkClass() %>" href="<%= ctx.Route("workspace", "p", k) %>"><%= k %></a></td>
+                <td><a class="<%= ctx.Profile.LinkClass() %>" href="<%= ctx.Route("workspace", "p", k) %>"><%= proj.Title %></a></td>
               </tr>
             <% } %>
           </tbody>

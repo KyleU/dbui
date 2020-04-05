@@ -1,6 +1,6 @@
 <%: func ComponentColumns(columns []results.Column, buffer *bytes.Buffer) %>
 <li>
-  <a class="uk-accordion-title" href="#"><%=v len(columns) %> Columns</a>
+  <a class="uk-accordion-title" href="#"><%= util.PluralChoice("Column", "Columns", len(columns)) %></a>
   <div class="uk-accordion-content">
     <table class="uk-table uk-table-small">
       <thead>
@@ -12,7 +12,7 @@
         </tr>
       </thead>
       <tbody>
-      <% for idx, c := range columns {%>
+      <% for idx, c := range columns { %>
       <tr>
         <td><%=v idx + 1 %></td>
         <td><%= c.Name %></td>

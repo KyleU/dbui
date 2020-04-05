@@ -22,7 +22,7 @@ func NewServerCommand(appName string, version string, commitHash string) *cobra.
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			info, err := InitApp(appName, version, commitHash)
 			if err != nil {
-				return errors.WithStack(errors.Wrap(err, "Error initializing application"))
+				return errors.WithStack(errors.Wrap(err, "error initializing application"))
 			}
 
 			return MakeServer(info, addr, port)
@@ -39,7 +39,7 @@ func NewServerCommand(appName string, version string, commitHash string) *cobra.
 func MakeServer(info *config.AppInfo, address string, port uint16) error {
 	routes, err := controllers.BuildRouter(info)
 	if err != nil {
-		return errors.WithStack(errors.WithMessage(err, "Unable to construct routes"))
+		return errors.WithStack(errors.WithMessage(err, "unable to construct routes"))
 	}
 	var msg = fmt.Sprintf("%v is starting on [%v:%v]", info.AppName, address, port)
 	if info.Debug {
@@ -47,5 +47,5 @@ func MakeServer(info *config.AppInfo, address string, port uint16) error {
 	}
 	info.Logger.Info(msg, map[string]interface{}{"address": address, "port": port})
 	err = http.ListenAndServe(fmt.Sprintf("%v:%v", address, port), handlers.CORS()(routes))
-	return errors.WithStack(errors.Wrap(err, "Unable to run http server"))
+	return errors.WithStack(errors.Wrap(err, "unable to run http server"))
 }

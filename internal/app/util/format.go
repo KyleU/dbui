@@ -1,6 +1,7 @@
 package util
 
 import (
+	"fmt"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
 	"regexp"
@@ -21,11 +22,11 @@ func FormatInteger(l language.Tag, v int) string {
 	return p.Sprintf("%d", v)
 }
 
-func PluralChoice(plural string, single string, v int) string {
+func PluralChoice(single string, plural string, v int) string {
 	if v == 1 || v == -1 {
-		return single
+		return fmt.Sprintf("%v %v", v, single)
 	}
-	return plural
+	return fmt.Sprintf("%v %v", v, plural)
 }
 
 func BoolUnicode(b bool) string {

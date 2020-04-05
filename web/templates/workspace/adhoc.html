@@ -1,0 +1,35 @@
+<%: func WorkspaceAdhoc(s *schema.Schema, sql string, results *results.ResultSet, ctx web.RequestContext, w io.Writer) (int, error) %>
+
+<%~ "layout/basic.html" %>
+
+<%@ body { %>
+  <% WorkspaceSidebar(s, "adhoc", ctx, _buffer) %>
+  <div id="workspace">
+    <div class="uk-container uk-container-expand">
+      <div class="uk-margin-medium-top">
+        <h1 class="uk-heading-hero">New Query</h1>
+      </div>
+      <div class="uk-margin uk-card uk-card-body <%= ctx.Profile.Theme.CardClass %>">
+        <form action="" method="post">
+          <div class="uk-margin">
+            <textarea name="sql" class="uk-textarea" placeholder="SQL"><%= sql %></textarea>
+          </div>
+          <div class="uk-margin">
+            <select name="fmt" class="uk-select">
+              <option value="">HTML</option>
+              <option value="csv">CSV</option>
+              <option value="json">JSON</option>
+              <option value="xlsx">Excel</option>
+            </select>
+          </div>
+          <p><button class="uk-button uk-button-default" type="submit">Run Query</button></p>
+        </form>
+      </div>
+
+      <% if results != nil { %>
+      <% ResultSetRender(results, web.NewResultOptions(ctx.Profile, s.Engine, false), ctx, _buffer) %>
+      <% } %>
+    </div>
+  </div>
+  <script>window.onload = function() { connect("<%= s.ID %>") }</script>
+<% } %>

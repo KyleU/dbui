@@ -10,12 +10,17 @@ var PostgreSQL = Engine{
 	Name: "PostgreSQL",
 }
 
+var MySQL = Engine{
+	Key:  "mysql",
+	Name: "MySQL",
+}
+
 var SQLite = Engine{
-	Key:  "sqlite",
+	Key:  "sqlite3",
 	Name: "SQLite",
 }
 
-var AllEngines = []Engine{PostgreSQL, SQLite}
+var AllEngines = []Engine{PostgreSQL, MySQL, SQLite}
 
 func (t Engine) String() string {
 	return t.Key

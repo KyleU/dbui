@@ -12,9 +12,16 @@
       </div>
       <div class="uk-margin uk-card uk-card-body <%= ctx.Profile.Theme.CardClass %>">
         <ul uk-accordion>
-        <% ComponentColumns(table.Columns, _buffer) %>
+          <% ComponentColumns(table.Columns, _buffer) %>
         </ul>
       </div>
+      <% if len(table.Indexes) > 0 { %>
+      <div class="uk-margin uk-card uk-card-body <%= ctx.Profile.Theme.CardClass %>">
+        <ul uk-accordion>
+          <% ComponentIndexes(table.Indexes, _buffer) %>
+        </ul>
+      </div>
+      <% } %>
       <div class="uk-margin-medium-top">
         <a class="<%= ctx.Profile.LinkClass() %>" href="<%= ctx.Route("workspace.data", "p", s.ID, "t", name) %>">View Data</a>
       </div>

@@ -22,7 +22,7 @@ func act(w http.ResponseWriter, r *http.Request, f func(web.RequestContext) (int
 
 	_, err := f(ctx)
 	if err != nil {
-		ctx.Logger.Warn(fmt.Sprintf("Error running action: %+v", err))
+		ctx.Logger.Warn(fmt.Sprintf("error running action: %+v", err))
 		if ctx.Title == "" {
 			ctx.Title = "Error"
 		}
@@ -40,7 +40,7 @@ func redir(w http.ResponseWriter, r *http.Request, f func(web.RequestContext) (s
 		w.WriteHeader(http.StatusFound)
 		logComplete(startNanos, ctx, http.StatusFound, r)
 	} else {
-		ctx.Logger.Warn(fmt.Sprintf("Error running redirect: %+v", err))
+		ctx.Logger.Warn(fmt.Sprintf("error running redirect: %+v", err))
 		if ctx.Title == "" {
 			ctx.Title = "Error"
 		}

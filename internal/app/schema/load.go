@@ -3,6 +3,7 @@ package schema
 import (
 	"emperror.dev/errors"
 	"github.com/kyleu/dbui/internal/app/config"
+	"github.com/kyleu/dbui/internal/app/conn"
 )
 
 var cache = map[string]Schema{}
@@ -14,7 +15,7 @@ func GetSchema(ai *config.AppInfo, id string, forceReload bool) (*Schema, error)
 	}
 	c, err := LoadSchema(ai, id)
 	if err != nil {
-		return &c, err
+		return &c, errors.WithStack(errors.Wrap(err, "error loading schema"))
 	}
 
 	cache[id] = c
@@ -22,10 +23,11 @@ func GetSchema(ai *config.AppInfo, id string, forceReload bool) (*Schema, error)
 }
 
 func LoadSchema(ai *config.AppInfo, id string) (Schema, error) {
-	s := NewSchema(id, "Test Schema")
-	connection, _, err := ai.ConfigService.GetConnection(id)
+	p := ai.ConfigService.ProjectRegistry.Get(id)
+	s := NewSchema(id, p.Engine(), p.Title)
+	connection, _, err := conn.Connect(p.Engine(), p.URL)
 	if err != nil {
-		return s, errors.WithStack(errors.Wrap(err, "Error connecting to ["+id+"]"))
+		return s, errors.WithStack(errors.Wrap(err, "error connecting to ["+id+"]"))
 	}
 	defer func() {
 		if connection != nil {
@@ -34,13 +36,16 @@ func LoadSchema(ai *config.AppInfo, id string) (Schema, error) {
 	}()
 
 	var tables = map[string]Table{}
-	if id == "_root" {
-		tables, err = loadSqlite(ai.Logger, id, connection)
-	} else {
+	switch p.Engine() {
+	case conn.PostgreSQL:
 		tables, err = loadPostgres(ai.Logger, id, connection)
+	case conn.MySQL:
+		tables, err = loadMySQL(ai.Logger, id, connection)
+	case conn.SQLite:
+		tables, err = loadSqlite(ai.Logger, id, connection)
 	}
 	if err != nil {
-		return s, errors.WithStack(errors.Wrap(err, "Error loading columns from ["+id+"]"))
+		return s, errors.WithStack(errors.Wrap(err, "error loading columns from ["+id+"]"))
 	}
 
 	var ts []Table

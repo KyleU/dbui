@@ -7,13 +7,15 @@ import (
 )
 
 type Column struct {
-	Name      string
-	T         FieldType
-	Nullable  bool
-	Default   string
-	Precision int64
-	Scale     int64
-	Length    int64
+	Name       string
+	T          FieldType
+	Nullable   bool
+	PrimaryKey bool
+	Indexed    bool
+	Default    string
+	Precision  int64
+	Scale      int64
+	Length     int64
 }
 
 func (c Column) String() string {

@@ -39,7 +39,7 @@ func zipResponse(w http.ResponseWriter, r *http.Request, data []byte, hash strin
 		} else {
 			w.WriteHeader(http.StatusOK)
 			_, err := w.Write(data)
-			emperror.Panic(errors.WithStack(errors.Wrap(err, "Unable to write to response")))
+			emperror.Panic(errors.WithStack(errors.Wrap(err, "unable to write to response")))
 		}
 	} else {
 		NotFound(w, r)

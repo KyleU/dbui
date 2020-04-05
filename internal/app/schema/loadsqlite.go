@@ -2,7 +2,6 @@ package schema
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/jmoiron/sqlx"
 	"logur.dev/logur"
 	"strings"
@@ -13,20 +12,13 @@ import (
 )
 
 func loadSqlite(logger logur.LoggerFacade, id string, connection *sqlx.DB) (map[string]Table, error) {
-	tx, rows, err := conn.GetRowsNoTx(logger, connection, "named:list-columns-sqlite")
-	if err != nil {
-		return nil, errors.WithStack(errors.Wrap(err, "Error retrieving columns from ["+id+"]"))
-	}
-	defer func() {
-		_ = rows.Close()
-	}()
-
 	var tables = map[string]Table{}
-	for rows.Next() {
+
+	_, err := conn.GetRowsNoTx(logger, connection, conn.Adhoc("named:list-columns-sqlite"), func(rows *sqlx.Rows) error {
 		var res SqliteColumnResult
 		err := rows.StructScan(&res)
 		if err != nil {
-			return nil, errors.WithStack(errors.Wrap(err, "Error scanning column results from ["+id+"]"))
+			return errors.WithStack(errors.Wrap(err, "error scanning column results from ["+id+"]"))
 		}
 
 		table, ok := tables[res.Table]
@@ -50,17 +42,18 @@ func loadSqlite(logger logur.LoggerFacade, id string, connection *sqlx.DB) (map[
 			T:        t,
 			Name:     res.Name,
 			Nullable: res.IsNullable(),
+			PrimaryKey: false,
+			Indexed:    false,
 			Default:  d,
 			Precision: p,
 			Scale: s,
 			Length: l,
 		})
 		tables[table.Name] = table
-	}
-
-	err = tx.Commit()
+		return nil
+	})
 	if err != nil {
-		logger.Warn(fmt.Sprintf("Error comitting config database transaction: %+v", err))
+		return nil, errors.WithStack(errors.Wrap(err, "error retrieving columns from ["+id+"]"))
 	}
 
 	return tables, nil

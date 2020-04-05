@@ -1,4 +1,4 @@
-<%: func ResultSetRender(results *results.ResultSet, opts web.ResultOptions, buffer *bytes.Buffer) %>
+<%: func ResultSetRender(results *results.ResultSet, opts web.ResultOptions, ctx web.RequestContext, buffer *bytes.Buffer) %>
 <div class="uk-margin uk-card uk-card-body <%= opts.Profile.Theme.CardClass %>">
   Query
   connected in
@@ -18,13 +18,13 @@
       <tr>
         <th title="row number">#</th>
         <% for _, c := range results.Columns { %>
-        <% ResultColumnHeader(c, opts, buffer) %>
+        <% ResultColumnHeader(c, opts, ctx, buffer) %>
         <% } %>
       </tr>
       </thead>
       <tbody>
       <% for idx, row := range results.Data { %>
-      <% ResultRow(row, idx, results.Columns, opts, buffer) %>
+      <% ResultRow(row, idx, results.Columns, opts, ctx, buffer) %>
       <% } %>
       </tbody>
     </table>

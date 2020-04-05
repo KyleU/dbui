@@ -55,7 +55,7 @@ func InternalServerError(router *mux.Router, info *config.AppInfo, w http.Respon
 
 func lastChanceError(w io.Writer) {
 	if err := recover(); err != nil {
-		println(fmt.Sprintf("Error while processing error handler: %+v", err))
+		println(fmt.Sprintf("error while processing error handler: %+v", err))
 		_, _ = w.Write([]byte("Internal Server Error"))
 	}
 }
