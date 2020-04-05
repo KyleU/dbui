@@ -2,9 +2,10 @@ package schema
 
 import (
 	"database/sql"
+	"strings"
+
 	"github.com/jmoiron/sqlx"
 	"logur.dev/logur"
-	"strings"
 
 	"emperror.dev/errors"
 	"github.com/kyleu/dbui/internal/app/conn"

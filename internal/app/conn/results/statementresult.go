@@ -2,6 +2,7 @@ package results
 
 import (
 	"fmt"
+
 	"logur.dev/logur"
 )
 

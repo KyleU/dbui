@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"compress/gzip"
 	"crypto/md5"
-	"emperror.dev/errors"
 	"encoding/hex"
 	"io/ioutil"
 	"mime"
 	"path/filepath"
+
+	"emperror.dev/errors"
 )
 
 func init() {
@@ -24,7 +25,7 @@ func Asset(base, path string) ([]byte, string, string, error) {
 	file := base + path
 	data, err := ioutil.ReadFile(file)
 	if err != nil {
-		return nil, "", "", errors.WithStack(errors.Wrap(err, "error reading asset [" + path + "]"))
+		return nil, "", "", errors.WithStack(errors.Wrap(err, "error reading asset ["+path+"]"))
 	}
 	if data != nil {
 		w := gzip.NewWriter(&b)

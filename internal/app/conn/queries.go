@@ -1,14 +1,15 @@
 package conn
 
 import (
-	"github.com/kyleu/dbui/internal/gen/queries"
 	"io/ioutil"
 	"strings"
+
+	"github.com/kyleu/dbui/internal/gen/queries"
 )
 
 type Query struct {
-	Key string
-	SQL string
+	Key    string
+	SQL    string
 	Values []interface{}
 }
 

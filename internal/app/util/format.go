@@ -2,9 +2,10 @@ package util
 
 import (
 	"fmt"
+	"regexp"
+
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
-	"regexp"
 )
 
 func MicrosToMillis(l language.Tag, i int) string {

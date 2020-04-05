@@ -2,13 +2,14 @@ package config
 
 import (
 	"database/sql"
+	"sort"
+
 	"emperror.dev/errors"
 	"github.com/gofrs/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/kyleu/dbui/internal/app/conn"
 	"github.com/kyleu/dbui/internal/app/conn/results"
 	"logur.dev/logur"
-	"sort"
 )
 
 type Project struct {
@@ -119,7 +120,7 @@ func update(s *ProjectRegistry, key string, proj Project) (*results.StatementRes
 		_ = db.Close()
 	}()
 
-	values := []interface{} {
+	values := []interface{}{
 		proj.Key,
 		proj.Title,
 		proj.Description,

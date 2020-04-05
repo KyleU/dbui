@@ -2,11 +2,12 @@ package web
 
 import (
 	"fmt"
-	"github.com/kyleu/dbui/internal/app/config"
-	"github.com/kyleu/dbui/internal/app/util"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/kyleu/dbui/internal/app/config"
+	"github.com/kyleu/dbui/internal/app/util"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"

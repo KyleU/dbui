@@ -3,10 +3,11 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"github.com/kyleu/dbui/internal/app/config"
-	"github.com/kyleu/dbui/internal/app/web"
 	"io"
 	"net/http"
+
+	"github.com/kyleu/dbui/internal/app/config"
+	"github.com/kyleu/dbui/internal/app/web"
 
 	"emperror.dev/errors"
 

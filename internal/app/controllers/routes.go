@@ -2,8 +2,9 @@ package controllers
 
 import (
 	"context"
-	"github.com/kyleu/dbui/internal/app/config"
 	"net/http"
+
+	"github.com/kyleu/dbui/internal/app/config"
 
 	"github.com/gorilla/mux"
 	"github.com/sagikazarmark/ocmux"

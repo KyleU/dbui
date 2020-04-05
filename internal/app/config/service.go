@@ -2,15 +2,16 @@ package config
 
 import (
 	"fmt"
-	"github.com/kyleu/dbui/internal/gen/queries"
 	"strings"
 
+	"github.com/kyleu/dbui/internal/gen/queries"
+
 	"emperror.dev/errors"
+	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/jmoiron/sqlx"
 	"github.com/kyleu/dbui/internal/app/conn"
 	_ "github.com/mattn/go-sqlite3"
-  _ "github.com/go-sql-driver/mysql"
 	"logur.dev/logur"
 )
 

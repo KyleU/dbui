@@ -2,8 +2,9 @@ package cli
 
 import (
 	"fmt"
-	"github.com/kyleu/dbui/internal/app/config"
 	"net/http"
+
+	"github.com/kyleu/dbui/internal/app/config"
 
 	"emperror.dev/errors"
 	"github.com/gorilla/handlers"

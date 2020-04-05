@@ -2,6 +2,7 @@ package schema
 
 import (
 	"database/sql"
+
 	"github.com/jmoiron/sqlx"
 	"logur.dev/logur"
 
@@ -50,25 +51,23 @@ func loadMySQL(logger logur.LoggerFacade, id string, connection *sqlx.DB) (map[s
 	return tables, nil
 }
 
-
 type MySQLColumnResult struct {
-	Schema                string         `db:"table_schema"`
-	Table                 string         `db:"table_name"`
-	Name                  string         `db:"column_name"`
-	Ordinal               int32          `db:"ordinal_position"`
-	Default               sql.NullString `db:"column_default"`
-	Nullable              string         `db:"is_nullable"`
-	DataType              string         `db:"data_type"`
-	NumericPrecision      sql.NullInt32  `db:"numeric_precision"`
-	NumericScale          sql.NullInt32  `db:"numeric_scale"`
-	CharLength            sql.NullInt32  `db:"character_maximum_length"`
-	DatetimePrecision     sql.NullInt32  `db:"datetime_precision"`
+	Schema            string         `db:"table_schema"`
+	Table             string         `db:"table_name"`
+	Name              string         `db:"column_name"`
+	Ordinal           int32          `db:"ordinal_position"`
+	Default           sql.NullString `db:"column_default"`
+	Nullable          string         `db:"is_nullable"`
+	DataType          string         `db:"data_type"`
+	NumericPrecision  sql.NullInt32  `db:"numeric_precision"`
+	NumericScale      sql.NullInt32  `db:"numeric_scale"`
+	CharLength        sql.NullInt32  `db:"character_maximum_length"`
+	DatetimePrecision sql.NullInt32  `db:"datetime_precision"`
 }
 
 func (cr *MySQLColumnResult) IsNullable() bool {
 	return cr.Nullable == "YES"
 }
-
 
 type MySQLColumn struct {
 	T sql.NullString `db:"t"`

@@ -2,9 +2,10 @@ package schema
 
 import (
 	"database/sql"
+	"strings"
+
 	"github.com/jmoiron/sqlx"
 	"logur.dev/logur"
-	"strings"
 
 	"emperror.dev/errors"
 	"github.com/kyleu/dbui/internal/app/conn"
@@ -39,15 +40,15 @@ func loadSqlite(logger logur.LoggerFacade, id string, connection *sqlx.DB) (map[
 		}
 		p, s, l := results.ParseArgs(t, args)
 		table.AddColumn(results.Column{
-			T:        t,
-			Name:     res.Name,
-			Nullable: res.IsNullable(),
+			T:          t,
+			Name:       res.Name,
+			Nullable:   res.IsNullable(),
 			PrimaryKey: false,
 			Indexed:    false,
-			Default:  d,
-			Precision: p,
-			Scale: s,
-			Length: l,
+			Default:    d,
+			Precision:  p,
+			Scale:      s,
+			Length:     l,
 		})
 		tables[table.Name] = table
 		return nil

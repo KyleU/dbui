@@ -170,8 +170,8 @@ func exec(stmt sqlx.Stmt, args []interface{}) (sql.Result, int, error) {
 }
 
 func resultset(
-		logger logur.LoggerFacade, sqlText string, rows *sqlx.Rows,
-		connected int, prepared int, elapsed int,
+	logger logur.LoggerFacade, sqlText string, rows *sqlx.Rows,
+	connected int, prepared int, elapsed int,
 ) (*results.ResultSet, error) {
 	rs := results.ResultSet{
 		SQL: sqlText,

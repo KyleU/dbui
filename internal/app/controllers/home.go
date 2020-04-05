@@ -1,8 +1,9 @@
 package controllers
 
 import (
-	"github.com/kyleu/dbui/internal/app/web"
 	"net/http"
+
+	"github.com/kyleu/dbui/internal/app/web"
 
 	"github.com/gorilla/websocket"
 	"github.com/kyleu/dbui/internal/gen/templates"

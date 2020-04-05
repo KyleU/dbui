@@ -1,11 +1,12 @@
 package controllers
 
 import (
+	"net/http"
+
 	"emperror.dev/errors"
 	"github.com/kyleu/dbui/internal/app/conn"
 	"github.com/kyleu/dbui/internal/app/conn/output"
 	"github.com/kyleu/dbui/internal/app/web"
-	"net/http"
 
 	"github.com/kyleu/dbui/internal/app/schema"
 	"github.com/kyleu/dbui/internal/gen/templates"
@@ -24,7 +25,7 @@ func Workspace(w http.ResponseWriter, r *http.Request) {
 		p := mux.Vars(r)["p"]
 		s, bc, err := load(ctx, p, false)
 		if err != nil {
-			return 0, errors.WithStack(errors.Wrap(err, "error loading workspace [" + p + "]"))
+			return 0, errors.WithStack(errors.Wrap(err, "error loading workspace ["+p+"]"))
 		}
 		ctx.Title = s.Name
 		ctx.Breadcrumbs = bc
@@ -42,7 +43,7 @@ func WorkspaceAdhocForm(w http.ResponseWriter, r *http.Request) {
 		}
 		s, bc, err := load(ctx, p, false)
 		if err != nil {
-			return 0, errors.WithStack(errors.Wrap(err, "error loading workspace [" + p + "]"))
+			return 0, errors.WithStack(errors.Wrap(err, "error loading workspace ["+p+"]"))
 		}
 		ctx.Title = "New Query"
 		ctx.Breadcrumbs = append(bc, web.Breadcrumb{Path: ctx.Route("workspace.adhoc.form", "p", p), Title: "query"})
@@ -55,7 +56,7 @@ func WorkspaceAdhoc(w http.ResponseWriter, r *http.Request) {
 		p := mux.Vars(r)["p"]
 		s, bc, err := load(ctx, p, false)
 		if err != nil {
-			return 0, errors.WithStack(errors.Wrap(err, "error loading workspace [" + p + "]"))
+			return 0, errors.WithStack(errors.Wrap(err, "error loading workspace ["+p+"]"))
 		}
 
 		_ = r.ParseForm()
@@ -107,7 +108,7 @@ func WorkspaceTable(w http.ResponseWriter, r *http.Request) {
 		t := mux.Vars(r)["t"]
 		s, bc, err := load(ctx, p, false)
 		if err != nil {
-			return 0, errors.WithStack(errors.Wrap(err, "error loading workspace [" + p + "]"))
+			return 0, errors.WithStack(errors.Wrap(err, "error loading workspace ["+p+"]"))
 		}
 		ctx.Title = "Table [" + t + "]"
 		ctx.Breadcrumbs = append(bc, tableBC(ctx, s.ID, t))
@@ -122,15 +123,15 @@ func WorkspaceData(w http.ResponseWriter, r *http.Request) {
 		opts := web.FromQueryString(ctx.Profile, true, r.URL.Query())
 		s, bc, err := load(ctx, p, false)
 		if err != nil {
-			return 0, errors.WithStack(errors.Wrap(err, "error loading workspace [" + p + "]"))
+			return 0, errors.WithStack(errors.Wrap(err, "error loading workspace ["+p+"]"))
 		}
 		db, connectMS, err := ctx.AppInfo.ConfigService.GetConnection(s.ID)
 		if err != nil {
-			return 0, errors.WithStack(errors.Wrap(err, "error opening connection to [" + s.ID + "]"))
+			return 0, errors.WithStack(errors.Wrap(err, "error opening connection to ["+s.ID+"]"))
 		}
 		rs, err := conn.RunQueryNoTx(ctx.AppInfo.Logger, db, connectMS, conn.Adhoc(opts.ToSQL(name)))
 		if err != nil {
-			return 0, errors.WithStack(errors.Wrap(err, "error running query against project [" + p + "]"))
+			return 0, errors.WithStack(errors.Wrap(err, "error running query against project ["+p+"]"))
 		}
 
 		table := s.Tables.Get(name)
@@ -153,7 +154,7 @@ func tableBC(ctx web.RequestContext, id string, name string) web.Breadcrumb {
 func load(ctx web.RequestContext, p string, forceReload bool) (*schema.Schema, web.Breadcrumbs, error) {
 	s, err := schema.GetSchema(ctx.AppInfo, p, forceReload)
 	if err != nil {
-		return nil, nil, errors.WithStack(errors.Wrap(err, "error loading workspace [" + p + "]"))
+		return nil, nil, errors.WithStack(errors.Wrap(err, "error loading workspace ["+p+"]"))
 	}
 	key := s.ID
 	if key == "_root" {

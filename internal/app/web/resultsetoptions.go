@@ -1,9 +1,10 @@
 package web
 
 import (
+	"strings"
+
 	"github.com/kyleu/dbui/internal/app/conn"
 	"github.com/kyleu/dbui/internal/app/util"
-	"strings"
 )
 
 type ResultOptions struct {

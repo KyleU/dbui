@@ -1,8 +1,9 @@
 package controllers
 
 import (
-	web "github.com/kyleu/dbui/internal/app/web"
 	"net/http"
+
+	web "github.com/kyleu/dbui/internal/app/web"
 
 	"emperror.dev/errors"
 

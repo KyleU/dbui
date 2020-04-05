@@ -2,9 +2,10 @@ package controllers
 
 import (
 	"fmt"
-	"github.com/kyleu/dbui/internal/app/web"
 	"net/http"
 	"time"
+
+	"github.com/kyleu/dbui/internal/app/web"
 
 	"github.com/kyleu/dbui/internal/gen/templates"
 	"golang.org/x/text/language"

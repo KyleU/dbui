@@ -1,8 +1,9 @@
 package cli
 
 import (
-	"emperror.dev/errors"
 	"fmt"
+
+	"emperror.dev/errors"
 	"github.com/kyleu/dbui/internal/app/conn"
 	"github.com/kyleu/dbui/internal/app/conn/output"
 	"github.com/spf13/cobra"

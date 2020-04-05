@@ -2,11 +2,12 @@ package controllers
 
 import (
 	"database/sql"
+	"net/http"
+
 	"emperror.dev/errors"
 	"github.com/gofrs/uuid"
 	"github.com/kyleu/dbui/internal/app/config"
 	"github.com/kyleu/dbui/internal/app/web"
-	"net/http"
 
 	"github.com/kyleu/dbui/internal/gen/templates"
 )
@@ -33,7 +34,7 @@ func WorkspaceAdd(w http.ResponseWriter, r *http.Request) {
 		o := r.Form.Get("owner")
 		owner, err := uuid.FromString(o)
 		if err != nil {
-			return ctx.Route("workspace.add.form"), errors.WithStack(errors.Wrap(err, "error parsing owner uuid from [" + o + "]"))
+			return ctx.Route("workspace.add.form"), errors.WithStack(errors.Wrap(err, "error parsing owner uuid from ["+o+"]"))
 		}
 		username := sql.NullString{
 			String: r.Form.Get("username"),
@@ -55,7 +56,7 @@ func WorkspaceAdd(w http.ResponseWriter, r *http.Request) {
 		}
 		err = ctx.AppInfo.ConfigService.ProjectRegistry.Add(true, p)
 		if err != nil {
-			return ctx.Route("workspace.add.form"), errors.WithStack(errors.Wrap(err, "error adding [" + key + "] to project registry"))
+			return ctx.Route("workspace.add.form"), errors.WithStack(errors.Wrap(err, "error adding ["+key+"] to project registry"))
 		}
 		return ctx.Route("workspace", "p", key), nil
 	})
