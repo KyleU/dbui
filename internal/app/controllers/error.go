@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"github.com/kyleu/dbui/internal/app/util"
 	"io"
 	"net/http"
 
@@ -41,13 +42,7 @@ func InternalServerError(router *mux.Router, info *config.AppInfo, w http.Respon
 		ctx := web.ExtractContext(r.WithContext(rc))
 		ctx.Title = "Server Error"
 		ctx.Breadcrumbs = web.BreadcrumbsSimple(r.URL.Path, "error")
-		tracer, ok := err.(stackTracer)
-		msg := err.(error).Error()
-		if ok {
-			_, _ = templates.InternalServerError(msg, tracer.StackTrace(), r, ctx, w)
-		} else {
-			_, _ = templates.InternalServerError(msg, nil, r, ctx, w)
-		}
+			_, _ = templates.InternalServerError(util.GetErrorDetail(err.(error)), r, ctx, w)
 		args := map[string]interface{}{"status": 500}
 		st := http.StatusInternalServerError
 		ctx.Logger.Warn(fmt.Sprintf("[%v %v] returned [%d]: %+v", r.Method, r.URL.Path, st, err), args)

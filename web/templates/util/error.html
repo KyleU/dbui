@@ -1,10 +1,4 @@
-<%: func InternalServerError(msg string, trace errors.StackTrace, r *http.Request, ctx web.RequestContext, w io.Writer) (int, error) %>
-
-<%!
-  import (
-      "fmt"
-  )
-%>
+<%: func InternalServerError(ed *util.ErrorDetail, r *http.Request, ctx web.RequestContext, w io.Writer) (int, error) %>
 
 <%~ "layout/basic.html" %>
 
@@ -12,31 +6,17 @@
 <div class="uk-section uk-section-small">
   <div class="uk-container">
     <div>
-      <h1 class="uk-heading-hero"><%= msg %></h1>
+      <h1 class="uk-heading-hero"><%= ed.Message %></h1>
       <div class="uk-text-lead">Internal Server Error</div>
-      <% if trace != nil { %>
-        <div class="uk-margin-top">
-          <div class="uk-card <%= ctx.Profile.Theme.CardClass %> uk-card-body">
-            <table class="uk-table uk-table-divider">
-              <tbody>
-              <% for _, f := range util.TraceDetail(trace) { %>
-              <tr>
-                <td>
-                  <% if strings.Contains(f.Key, ctx.AppInfo.AppName) { %>
-                  <div class="error-key error-owned"><%=v f.Key %></div>
-                  <% } else { %>
-                  <div class="error-key"><%=v f.Key %></div>
-                  <% } %>
-                  <div class="error-location"><%=v f.Loc %></div>
-                </td>
-              </tr>
-              <% } %>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      <% } %>
+      <% ErrorStack(ed, ctx, _buffer) %>
     </div>
+    <% cause := ed.Cause %>
+    <% for cause != nil { %>
+      <div class="uk-text-lead">Caused by</div>
+      <div class="uk-text-lead"><%= cause.Message %></div>
+      <% ErrorStack(cause, ctx, _buffer) %>
+      <% cause = cause.Cause %>
+    <% } %>
   </div>
 </div>
 <% } %>

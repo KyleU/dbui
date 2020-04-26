@@ -10,13 +10,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewSandboxCommand(appName string, version string, commitHash string) *cobra.Command {
+func NewSandboxCommand(version string, commitHash string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "sandbox",
 		Aliases: []string{"x"},
 		Short:   "Runs an internal test",
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			info, err := InitApp(appName, version, commitHash)
+			info, err := InitApp(version, commitHash)
 			if err != nil {
 				return errors.WithStack(errors.Wrap(err, "error initializing application"))
 			}

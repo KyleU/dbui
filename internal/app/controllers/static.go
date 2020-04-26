@@ -12,7 +12,7 @@ import (
 
 func Favicon(w http.ResponseWriter, r *http.Request) {
 	data, hash, contentType, err := assets.Asset("web/assets", "/favicon.ico")
-	zipResponse(w, r, data, hash, contentType, err)
+	zipResponse(w, r, data, hash, contentType, errors.WithStack(err))
 }
 
 func Static(w http.ResponseWriter, r *http.Request) {
@@ -22,7 +22,7 @@ func Static(w http.ResponseWriter, r *http.Request) {
 			path = "/" + path
 		}
 		data, hash, contentType, err := assets.Asset("web/assets", path)
-		zipResponse(w, r, data, hash, contentType, err)
+		zipResponse(w, r, data, hash, contentType, errors.WithStack(err))
 	} else {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}

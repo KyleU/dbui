@@ -78,6 +78,7 @@ const (
 	TypeVarchar
 	TypeXID
 	TypeXML
+	TypeYear
 	endTypes
 )
 

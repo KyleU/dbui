@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"emperror.dev/errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -23,11 +24,11 @@ func act(w http.ResponseWriter, r *http.Request, f func(web.RequestContext) (int
 
 	_, err := f(ctx)
 	if err != nil {
-		ctx.Logger.Warn(fmt.Sprintf("error running action: %+v", err))
+		ctx.Logger.Warn(fmt.Sprintf("error running action: %+v", errors.WithStack(err)))
 		if ctx.Title == "" {
 			ctx.Title = "Error"
 		}
-		_, _ = templates.InternalServerError(err.(error).Error(), err.(stackTracer).StackTrace(), r, ctx, w)
+		_, _ = templates.InternalServerError(util.GetErrorDetail(err), r, ctx, w)
 	}
 	logComplete(startNanos, ctx, http.StatusOK, r)
 }
@@ -41,11 +42,11 @@ func redir(w http.ResponseWriter, r *http.Request, f func(web.RequestContext) (s
 		w.WriteHeader(http.StatusFound)
 		logComplete(startNanos, ctx, http.StatusFound, r)
 	} else {
-		ctx.Logger.Warn(fmt.Sprintf("error running redirect: %+v", err))
+		ctx.Logger.Warn(fmt.Sprintf("error running redirect: %+v", errors.WithStack(err)))
 		if ctx.Title == "" {
 			ctx.Title = "Error"
 		}
-		_, _ = templates.InternalServerError(err.(error).Error(), err.(stackTracer).StackTrace(), r, ctx, w)
+		_, _ = templates.InternalServerError(util.GetErrorDetail(err), r, ctx, w)
 	}
 }
 

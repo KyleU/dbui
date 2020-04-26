@@ -22,14 +22,21 @@ type Service struct {
 }
 
 func (s *Service) GetConnection(connArg string) (*sqlx.DB, int, error) {
-	p := s.ProjectRegistry.Get(connArg)
+	p, err := s.ProjectRegistry.Get(connArg)
+	if err != nil {
+		return nil, 0, errors.WithStack(err)
+	}
 	db, elapsed, err := conn.Connect(p.Engine(), p.URL)
 	return db, elapsed, errors.WithStack(errors.Wrap(err, "error connecting to database"))
 }
 
 func NewService(logger logur.LoggerFacade) (*Service, error) {
-	path := ConfigPath("dbui.db")
-	db, _, err := conn.Connect(conn.SQLite, path)
+	pr := NewRegistry(logger)
+	root, err := pr.Get(".config")
+	if err != nil {
+		return nil, errors.WithStack(errors.Wrap(err, "error getting root project"))
+	}
+	db, _, err := conn.Connect(root.Engine(), root.URL)
 	if err != nil {
 		return nil, errors.WithStack(errors.Wrap(err, "error opening config database"))
 	}
@@ -37,7 +44,6 @@ func NewService(logger logur.LoggerFacade) (*Service, error) {
 		_ = db.Close()
 	}()
 
-	pr := NewRegistry(logger)
 	svc := Service{ProjectRegistry: pr, configDB: db, logger: logger}
 
 	err = initIfNeeded(db, logger)
@@ -50,7 +56,7 @@ func NewService(logger logur.LoggerFacade) (*Service, error) {
 		return nil, errors.WithStack(errors.Wrap(err, "error initializing project registry"))
 	}
 
-	logger.Debug("Config service started at [" + path + "]")
+	logger.Debug("Config service started at [" + root.URL + "]")
 	return &svc, nil
 }
 
@@ -66,7 +72,7 @@ func exec(name string, db *sqlx.DB, logger logur.LoggerFacade, f func(*strings.B
 	f(sb)
 	result, err := conn.ExecuteNoTx(logger, db, conn.Adhoc(sb.String()))
 	if err != nil {
-		panic(err)
+		panic(errors.WithStack(err))
 	}
 	logger.Debug(fmt.Sprintf("Ran [%s] in [%vms], [%v] rows affected", name, result.Timing.Elapsed, result.RowsAffected))
 }

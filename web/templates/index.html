@@ -7,7 +7,7 @@
     <div class="uk-container">
       <div class="uk-card <%= ctx.Profile.Theme.CardClass %> uk-card-body">
         <div class="right">
-          <a class="<%= ctx.Profile.LinkClass() %>" href="<%= ctx.Route("workspace.add.form") %>">add new</a>
+          <a class="<%= ctx.Profile.LinkClass() %>" href="<%= ctx.Route("workspace.add.form") %>"><span title="add new project" data-uk-icon="icon: plus"></span></a>
         </div>
         <h3 style="margin-top: 0;" class="uk-card-title">Projects</h3>
         <table class="uk-table uk-table-divider uk-table-small">
@@ -17,9 +17,13 @@
             <% } %>
             <% var reg = ctx.AppInfo.ConfigService.ProjectRegistry %>
             <% for _, k := range reg.Names() { %>
-              <% var proj = reg.Get(k) %>
+              <% proj, _ := reg.Get(k) %>
               <tr>
-                <td><a class="<%= ctx.Profile.LinkClass() %>" href="<%= ctx.Route("workspace", "p", k) %>"><%= proj.Title %></a></td>
+                <td><a class="<%= ctx.Profile.LinkClass() %>" href="<%= ctx.Route("workspace", "p", k) %>" title="load workspace"><%= proj.Title %></a></td>
+                <td style="width: 48px;">
+                  <a class="<%= ctx.Profile.LinkClass() %>" href="<%= ctx.Route("workspace.edit.form", "p", k) %>" title="edit connection"><span uk-icon="icon: file-edit"></span></a>
+                  <a class="<%= ctx.Profile.LinkClass() %>" href="<%= ctx.Route("workspace", "p", k + ".config") %>" title="configure project"><span uk-icon="icon: cog"></span></a>
+                </td>
               </tr>
             <% } %>
           </tbody>
@@ -34,14 +38,14 @@
         </div>
         <div>
           <div class="uk-card <%= ctx.Profile.Theme.CardClass %> uk-card-body">
-            <h3 class="uk-card-title"><a class="<%= ctx.Profile.LinkClass() %>" href="<%= ctx.Route("sql.form") %>">Ad-hoc Query</a></h3>
-            <p>Run queries and manipulate the results</p>
+            <h3 class="uk-card-title"><a class="<%= ctx.Profile.LinkClass() %>" href="<%= ctx.Route("workspace", "p", ".config") %>">System Config</a></h3>
+            <p>Manage the system configuration database</p>
           </div>
         </div>
         <div>
           <div class="uk-card <%= ctx.Profile.Theme.CardClass %> uk-card-body">
             <h3 class="uk-card-title"><a class="<%= ctx.Profile.LinkClass() %>" href="<%= ctx.Route("about") %>">About</a></h3>
-            <p>Details about the running instance of <%= ctx.AppInfo.AppName %></p>
+            <p>Details about the running instance of <%= util.AppName %></p>
           </div>
         </div>
       </div>

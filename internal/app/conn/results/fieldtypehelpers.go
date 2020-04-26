@@ -39,19 +39,19 @@ func FieldTypeForName(logger logur.LoggerFacade, name string, t string) FieldTyp
 		r = TypeDate
 	case "daterange":
 		r = TypeDateRange
-	case "float4", "real":
+	case "float4", "real", "float":
 		r = TypeFloat32
-	case "float8", "double precision":
+	case "float8", "double precision", "double":
 		r = TypeFloat64
 	case "hstore":
 		r = TypeHStore
 	case "inet":
 		r = TypeInet
-	case "int1":
+	case "int1", "tinyint":
 		r = TypeInt8
 	case "int2", "smallint":
 		r = TypeInt16
-	case "int4", "integer", "int":
+	case "int4", "integer", "int", "mediumint":
 		r = TypeInt32
 	case "int4range":
 		r = TypeInt32Range
@@ -75,7 +75,7 @@ func FieldTypeForName(logger logur.LoggerFacade, name string, t string) FieldTyp
 		r = TypeMoney
 	case "name":
 		r = TypeName
-	case "numeric":
+	case "numeric", "decimal":
 		r = TypeNumeric
 	case "numrange":
 		r = TypeNumRange
@@ -97,7 +97,7 @@ func FieldTypeForName(logger logur.LoggerFacade, name string, t string) FieldTyp
 		r = TypeTime
 	case "timetz", "time with time zone":
 		r = TypeTimeTZ
-	case "timestamp", "timestamp without time zone":
+	case "timestamp", "timestamp without time zone", "datetime":
 		r = TypeTimestamp
 	case "timestamptz", "timestamp with time zone":
 		r = TypeTimestampTZ
@@ -119,6 +119,8 @@ func FieldTypeForName(logger logur.LoggerFacade, name string, t string) FieldTyp
 		r = TypeXID
 	case "xml":
 		r = TypeXML
+	case "year":
+		r = TypeYear
 	default:
 		logger.Debug("Unhandled data type [" + t + "] for column [" + name + "]")
 	}
@@ -134,7 +136,7 @@ func arrayTypeFor(logger logur.LoggerFacade, name string, t string) FieldType {
 		r = TypeArrayBool
 	case "bpchar":
 		r = TypeArrayBPChar
-	case "bytea":
+	case "bytea", "blob", "binary":
 		r = TypeArrayByteA
 	case "cidr":
 		r = TypeArrayCIDR

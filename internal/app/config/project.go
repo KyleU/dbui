@@ -2,7 +2,9 @@ package config
 
 import (
 	"database/sql"
+	"github.com/kyleu/dbui/internal/app/util"
 	"sort"
+	"strings"
 
 	"emperror.dev/errors"
 	"github.com/gofrs/uuid"
@@ -27,45 +29,32 @@ func (p *Project) Engine() conn.Engine {
 	return conn.EngineFromString(p.EngineString)
 }
 
-var systemProject = Project{
-	Key:          "_root",
-	Title:        "System Database",
-	Description:  "Main database for dbui configuration",
-	EngineString: "sqlite3",
-	URL:          "dbui.db",
-}
-
 type ProjectRegistry struct {
 	logger   logur.LoggerFacade
 	names    []string
-	projects map[string]Project
+	projects map[string]*Project
 }
 
 func NewRegistry(logger logur.LoggerFacade) *ProjectRegistry {
 	x := &ProjectRegistry{
 		logger:   logger,
 		names:    make([]string, 0),
-		projects: make(map[string]Project),
+		projects: make(map[string]*Project),
 	}
 	return x
 }
 
 func (s *ProjectRegistry) Refresh(db *sqlx.DB) error {
-	s.projects = make(map[string]Project)
+	s.projects = make(map[string]*Project)
 	s.names = make([]string, 0)
 
-	err := s.Add(false, systemProject)
-	if err != nil {
-		return errors.WithStack(errors.Wrap(err, "error registering system project"))
-	}
-
-	_, err = conn.GetRowsNoTx(s.logger, db, conn.Adhoc("select * from projects"), func(rows *sqlx.Rows) error {
+	_, err := conn.GetRowsNoTx(s.logger, db, conn.Adhoc("select * from projects"), func(rows *sqlx.Rows) error {
 		var res Project
 		err := rows.StructScan(&res)
 		if err != nil {
 			return errors.WithStack(errors.Wrap(err, "error scanning project from config database"))
 		}
-		err = s.Add(false, res)
+		err = s.Add(false, &res)
 		return errors.WithStack(errors.Wrap(err, "error adding projects to registry"))
 	})
 	if err != nil {
@@ -79,15 +68,40 @@ func (s *ProjectRegistry) Names() []string {
 	return s.names
 }
 
-func (s *ProjectRegistry) Get(key string) Project {
-	return s.projects[key]
+func (s *ProjectRegistry) Get(key string) (*Project, error) {
+	cfg := strings.HasSuffix(key, ".config")
+	if cfg {
+		key = strings.TrimSuffix(key, ".config")
+	}
+	ret, ok := s.projects[key]
+	if len(key) > 0 && !ok {
+		return nil, errors.WithStack(errors.New("cannot find project [" + key + "]"))
+	}
+	if cfg {
+		title := key + " Configuration"
+		desc := "Local SQLite database for settings and caches"
+		url := ConfigPath(key + ".config.db")
+		if len(key) == 0 {
+			title = "System Configuration"
+			desc = "SQLite database for system settings and configuration"
+			url = ConfigPath(util.AppName + ".db")
+		}
+		ret = &Project{
+			Key:          key + ".config",
+			Title:        title,
+			Description:  desc,
+			EngineString: "sqlite3",
+			URL:          url,
+		}
+	}
+	return ret, nil
 }
 
 func (s *ProjectRegistry) Size() int {
 	return len(s.names)
 }
 
-func (s *ProjectRegistry) Add(addToDb bool, t ...Project) error {
+func (s *ProjectRegistry) Add(addToDb bool, t ...*Project) error {
 	for _, proj := range t {
 		if addToDb {
 			_, err := update(s, proj.Key, proj)
@@ -106,12 +120,14 @@ func (s *ProjectRegistry) Add(addToDb bool, t ...Project) error {
 	return nil
 }
 
-func update(s *ProjectRegistry, key string, proj Project) (*results.StatementResult, error) {
-	root, rootExists := s.projects["_root"]
-	if !rootExists {
-		return nil, errors.WithStack(errors.New("cannot load root project"))
-	}
+func update(s *ProjectRegistry, key string, proj *Project) (*results.StatementResult, error) {
 	_, pExists := s.projects[key]
+
+	root, err := s.Get(".config")
+	if err != nil {
+		return nil, errors.WithStack(errors.Wrap(err, "error opening root database"))
+	}
+
 	db, _, err := conn.Connect(root.Engine(), root.URL)
 	if err != nil {
 		return nil, errors.WithStack(errors.Wrap(err, "error opening config database"))

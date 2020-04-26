@@ -42,14 +42,6 @@ func getSQL(in string) string {
 				queries.ListIndexesPostgres(sb)
 			}
 		}
-		if strings.HasPrefix(qName, "example-") {
-			switch strings.TrimPrefix(qName, "example-") {
-			case "simple":
-				queries.ExampleSimple(sb)
-			case "complex":
-				queries.ExampleComplex(sb)
-			}
-		}
 		if sb.Len() == 0 {
 			return "select 'Cannot load named query [" + qName + "]' as error"
 		}

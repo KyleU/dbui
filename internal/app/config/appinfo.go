@@ -6,11 +6,9 @@ import (
 )
 
 type AppInfo struct {
-	AppName       string
 	Debug         bool
 	Version       string
 	CommitHash    string
-	CachePath     string
 	Logger        logur.LoggerFacade
 	ErrorHandler  emperror.ErrorHandlerFacade
 	ConfigService *Service

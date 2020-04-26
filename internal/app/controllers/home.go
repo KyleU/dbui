@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/kyleu/dbui/internal/app/util"
 	"net/http"
 
 	"github.com/kyleu/dbui/internal/app/web"
@@ -45,7 +46,7 @@ func Socket(w http.ResponseWriter, r *http.Request) {
 
 func About(w http.ResponseWriter, r *http.Request) {
 	act(w, r, func(ctx web.RequestContext) (int, error) {
-		ctx.Title = "About " + ctx.AppInfo.AppName
+		ctx.Title = "About " + util.AppName
 		ctx.Breadcrumbs = web.BreadcrumbsSimple(ctx.Route("about"), "about")
 		return templates.About(ctx, w)
 	})

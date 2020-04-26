@@ -39,7 +39,7 @@ var (
 		TypeACL:              FieldTypeDesc{T: TypeACL, Key: "acl", Title: "ACL", Examples: "", ToString: fmtString},
 		TypeBit:              FieldTypeDesc{T: TypeBit, Key: "bit", Title: "Bit", Examples: "", ToString: fmtString},
 		TypeBitVarying:       FieldTypeDesc{T: TypeBitVarying, Key: "bit varying", Title: "Bit Varying", Examples: "", ToString: fmtString},
-		TypeBool:             FieldTypeDesc{T: TypeBool, Key: "bool", Title: "Boolean", Examples: "", ToString: fmtString},
+		TypeBool:             FieldTypeDesc{T: TypeBool, Key: "bool", Title: "Boolean", Examples: "true", ToString: fmtString},
 		TypeBox:              FieldTypeDesc{T: TypeBox, Key: "box", Title: "Box", Examples: "", ToString: fmtString},
 		TypeBpchar:           FieldTypeDesc{T: TypeBpchar, Key: "bpchar", Title: "Character String", Examples: "", ToString: fmtString},
 		TypeByteA:            FieldTypeDesc{T: TypeByteA, Key: "bytea", Title: "Bytes", Examples: "", ToString: fmtString},
@@ -47,26 +47,26 @@ var (
 		TypeCID:              FieldTypeDesc{T: TypeCID, Key: "cid", Title: "CID", Examples: "", ToString: fmtString},
 		TypeCIDR:             FieldTypeDesc{T: TypeCIDR, Key: "cidr", Title: "CIDR", Examples: "", ToString: fmtString},
 		TypeCircle:           FieldTypeDesc{T: TypeCircle, Key: "circle", Title: "Circle", Examples: "", ToString: fmtString},
-		TypeDate:             FieldTypeDesc{T: TypeDate, Key: "date", Title: "Date", Examples: "", ToString: fmtString},
+		TypeDate:             FieldTypeDesc{T: TypeDate, Key: "date", Title: "Date", Examples: "2001-01-25", ToString: fmtString},
 		TypeDateRange:        FieldTypeDesc{T: TypeDateRange, Key: "daterange", Title: "Date Range", Examples: "", ToString: fmtString},
-		TypeFloat32:          FieldTypeDesc{T: TypeFloat32, Key: "float32", Title: "32-bit Float", Examples: "", ToString: fmtString},
-		TypeFloat64:          FieldTypeDesc{T: TypeFloat64, Key: "float64", Title: "64-bit Float", Examples: "", ToString: fmtString},
+		TypeFloat32:          FieldTypeDesc{T: TypeFloat32, Key: "float32", Title: "32-bit Float", Examples: "0.123", ToString: fmtString},
+		TypeFloat64:          FieldTypeDesc{T: TypeFloat64, Key: "float64", Title: "64-bit Float", Examples: "0.123", ToString: fmtString},
 		TypeHStore:           FieldTypeDesc{T: TypeHStore, Key: "hstore", Title: "HStore", Examples: "", ToString: fmtString},
 		TypeInet:             FieldTypeDesc{T: TypeInet, Key: "inet", Title: "Inet Address", Examples: "", ToString: fmtString},
-		TypeInt8:             FieldTypeDesc{T: TypeInt8, Key: "int8", Title: "8-bit Integer", Examples: "", ToString: fmtString},
-		TypeInt16:            FieldTypeDesc{T: TypeInt16, Key: "int16", Title: "16-bit Integer", Examples: "", ToString: fmtString},
-		TypeInt32:            FieldTypeDesc{T: TypeInt32, Key: "int32", Title: "32-bit Integer", Examples: "", ToString: fmtString},
+		TypeInt8:             FieldTypeDesc{T: TypeInt8, Key: "int8", Title: "8-bit Integer", Examples: "255", ToString: fmtString},
+		TypeInt16:            FieldTypeDesc{T: TypeInt16, Key: "int16", Title: "16-bit Integer", Examples: "1000", ToString: fmtString},
+		TypeInt32:            FieldTypeDesc{T: TypeInt32, Key: "int32", Title: "32-bit Integer", Examples: "1000", ToString: fmtString},
 		TypeInt32Range:       FieldTypeDesc{T: TypeInt32Range, Key: "int32range", Title: "32-bit Integer Range", Examples: "", ToString: fmtString},
-		TypeInt64:            FieldTypeDesc{T: TypeInt64, Key: "int64", Title: "64-bit Integer", Examples: "", ToString: fmtString},
+		TypeInt64:            FieldTypeDesc{T: TypeInt64, Key: "int64", Title: "64-bit Integer", Examples: "1000", ToString: fmtString},
 		TypeInt64Range:       FieldTypeDesc{T: TypeInt64Range, Key: "int64range", Title: "64-bit Integer Range", Examples: "", ToString: fmtString},
 		TypeInterval:         FieldTypeDesc{T: TypeInterval, Key: "interval", Title: "Interval", Examples: "", ToString: fmtString},
-		TypeJSON:             FieldTypeDesc{T: TypeJSON, Key: "json", Title: "JSON", Examples: "", ToString: fmtString},
-		TypeJSONB:            FieldTypeDesc{T: TypeJSONB, Key: "jsonb", Title: "JSONB", Examples: "", ToString: fmtString},
+		TypeJSON:             FieldTypeDesc{T: TypeJSON, Key: "json", Title: "JSON", Examples: "{}", ToString: fmtString},
+		TypeJSONB:            FieldTypeDesc{T: TypeJSONB, Key: "jsonb", Title: "JSONB", Examples: "{}", ToString: fmtString},
 		TypeLine:             FieldTypeDesc{T: TypeLine, Key: "line", Title: "Line", Examples: "", ToString: fmtString},
 		TypeLineSegment:      FieldTypeDesc{T: TypeLineSegment, Key: "linesegment", Title: "Line Segment", Examples: "", ToString: fmtString},
 		TypeMacAddr:          FieldTypeDesc{T: TypeMacAddr, Key: "macaddr", Title: "MAC Address", Examples: "", ToString: fmtString},
 		TypeMoney:            FieldTypeDesc{T: TypeMoney, Key: "money", Title: "Money", Examples: "", ToString: fmtString},
-		TypeName:             FieldTypeDesc{T: TypeName, Key: "name", Title: "Name", Examples: "", ToString: fmtString},
+		TypeName:             FieldTypeDesc{T: TypeName, Key: "name", Title: "Name", Examples: "Hello", ToString: fmtString},
 		TypeNumeric:          FieldTypeDesc{T: TypeNumeric, Key: "numeric", Title: "Numeric", Examples: "", ToString: fmtTruncZeros},
 		TypeNumRange:         FieldTypeDesc{T: TypeNumRange, Key: "numrange", Title: "Numeric Range", Examples: "", ToString: fmtString},
 		TypeOID:              FieldTypeDesc{T: TypeOID, Key: "oid", Title: "OID", Examples: "", ToString: fmtString},
@@ -75,8 +75,8 @@ var (
 		TypePolygon:          FieldTypeDesc{T: TypePolygon, Key: "polygon", Title: "Polygon", Examples: "", ToString: fmtString},
 		TypeRecord:           FieldTypeDesc{T: TypeRecord, Key: "record", Title: "Record", Examples: "", ToString: fmtString},
 		TypeTID:              FieldTypeDesc{T: TypeTID, Key: "tid", Title: "TID", Examples: "", ToString: fmtString},
-		TypeText:             FieldTypeDesc{T: TypeText, Key: "text", Title: "Text", Examples: "", ToString: fmtString},
-		TypeTime:             FieldTypeDesc{T: TypeTime, Key: "time", Title: "Time", Examples: "", ToString: fmtString},
+		TypeText:             FieldTypeDesc{T: TypeText, Key: "text", Title: "Text", Examples: "Hello, world", ToString: fmtString},
+		TypeTime:             FieldTypeDesc{T: TypeTime, Key: "time", Title: "Time", Examples: "11:23:45am", ToString: fmtString},
 		TypeTimeTZ:           FieldTypeDesc{T: TypeTimeTZ, Key: "timetz", Title: "Zoned Time", Examples: "", ToString: fmtString},
 		TypeTimestamp:        FieldTypeDesc{T: TypeTimestamp, Key: "timestamp", Title: "Timestamp", Examples: "", ToString: fmtString},
 		TypeTsRange:          FieldTypeDesc{T: TypeTsRange, Key: "tsrange", Title: "Timestamp Range", Examples: "", ToString: fmtString},
@@ -84,15 +84,21 @@ var (
 		TypeTsTzRange:        FieldTypeDesc{T: TypeTsTzRange, Key: "tstzrange", Title: "Zoned Timestamp Range", Examples: "", ToString: fmtString},
 		TypeTsQuery:          FieldTypeDesc{T: TypeTsQuery, Key: "tsquery", Title: "TS Query", Examples: "", ToString: fmtString},
 		TypeTsVector:         FieldTypeDesc{T: TypeTsVector, Key: "tsvector", Title: "TS Vector", Examples: "", ToString: fmtString},
-		TypeUUID:             FieldTypeDesc{T: TypeUUID, Key: "uuid", Title: "UUID", Examples: "", ToString: fmtString},
-		TypeVarchar:          FieldTypeDesc{T: TypeVarchar, Key: "varchar", Title: "Varchar", Examples: "", ToString: fmtString},
+		TypeUUID:             FieldTypeDesc{T: TypeUUID, Key: "uuid", Title: "UUID", Examples: "00000000-0000-0000-0000-000000000000", ToString: fmtString},
+		TypeVarchar:          FieldTypeDesc{T: TypeVarchar, Key: "varchar", Title: "Varchar", Examples: "Hello, world", ToString: fmtString},
 		TypeXID:              FieldTypeDesc{T: TypeXID, Key: "xid", Title: "XID", Examples: "", ToString: fmtString},
-		TypeXML:              FieldTypeDesc{T: TypeXML, Key: "xml", Title: "XML", Examples: "", ToString: fmtString},
+		TypeXML:              FieldTypeDesc{T: TypeXML, Key: "xml", Title: "XML", Examples: "<example />", ToString: fmtString},
+		TypeYear:             FieldTypeDesc{T: TypeYear, Key: "year", Title: "Year", Examples: "2001", ToString: fmtString},
 		TypeUnknown:          FieldTypeDesc{T: TypeUnknown, Key: "unknown", Title: "Unknown", Examples: "", ToString: fmtString},
 	}
 )
 
 func fmtString(v interface{}) string {
+	switch v.(type) {
+	case []uint8:
+		v = string(v.([]uint8))
+	default:
+	}
 	s := fmt.Sprintf("%v", v)
 	if s == "<nil>" {
 		s = "∅"

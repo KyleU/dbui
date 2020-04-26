@@ -26,9 +26,43 @@ func (a AppErrorHandler) Handle(err error) {
 }
 func (AppErrorHandler) HandleContext(_ context.Context, _ error) {}
 
+type stackTracer interface {
+	StackTrace() errors.StackTrace
+}
+
+type unwrappable interface {
+	Unwrap() error
+}
+
 type ErrorFrame struct {
 	Key string
 	Loc string
+}
+
+type ErrorDetail struct {
+	Message    string
+	StackTrace errors.StackTrace
+	Cause      *ErrorDetail
+}
+
+func GetErrorDetail(e error) *ErrorDetail {
+	var stack errors.StackTrace = nil
+	t, ok := e.(stackTracer)
+	if ok {
+		stack = t.StackTrace()
+	}
+
+	var cause *ErrorDetail = nil
+	u, ok := e.(unwrappable)
+	if ok {
+		cause = GetErrorDetail(u.Unwrap())
+	}
+
+	return &ErrorDetail{
+		Message:    e.Error(),
+		StackTrace: stack,
+		Cause:      cause,
+	}
 }
 
 func TraceDetail(trace errors.StackTrace) []ErrorFrame {

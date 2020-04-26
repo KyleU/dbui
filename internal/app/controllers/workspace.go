@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"net/http"
-
 	"emperror.dev/errors"
 	"github.com/kyleu/dbui/internal/app/conn"
 	"github.com/kyleu/dbui/internal/app/conn/output"
 	"github.com/kyleu/dbui/internal/app/web"
+	"net/http"
+	"strings"
 
 	"github.com/kyleu/dbui/internal/app/schema"
 	"github.com/kyleu/dbui/internal/gen/templates"
@@ -157,9 +157,16 @@ func load(ctx web.RequestContext, p string, forceReload bool) (*schema.Schema, w
 		return nil, nil, errors.WithStack(errors.Wrap(err, "error loading workspace ["+p+"]"))
 	}
 	key := s.ID
-	if key == "_root" {
-		key = "system"
+	cfg := strings.HasSuffix(key, ".config")
+	if cfg {
+		key = strings.TrimSuffix(key, ".config")
 	}
-	bc := web.BreadcrumbsSimple(ctx.Route("workspace", "p", s.ID), key)
+	bc := web.BreadcrumbsSimple(ctx.Route("workspace", "p", key), key)
+	if key == "" {
+		bc = web.BreadcrumbsSimple(ctx.Route("workspace", "p", ".config"), "system")
+	}
+	if cfg {
+		bc = append(bc, web.BreadcrumbsSimple(ctx.Route("workspace", "p", s.ID), "config")...)
+	}
 	return s, bc, nil
 }

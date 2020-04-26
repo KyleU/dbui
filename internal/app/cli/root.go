@@ -12,30 +12,27 @@ import (
 
 var verbose bool
 
-const AppName = "dbui"
-
 // Configure configures a root command.
 func Configure(version string, commitHash string) cobra.Command {
 	rootCmd := cobra.Command{
-		Use:   AppName,
-		Short: "Command line interface for dbui",
-		Long:  "A work in progress...",
+		Use:   util.AppName,
+		Short: "Command line interface for " + util.AppName + ", the database user interface",
 	}
 
 	flags := rootCmd.PersistentFlags()
 	flags.BoolVarP(&verbose, "verbose", "v", false, "verbose output")
 
 	rootCmd.AddCommand(
-		NewServerCommand(rootCmd.Use, version, commitHash),
-		NewQueryCommand(rootCmd.Use, version, commitHash),
-		NewSandboxCommand(rootCmd.Use, version, commitHash),
+		NewServerCommand(version, commitHash),
+		NewQueryCommand(version, commitHash),
+		NewSandboxCommand(version, commitHash),
 		NewVersionCommand(version),
 	)
 
 	return rootCmd
 }
 
-func InitApp(appName string, version string, commitHash string) (*config.AppInfo, error) {
+func InitApp(version string, commitHash string) (*config.AppInfo, error) {
 	logger := util.InitLogging(verbose)
 	logger = logur.WithFields(logger, map[string]interface{}{"debug": verbose, "version": version, "commit": commitHash})
 
@@ -50,7 +47,6 @@ func InitApp(appName string, version string, commitHash string) (*config.AppInfo
 	}
 
 	ai := config.AppInfo{
-		AppName:       appName,
 		Debug:         verbose,
 		Version:       version,
 		CommitHash:    commitHash,

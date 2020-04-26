@@ -6,8 +6,9 @@ require (
 	emperror.dev/emperror v0.32.0
 	emperror.dev/errors v0.7.0
 	emperror.dev/handler/logur v0.4.0
+	github.com/cube2222/octosql v0.2.0
 	github.com/emirpasic/gods v1.12.0
-	github.com/go-sql-driver/mysql v1.4.0
+	github.com/go-sql-driver/mysql v1.4.1
 	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/gorilla/handlers v1.4.2
 	github.com/gorilla/mux v1.7.4

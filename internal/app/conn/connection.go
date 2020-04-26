@@ -108,7 +108,6 @@ func GetRowsNoTx(logger logur.LoggerFacade, db *sqlx.DB, q Query, rowFn func(row
 
 func RunQuery(logger logur.LoggerFacade, tx *sqlx.Tx, connectionMs int, q Query) (*results.ResultSet, error) {
 	sqlText := getSQL(q.SQL)
-
 	res, prepared, err := prepare(logger, *tx, sqlText)
 	if err != nil {
 		return nil, errors.WithStack(errors.Wrap(err, "error preparing query"))
@@ -126,7 +125,7 @@ func RunQuery(logger logur.LoggerFacade, tx *sqlx.Tx, connectionMs int, q Query)
 func RunQueryNoTx(logger logur.LoggerFacade, db *sqlx.DB, connectionMs int, q Query) (*results.ResultSet, error) {
 	tx, err := db.Beginx()
 	if err != nil {
-		logger.Warn(fmt.Sprintf("error opening database transaction: %+v", err))
+		logger.Warn(fmt.Sprintf("error opening database transaction: %+v", errors.WithStack(err)))
 		return nil, errors.WithStack(errors.Wrap(err, "error opening transaction"))
 	}
 	rs, err := RunQuery(logger, tx, connectionMs, q)
@@ -211,10 +210,13 @@ func resultset(
 				}
 				t := results.FieldTypeForName(logger, col.Name(), dt)
 				if t == results.TypeUnknown {
-					if strings.HasPrefix(values[i].(string), "{") {
-						t = results.TypeArrayUnknown
-					} else if strings.Contains(values[i].(string), "\"=>\"") {
-						t = results.TypeHStore
+					s, ok := values[i].(string)
+					if ok {
+						if strings.HasPrefix(s, "{") {
+							t = results.TypeArrayUnknown
+						} else if strings.Contains(s, "\"=>\"") {
+							t = results.TypeHStore
+						}
 					}
 				}
 				nullable, _ := col.Nullable()

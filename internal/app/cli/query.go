@@ -1,15 +1,14 @@
 package cli
 
 import (
-	"fmt"
-
 	"emperror.dev/errors"
+	"fmt"
 	"github.com/kyleu/dbui/internal/app/conn"
 	"github.com/kyleu/dbui/internal/app/conn/output"
 	"github.com/spf13/cobra"
 )
 
-func NewQueryCommand(appName string, version string, commitHash string) *cobra.Command {
+func NewQueryCommand(version string, commitHash string) *cobra.Command {
 	var connNameArg string
 	var inputArg string
 	var outputArg string
@@ -20,7 +19,7 @@ func NewQueryCommand(appName string, version string, commitHash string) *cobra.C
 		Short:   "Runs the provided sql, displaying or saving the result",
 		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			info, err := InitApp(appName, version, commitHash)
+			info, err := InitApp(version, commitHash)
 			if err != nil {
 				return errors.WithStack(errors.Wrap(err, "error initializing application"))
 			}

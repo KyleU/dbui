@@ -12058,7 +12058,7 @@ pre {
 }
 
 h4 {
-  margin-top: none;
+  margin-top: 0;
 }
 
 #content {
@@ -12074,6 +12074,10 @@ html.uk-light, html.uk-section-primary:not(.uk-preserve-color), html.uk-section-
 
 html.uk-dark, body.uk-dark {
   background-color: #fff;
+}
+
+.row-index {
+  color: #999;
 }
 
 .sidebar-left {
@@ -12154,9 +12158,6 @@ html.uk-dark, body.uk-dark {
 }
 .resultset th.column-header:hover .current-sort {
   display: none;
-}
-.resultset td.row-index {
-  color: #999;
 }
 .resultset .sort-indicator {
   float: right;

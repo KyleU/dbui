@@ -46,9 +46,17 @@
         </ul>
       </li>
       <li class="uk-nav-divider"></li>
+      <% if !strings.HasSuffix(s.ID, ".config") { %>
+      <li>
+        <a href="<%= ctx.Route("workspace", "p", s.ID + ".config") %>">
+          <span class="uk-margin-small-right" data-uk-icon="icon: cog"></span>
+          Configure
+        </a>
+      </li>
+      <% } %>
       <li>
         <a href="" onclick="return false;">
-          <span class="uk-margin-small-right" data-uk-icon="icon: cog"></span>
+          <span class="uk-margin-small-right" data-uk-icon="icon: refresh"></span>
           Refresh Schema
         </a>
       </li>

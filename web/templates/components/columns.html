@@ -14,7 +14,7 @@
       <tbody>
       <% for idx, c := range columns { %>
       <tr>
-        <td><%=v idx + 1 %></td>
+        <td class="row-index"><%=v idx + 1 %></td>
         <td><%= c.Name %></td>
         <td><% ComponentBoolean(c.Nullable, "allows null", "forbids null", buffer) %></td>
         <td title="<%= c.T.String() %>"><%= c.T.Desc().Title %></td>

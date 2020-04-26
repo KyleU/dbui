@@ -23,7 +23,7 @@ type Breadcrumbs []Breadcrumb
 
 func (bc Breadcrumbs) Title(ai *config.AppInfo) string {
 	if len(bc) == 0 {
-		return ai.AppName
+		return util.AppName
 	}
 	return bc[len(bc)-1].Title
 }
@@ -69,7 +69,7 @@ var sessionKey = func() string {
 
 var store = sessions.NewCookieStore([]byte(sessionKey))
 
-const sessionName = "dbui-session"
+const sessionName = util.AppName + "-session"
 
 func ExtractContext(r *http.Request) RequestContext {
 	ai := r.Context().Value("info").(*config.AppInfo)
@@ -92,7 +92,7 @@ func ExtractContext(r *http.Request) RequestContext {
 		Logger:      logger,
 		Profile:     prof,
 		Routes:      routes,
-		Title:       ai.AppName,
+		Title:       util.AppName,
 		Breadcrumbs: nil,
 		Flashes:     flashes,
 		Session:     *session,

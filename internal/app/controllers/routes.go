@@ -36,6 +36,8 @@ func BuildRouter(info *config.AppInfo) (*mux.Router, error) {
 	r.Path("/w/new").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(WorkspaceAddForm))).Name("workspace.add.form")
 	r.Path("/w/new").Methods(http.MethodPost).Handler(addContext(r, info, http.HandlerFunc(WorkspaceAdd))).Name("workspace.add")
 	r.Path("/w/{p}").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(Workspace))).Name("workspace")
+	r.Path("/w/{p}/edit").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(WorkspaceEditForm))).Name("workspace.edit.form")
+	r.Path("/w/{p}/edit").Methods(http.MethodPost).Handler(addContext(r, info, http.HandlerFunc(WorkspaceEdit))).Name("workspace.edit")
 	r.Path("/w/{p}/adhoc").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(WorkspaceAdhocForm))).Name("workspace.adhoc.form")
 	r.Path("/w/{p}/adhoc").Methods(http.MethodPost).Handler(addContext(r, info, http.HandlerFunc(WorkspaceAdhoc))).Name("workspace.adhoc")
 	r.Path("/w/{p}/t/{t}").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(WorkspaceTable))).Name("workspace.table")
@@ -45,11 +47,6 @@ func BuildRouter(info *config.AppInfo) (*mux.Router, error) {
 	sandbox := r.Path("/sandbox").Subrouter()
 	sandbox.Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(SandboxList))).Name("sandbox")
 	r.Path("/sandbox/{key}").Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(SandboxForm))).Name("sandbox.run")
-
-	// Ad-hoc SQL Queries
-	sql := r.Path("/sql").Subrouter()
-	sql.Methods(http.MethodGet).Handler(addContext(r, info, http.HandlerFunc(SQLForm))).Name("sql.form")
-	sql.Methods(http.MethodPost).Handler(addContext(r, info, http.HandlerFunc(SQLRun))).Name("sql.run")
 
 	// Utils
 	_ = r.Path("/utils").Subrouter()

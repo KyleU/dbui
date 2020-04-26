@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"github.com/kyleu/dbui/internal/app/util"
 	"net/http"
 
 	"github.com/kyleu/dbui/internal/app/config"
@@ -12,7 +13,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewServerCommand(appName string, version string, commitHash string) *cobra.Command {
+func NewServerCommand(version string, commitHash string) *cobra.Command {
 	var port uint16
 	var addr string
 
@@ -21,7 +22,7 @@ func NewServerCommand(appName string, version string, commitHash string) *cobra.
 		Short: "Starts the http server",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			info, err := InitApp(appName, version, commitHash)
+			info, err := InitApp(version, commitHash)
 			if err != nil {
 				return errors.WithStack(errors.Wrap(err, "error initializing application"))
 			}
@@ -42,7 +43,7 @@ func MakeServer(info *config.AppInfo, address string, port uint16) error {
 	if err != nil {
 		return errors.WithStack(errors.WithMessage(err, "unable to construct routes"))
 	}
-	var msg = fmt.Sprintf("%v is starting on [%v:%v]", info.AppName, address, port)
+	var msg = fmt.Sprintf("%v is starting on [%v:%v]", util.AppName, address, port)
 	if info.Debug {
 		msg += " (verbose)"
 	}
